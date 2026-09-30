@@ -76,6 +76,13 @@ The raw data intentionally includes missing values, duplicates, name and categor
 
 ## Daily Progress Log
 
+### Day 2 - 2026-09-30 - README Submission Compliance
+
+- Done: Rebuilt the README with the required 14-section structure, documented only repository-backed capabilities, and established the newest-first daily progress log.
+- Files: `README.md`.
+- Commit: `5d9dda9 Update README for submission requirements`
+- Next: Confirm cleaning rules and build the auditable DuckDB data pipeline.
+
 ### Day 1 - 2026-09-30 - Streamlit App Skeleton
 
 - Done: Generated and profiled the synthetic automotive dataset, documented its structure and assumptions, and launched a Streamlit shell on `localhost:8501` with Overview, Investigate, Ask the Business, Management Brief, and Data Quality pages.
