@@ -1,0 +1,55 @@
+model_id,manufacturer,model_name,model_year,trim_name,vehicle_segment,body_style,powertrain,transmission,engine_size_l,battery_capacity_kwh,fuel_efficiency,seating_capacity,msrp,currency_code,launch_date,discontinued_date,active_flag
+1,Aster,Luma,2023,Comfort,Sedan,Sedan,Diesel,Automatic,1.5,,15.22,5,185000.00,GHS,2022-09-01,,False
+2,Aster,Luma ,2024,Premium,Sedan,Sedan,Diesel,CVT,1.5,,19.77,5,222740.00,GHS,2023-09-01,,False
+3,Aster,Luma ,2025,Core,Sedan,Sedan,Petrol,Automatic,2.5,,19.90,5,202112.50,GHS,2024-09-01,,True
+4,Aster,Luma Cross ,2023,Premium,SUV,Crossover,Hybrid,Automatic,1.8,,17.71,5,263200.00,GHS,2022-09-01,,False
+5,Aster,Luma Cross ,2024,Core,SUV,Crossover,Hybrid,Automatic,3.0,,20.74,5,239993.75,GHS,2023-09-01,,False
+6,,Luma-Cross,2025,Comfort,SUV,Crossover,Hybrid,Automatic,2.0,,13.91,5,270250.00,GHS,2024-09-01,,True
+7,Aster,Vela,2023,Core,Hatchback,Hatchback,Petrol,CVT,1.5,,19.59,5,147250.00,GHS,2022-09-01,,False
+8,Aster,Vela,2024,Comfort,Hatchback,Hatchback,Petrol,CVT,2.0,,16.18,5,166625.00,GHS,2023-09-01,,False
+9,Aster,Vela ,2025,Premium,Hatchback,Hatchback,Petrol,Automatic,2.0,,19.14,5,199640.00,GHS,2024-09-01,,True
+10,Boreal,Atlas,2023,Comfort,SUV,SUV,Petrol,CVT,1.8,,21.48,7,320000.00,GHS,2022-09-01,,False
+11,Boreal,Atlas,2024,Premium,SUV,SUV,Petrol,Automatic,1.5,,19.28,7,385280.00,GHS,2023-09-01,,False
+12,,Atlas ,2025,Core,SUV,SUV,Diesel,Manual,2.0,,20.06,7,349600.00,GHS,2024-09-01,,True
+13,Boreal,atlas sport,2023,Premium,SUV,Crossover,Hybrid,Automatic,1.8,,21.25,5,319200.00,GHS,2022-09-01,,False
+14,Boreal,Atlas Sport,2024,Core,SUV,Crossover,Hybrid,Automatic,3.0,,17.30,5,291056.25,GHS,2023-09-01,,False
+15,,Atlas-Sport,2025,Comfort,SUV,Crossover,Hybrid,Automatic,2.0,,15.66,5,327750.00,GHS,2024-09-01,,True
+16,Boreal,terra,2023,Core,Pickup,Double-cab pickup,Petrol,Automatic,2.0,,21.80,5,327750.00,GHS,2022-09-01,,False
+17,Boreal,TERRA,2024,Comfort,Pickup,Double-cab pickup,Diesel,Automatic,3.0,,17.50,5,370875.00,GHS,2023-09-01,,False
+18,Boreal,Terra,2025,Premium,Pickup,Double-cab pickup,Diesel,Automatic,1.8,,14.69,5,444360.00,GHS,2024-09-01,,True
+19,Crest,Metro,2023,Comfort,Sedan,Sedan,Petrol,Automatic,2.0,,19.75,5,170000.00,GHS,2022-09-01,,False
+20,Crest,metro,2024,Premium,Sedan,Sedan,Diesel,Automatic,1.8,,17.25,5,204680.00,GHS,2023-09-01,,False
+21,,metro,2025,Core,Sedan,Sedan,Petrol,CVT,2.5,,18.22,5,185725.00,GHS,2024-09-01,,True
+22,Crest,Voyager,2023,Premium,Van,Minivan,Hybrid,Automatic,1.8,,15.13,8,347200.00,GHS,2022-09-01,,False
+23,Crest,Voyager,2024,Core,Van,Minivan,Hybrid,Automatic,2.0,,14.74,8,316587.50,GHS,2023-09-01,,False
+24,Crest,Voyager,2025,Comfort,Van,Minivan,Hybrid,Automatic,2.0,,17.20,8,356500.00,GHS,2024-09-01,,True
+25,Crest,Pulse,2023,Core,Hatchback,Hatchback,Petrol,CVT,1.8,,21.01,5,137750.00,GHS,2022-09-01,,False
+26,Crest,Pulse,2024,Comfort,Hatchback,Hatchback,Petrol,CVT,3.0,,15.65,5,155875.00,GHS,2023-09-01,,False
+27,Crest,pulse,2025,Premium,Hatchback,Hatchback,Diesel,Automatic,1.8,,17.89,5,186760.00,GHS,2024-09-01,,True
+28,Dune,Ranger,2023,Comfort,Pickup,Double-cab pickup,Petrol,Automatic,2.5,,20.75,5,360000.00,GHS,2022-09-01,,False
+29,Dune,Ranger,2024,Premium,Pickup,Double-cab pickup,Petrol,Automatic,2.5,,17.41,5,433440.00,GHS,2023-09-01,,False
+30,Dune,RANGER,2025,Core,Pickup,Double-cab pickup,Petrol,CVT,2.5,,19.57,5,393300.00,GHS,2024-09-01,,True
+31,Dune,Sahara,2023,Premium,SUV,SUV,Petrol,Automatic,1.8,,13.62,7,436800.00,GHS,2022-09-01,,False
+32,,sahara,2024,Core,SUV,SUV,Diesel,Automatic,3.0,,17.31,7,398287.50,GHS,2023-09-01,,False
+33,Dune,Sahara ,2025,Comfort,SUV,SUV,Petrol,CVT,1.5,,13.03,7,448500.00,GHS,2024-09-01,,True
+34,Dune,TRAIL,2023,Core,SUV,Crossover,Petrol,Automatic,1.8,,15.49,5,247000.00,GHS,2022-09-01,,False
+35,,Trail,2024,Comfort,SUV,Crossover,Petrol,Automatic,1.5,,16.10,5,279500.00,GHS,2023-09-01,,False
+36,Dune,Trail,2025,Premium,SUV,Crossover,Petrol,Automatic,2.0,,13.40,5,334880.00,GHS,2024-09-01,,True
+37,,Eon,2023,Comfort,Sedan,Sedan,EV,Single-speed,,52.0,5.64,5,265000.00,GHS,2022-09-01,,False
+38,,EON,2024,Premium,Sedan,Sedan,EV,Single-speed,,64.0,6.78,5,319060.00,GHS,2023-09-01,,False
+39,,Eon,2025,Core,Sedan,Sedan,EV,Single-speed,,52.0,5.41,5,289512.50,GHS,2024-09-01,,True
+40,Elara,eon x,2023,Premium,SUV,Crossover,EV,Single-speed,,64.0,6.49,5,375200.00,GHS,2022-09-01,,False
+41,Elara,Eon X ,2024,Core,SUV,Crossover,EV,Single-speed,,78.0,5.22,5,342118.75,GHS,2023-09-01,,False
+42,Elara,Eon X,2025,Comfort,SUV,Crossover,EV,Single-speed,,78.0,5.32,5,385250.00,GHS,2024-09-01,,True
+43,Elara,Spark,2023,Core,Hatchback,Hatchback,EV,Single-speed,,78.0,5.62,5,204250.00,GHS,2022-09-01,,False
+44,Elara,SPARK,2024,Comfort,Hatchback,Hatchback,EV,Single-speed,,78.0,6.09,5,231125.00,GHS,2023-09-01,,False
+45,Elara,Spark,2025,Premium,Hatchback,Hatchback,EV,Single-speed,,64.0,6.85,5,276920.00,GHS,2024-09-01,,True
+46,Forge,CARGO,2023,Comfort,Van,Panel van,Petrol,Automatic,3.0,,18.91,3,295000.00,GHS,2022-09-01,,False
+47,Forge,Cargo,2024,Premium,Van,Panel van,Petrol,Automatic,3.0,,18.39,3,355180.00,GHS,2023-09-01,,False
+48,Forge,Cargo,2025,Core,Van,Panel van,Petrol,Automatic,1.8,,16.22,3,322287.50,GHS,2024-09-01,,True
+49,,WORKSTAR,2023,Premium,Pickup,Single-cab pickup,Petrol,Manual,1.5,,16.20,3,308000.00,GHS,2022-09-01,,False
+50,Forge,WORKSTAR,2024,Core,Pickup,Single-cab pickup,Petrol,Automatic,2.0,,13.87,3,280843.75,GHS,2023-09-01,,False
+51,Forge,Workstar,2025,Comfort,Pickup,Single-cab pickup,Petrol,CVT,1.8,,21.10,3,316250.00,GHS,2024-09-01,,True
+52,Forge,familia,2023,Core,Van,Minivan,Petrol,Automatic,2.0,,14.79,8,270750.00,GHS,2022-09-01,,False
+53,,Familia,2024,Comfort,Van,Minivan,Diesel,Automatic,1.5,,14.61,8,306375.00,GHS,2023-09-01,,False
+54,,Familia,2025,Premium,Van,Minivan,Petrol,CVT,2.0,,19.74,8,367080.00,GHS,2024-09-01,,True
