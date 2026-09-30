@@ -19,6 +19,7 @@ __pycache__/
 # Local analytical database and sidecar files
 data/business.duckdb
 data/business.duckdb.wal
+data/generator_truth.md
 
 # Editor and operating-system files
 .vscode/
