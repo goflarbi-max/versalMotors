@@ -1,0 +1,226 @@
+salesperson_id,employee_code,branch_id,first_name,last_name,gender,hire_date,termination_date,job_title,experience_years_at_hire,monthly_target_units,commission_rate,active_flag
+1,VM-E0001,6,Esi,Acheampong ,Female,2024-10-23,,Sales Consultant,8,11,0.0287,True
+2,VM-E0002,10,Esi,Mensah,Female,2014-07-01,,Sales Supervisor,5,9,0.0192,True
+3,VM-E0003,10,Ama,Sarpong,Female,2020-10-03,,Sales Consultant,5,10,0.0241,True
+4,VM-E0004,6,Linda,Amankwah ,Male,2021-01-07,,Sales Consultant,0,11,0.0316,True
+5,VM-E0005,12,Nana,Addo,Male,2018-02-15,,Sales Consultant,7,14,0.0192,True
+6,VM-E0006,9,Priscilla,Opoku,Female,2017-07-02,,Sales Consultant,9,13,0.0161,True
+7,VM-E0007,9001,Ama,Owusu,Male,2024-02-19,2025-03-03,Sales Consultant,7,7,0.0280,False
+8,VM-E0008,3,Ama,Gyasi,Male,2023-07-24,,,6,11,0.0235,True
+9,VM-E0009,1,Nana,Addo,Female,2021-04-30,,Senior Sales Consultant,3,8,0.0142,True
+10,VM-E0010,12,Ama,ADDO,Male,2017-11-04,,Sales Consultant,9,9,0.0159,True
+11,VM-E0011,2,Kwame,Asare,Male,2017-12-31,,Senior Sales Consultant,12,13,0.0287,True
+12,VM-E0012,8,Kojo,AGYEMAN,Male,2017-10-30,,Sales Consultant,6,14,0.0297,True
+13,VM-E0013,5,Mabel,ARTHUR,Male,2014-02-21,,Sales Consultant,8,15,0.0141,True
+14,VM-E0014,8,Ama,Acheampong,Female,2018-05-23,,Fleet Specialist,4,10,0.0160,True
+15,VM-E0015,9,Kwame,Owusu,Male,2021-02-02,,Sales Consultant,9,10,0.0214,True
+16,VM-E0016,10,Daniel,Arthur,Female,2021-02-25,2025-04-22,Sales Consultant,10,12,0.0305,False
+17,VM-E0017,11,Efua,Boateng,Male,2024-09-29,,,9,14,0.0342,True
+18,VM-E0018,2,Ama,Opoku,Female,2020-08-24,2024-02-10,Sales Supervisor,3,15,0.0267,False
+19,VM-E0019,3,Priscilla,Tetteh,Male,2021-12-13,,Senior Sales Consultant,0,11,0.0186,True
+20,VM-E0020,1,Efua,Acheampong,Male,2024-05-03,,Sales Consultant,7,11,0.0337,True
+21,VM-E0021,11,Michael,Badu,Male,2014-10-23,,Sales Consultant,8,12,0.0206,True
+22,VM-E0022,13,Mabel,Frimpong,Female,2021-02-11,2023-01-13,Sales Supervisor,12,7,0.0335,False
+23,VM-E0023,9,Daniel,Arthur,Female,2020-09-08,,Sales Consultant,9,14,0.0159,True
+24,VM-E0024,2,Nana,Amankwah,Male,2022-09-30,,,11,7,0.0152,True
+25,VM-E0025,7,Akosua,Quaye,Male,2017-06-10,2024-03-05,Sales Consultant,13,15,0.0208,False
+26,VM-E0026,9,Nana,Badu,Female,2024-09-13,,Fleet Specialist,2,10,0.0341,True
+27,VM-E0027,4,Kojo,Addo,Male,2014-06-15,,,4,13,0.0349,True
+28,VM-E0028,11,Kwame,darko,Female,2019-11-29,,Fleet Specialist,10,8,0.0151,True
+29,VM-E0029,7,Mabel,Acheampong,Female,2017-03-28,,Sales Consultant,9,11,0.0248,True
+30,VM-E0030,10,Efua,MENSAH,Male,2014-03-22,2025-02-13,Senior Sales Consultant,1,10,0.0314,False
+31,VM-E0031,7,Joseph,Osei ,Female,2021-02-05,,Senior Sales Consultant,10,7,0.0237,True
+32,VM-E0032,4,Mabel,Sarpong,Male,2022-05-16,,Fleet Specialist,3,12,0.0250,True
+33,VM-E0033,3,Priscilla,Tetteh,Female,2014-07-25,,Sales Consultant,2,8,0.0185,True
+34,VM-E0034,11,Kwame,ADDO,Female,2017-08-29,,Sales Supervisor,5,14,0.0143,True
+35,VM-E0035,12,Daniel,Arthur,Female,2017-12-15,2024-05-04,Senior Sales Consultant,13,8,0.0289,False
+36,VM-E0036,4,Samuel,sarpong,Male,2023-08-30,,Sales Consultant,1,11,0.0220,True
+37,VM-E0037,7,Kwame,Amankwah,Female,2019-11-17,,Senior Sales Consultant,13,10,0.0273,True
+38,VM-E0038,1,Adwoa,SARPONG,Female,2018-09-05,,Sales Consultant,12,9,0.0341,True
+39,VM-E0039,12,Efua,Badu,Female,2022-03-30,,Sales Consultant,10,12,0.0308,True
+40,VM-E0040,2,Grace,TETTEH,Male,2023-08-15,,Senior Sales Consultant,6,15,0.0232,True
+41,VM-E0041,3,Michael,Darko,Male,2025-02-11,,Sales Consultant,3,8,0.0173,True
+42,VM-E0042,8,Samuel,Quaye,Male,2021-08-22,,Sales Consultant,13,12,0.0144,True
+43,VM-E0043,1,Esi,Agyeman,Female,2021-12-15,2023-08-28,Sales Consultant,9,13,0.0245,False
+44,VM-E0044,2,Samuel,Antwi,Female,2018-07-27,,Senior Sales Consultant,2,13,0.0294,True
+45,VM-E0045,7,Esi,Osei,Female,2016-12-27,,Sales Consultant,2,9,0.0128,True
+46,VM-E0046,4,Kofi,opoku,Female,2018-02-28,,Sales Consultant,11,15,0.0346,True
+47,VM-E0047,8,Ama,Frimpong,Male,2020-11-14,2024-06-17,Sales Consultant,5,9,0.0316,False
+48,VM-E0048,12,Grace,Owusu,Male,2016-04-22,,,9,15,0.0205,True
+49,VM-E0049,10,Grace,Darko,Female,2018-12-09,2025-04-14,Sales Consultant,11,15,0.0347,False
+50,VM-E0050,3,Akosua,Badu,Female,2020-01-29,,Sales Consultant,2,14,0.0293,True
+51,VM-E0051,1,Kojo,BOATENG,Female,2015-02-15,2024-04-29,,6,7,0.0214,False
+52,VM-E0052,13,Mabel,arthur,Male,2022-04-21,2023-05-04,Sales Consultant,2,12,0.0257,False
+53,VM-E0053,4,Adwoa,Acheampong,Female,2014-12-15,,Sales Consultant,1,15,0.0121,True
+54,VM-E0054,3,Abena,Badu,Male,2016-03-01,,Sales Consultant,3,7,0.0160,True
+55,VM-E0055,8,Abena,asare,Male,2024-10-29,,Senior Sales Consultant,9,13,0.0179,True
+56,VM-E0056,4,Samuel,Asare ,Female,2014-11-15,,Senior Sales Consultant,0,12,0.0247,True
+57,VM-E0057,3,Mabel,Asare,Male,2022-11-11,,Sales Consultant,9,14,0.0228,True
+58,VM-E0058,3,Joseph,arthur,Female,2016-07-02,,Sales Consultant,6,13,0.0277,True
+59,VM-E0059,7,Mabel,addo,Female,2018-05-02,2024-01-08,Sales Consultant,12,10,0.0126,False
+60,VM-E0060,9,Yaw,Amankwah ,Male,2021-09-12,,Sales Consultant,2,14,0.0224,True
+61,VM-E0061,10,Samuel,Tetteh,Male,2017-02-26,,Sales Consultant,11,15,0.0138,True
+62,VM-E0062,2,Esi,Mensah,Male,2018-02-13,,Senior Sales Consultant,1,14,0.0305,True
+63,VM-E0063,4,Ama,Badu,Female,2023-11-17,,Sales Consultant,0,12,0.0323,True
+64,VM-E0064,9,Efua,OPOKU,Female,2022-11-15,,Senior Sales Consultant,10,13,0.0127,True
+65,VM-E0065,5,Grace,Boateng,Female,2015-05-03,,,3,12,0.0274,True
+66,VM-E0066,12,Kwame,gyasi,Female,2016-02-20,,Sales Consultant,0,12,0.0291,True
+67,VM-E0067,13,Kwame,Addo,Female,2024-03-01,2024-09-15,Sales Consultant,4,7,0.0164,False
+68,VM-E0068,13,Efua,Frimpong,Female,2014-04-27,,Sales Consultant,12,10,0.0202,True
+69,VM-E0069,8,Yaw,Darko,Female,2017-03-06,,,6,9,0.0242,True
+70,VM-E0070,4,Esi,Arthur,Female,2022-11-09,,Sales Consultant,4,12,0.0172,True
+71,VM-E0071,3,Michael,Boateng ,Male,2020-11-09,,Sales Consultant,9,13,0.0301,True
+72,VM-E0072,9,Ama,gyasi,Female,2015-05-10,2024-04-07,Senior Sales Consultant,2,9,0.0284,False
+73,VM-E0073,12,Michael,Addo,Male,2016-05-26,2025-06-26,Sales Consultant,7,14,0.0191,False
+74,VM-E0074,10,Michael,Agyeman,Male,2024-08-02,,Sales Consultant,6,13,0.0289,True
+75,VM-E0075,10,Michael,Agyeman,Female,2020-09-27,,Sales Consultant,11,7,0.0238,True
+76,VM-E0076,12,Joseph,gyasi,Female,2019-07-22,2023-04-26,Senior Sales Consultant,4,12,0.0277,False
+77,VM-E0077,6,Grace,Asare,Female,2022-08-04,,Fleet Specialist,10,15,0.0304,True
+78,VM-E0078,11,Linda,Appiah,Female,2023-11-22,,Sales Consultant,4,15,0.0323,True
+79,VM-E0079,1,Efua,Owusu,Female,2019-11-05,,Sales Consultant,8,13,0.0204,True
+80,VM-E0080,4,Nana,Addo,Female,2021-07-16,,Sales Consultant,9,8,0.0194,True
+81,VM-E0081,5,Grace,Darko,Male,2020-12-25,,Sales Consultant,3,15,0.0331,True
+82,VM-E0082,5,Grace,Quaye ,Male,2018-02-15,2025-04-19,Sales Consultant,4,12,0.0260,False
+83,VM-E0083,4,Efua,Appiah,Male,2019-03-13,,,11,8,0.0172,True
+84,VM-E0084,7,Esi,Antwi,Female,2020-04-23,,Sales Consultant,10,12,0.0134,True
+85,VM-E0085,3,Priscilla,Addo,Male,2015-03-26,,Sales Consultant,13,13,0.0221,True
+86,VM-E0086,3,Grace,Tetteh,Female,2018-10-11,,Sales Consultant,10,14,0.0323,True
+87,VM-E0087,7,Adwoa,Asare,Female,2020-02-02,,Sales Consultant,5,14,0.0315,True
+88,VM-E0088,9,Abena,Asare,Male,2024-06-18,2025-05-12,Sales Consultant,5,14,0.0343,False
+89,VM-E0089,2,Priscilla,Appiah ,Female,2021-03-10,,Senior Sales Consultant,9,9,0.0171,True
+90,VM-E0090,1,Nana,Amankwah,Male,2022-07-01,,Sales Consultant,2,10,0.0243,True
+91,VM-E0091,9,Michael,Osei,Male,2022-10-25,,Sales Consultant,11,8,0.0318,True
+92,VM-E0092,4,Daniel,Antwi,Male,2018-09-04,,Senior Sales Consultant,3,15,0.0201,True
+93,VM-E0093,6,Efua,Owusu,Female,2021-12-29,,Sales Supervisor,7,7,0.0224,True
+94,VM-E0094,4,Kwame,Sarpong,Male,2020-07-20,,,9,11,0.0258,True
+95,VM-E0095,1,Efua,Owusu ,Female,2017-01-09,,Sales Consultant,2,13,0.0268,True
+96,VM-E0096,9,Joseph,Antwi,Male,2020-12-20,,Senior Sales Consultant,11,11,0.0120,True
+97,VM-E0097,10,David,Frimpong,Female,2019-05-31,,Sales Consultant,5,15,0.0342,True
+98,VM-E0098,2,Daniel,Amankwah ,Male,2021-07-24,,Senior Sales Consultant,0,13,0.0220,True
+99,VM-E0099,6,Ama,Acheampong,Female,2021-06-04,,Sales Consultant,2,15,0.0233,True
+100,VM-E0100,5,Daniel,Asare,Female,2014-06-21,,Sales Consultant,7,11,0.0280,True
+101,VM-E0101,4,Adwoa,Mensah ,Female,2014-10-17,,Sales Consultant,8,7,0.0347,True
+102,VM-E0102,4,Esi,Mensah,Female,2021-03-12,,Sales Consultant,8,12,0.0176,True
+103,VM-E0103,13,Esi,Badu,Female,2023-01-04,,Senior Sales Consultant,6,14,0.0174,True
+104,VM-E0104,9,Michael,Badu,Female,2022-10-05,,,5,10,0.0134,True
+105,VM-E0105,9001,Akosua,Frimpong,Male,2020-08-20,,Senior Sales Consultant,8,11,0.0255,True
+106,VM-E0106,3,Adwoa,Amankwah,Male,2019-01-22,,Sales Consultant,0,13,0.0313,True
+107,VM-E0107,3,Efua,Tetteh,Male,2019-05-07,,Sales Consultant,10,15,0.0144,True
+108,VM-E0108,1,Esi,Badu,Male,2017-11-24,,Fleet Specialist,9,12,0.0234,True
+109,VM-E0109,2,Kwame,Asare,Male,2019-05-05,,Sales Consultant,12,12,0.0126,True
+110,VM-E0110,3,Linda,Opoku,Female,2024-11-22,,Sales Consultant,9,11,0.0129,True
+111,VM-E0111,1,Ama,Sarpong,Female,2015-10-10,,Sales Consultant,0,14,0.0180,True
+112,VM-E0112,4,Mabel,Arthur,Female,2016-04-06,,Sales Consultant,6,15,0.0121,True
+113,VM-E0113,9,Yaw,Appiah,Male,2025-02-12,,Sales Consultant,5,7,0.0251,True
+114,VM-E0114,2,Kojo,opoku,Female,2017-04-06,2023-02-13,Sales Supervisor,9,8,0.0286,False
+115,VM-E0115,3,Linda,Mensah,Female,2019-01-25,,Fleet Specialist,5,10,0.0344,True
+116,VM-E0116,2,Yaw,OWUSU,Male,2023-12-02,,Sales Consultant,6,9,0.0147,True
+117,VM-E0117,1,Ama,Antwi,Male,2014-07-16,,Sales Consultant,4,10,0.0306,True
+118,VM-E0118,5,David,Quaye,Female,2019-09-08,,Senior Sales Consultant,10,8,0.0300,True
+119,VM-E0119,8,Grace,Osei,Male,2018-04-27,,,3,9,0.0213,True
+120,VM-E0120,10,Efua,Antwi,Female,2014-01-10,,Sales Consultant,11,8,0.0323,True
+121,VM-E0121,2,Yaw,Darko ,Female,2022-05-12,,Sales Consultant,11,14,0.0128,True
+122,VM-E0122,1,Priscilla,Appiah,Female,2023-04-12,,Sales Consultant,9,14,0.0215,True
+123,VM-E0123,11,Kojo,Darko,Female,2024-09-11,,Senior Sales Consultant,6,12,0.0256,True
+124,VM-E0124,11,Kofi,Agyeman,Male,2017-11-04,,Senior Sales Consultant,0,12,0.0258,True
+125,VM-E0125,11,Abena,Gyasi ,Female,2017-02-17,,Senior Sales Consultant,12,14,0.0303,True
+126,VM-E0126,6,Michael,Antwi,Female,2022-07-18,,Sales Consultant,9,10,0.0328,True
+127,VM-E0127,6,Grace,BOATENG,Male,2019-01-04,,Senior Sales Consultant,9,9,0.0307,True
+128,VM-E0128,13,Ama,Quaye,Male,2015-07-01,,Senior Sales Consultant,13,10,0.0325,True
+129,VM-E0129,4,Nana,badu,Male,2017-10-29,,Sales Consultant,7,11,0.0293,True
+130,VM-E0130,2,Kofi,Antwi,Male,2021-04-10,,,0,7,0.0233,True
+131,VM-E0131,1,Grace,Addo,Male,2021-05-24,,Sales Consultant,9,13,0.0214,True
+132,VM-E0132,6,Abena,Asare,Female,2018-05-25,,Sales Consultant,11,12,0.0340,True
+133,VM-E0133,6,Mabel,Quaye,Male,2022-01-31,2024-05-11,Senior Sales Consultant,6,9,0.0181,False
+134,VM-E0134,2,Kwame,Agyeman,Female,2018-08-06,,,8,11,0.0312,True
+135,VM-E0135,2,Mabel,Gyasi,Male,2021-07-20,,Sales Consultant,3,12,0.0176,True
+136,VM-E0136,6,Joseph,Asare,Male,2016-01-06,,Sales Consultant,7,14,0.0258,True
+137,VM-E0137,6,Nana,Appiah,Male,2020-05-16,,Sales Consultant,11,11,0.0252,True
+138,VM-E0138,1,Esi,Boateng,Male,2018-09-12,,Sales Consultant,8,11,0.0281,True
+139,VM-E0139,12,Yaw,Osei,Male,2019-06-06,,Sales Consultant,2,11,0.0152,True
+140,VM-E0140,1,Samuel,Asare,Male,2022-05-10,,Fleet Specialist,6,8,0.0250,True
+141,VM-E0141,10,Kofi,Appiah,Female,2021-03-27,,Senior Sales Consultant,0,11,0.0128,True
+142,VM-E0142,9001,Mabel,Amankwah,Female,2014-06-26,,Senior Sales Consultant,7,12,0.0185,True
+143,VM-E0143,12,Kwame,asare,Male,2017-09-28,,Senior Sales Consultant,4,14,0.0316,True
+144,VM-E0144,4,Kojo,Boateng,Male,2023-05-10,2024-08-13,Sales Consultant,7,11,0.0186,False
+145,VM-E0145,1,Priscilla,Darko,Male,2024-11-22,,Fleet Specialist,3,12,0.0183,True
+146,VM-E0146,8,Ama,Agyeman,Male,2018-09-05,,Sales Consultant,6,10,0.0293,True
+147,VM-E0147,1,Linda,Frimpong,Female,2019-04-02,,Sales Consultant,7,9,0.0252,True
+148,VM-E0148,6,Michael,Frimpong,Female,2017-04-16,,Sales Consultant,12,11,0.0158,True
+149,VM-E0149,13,Mabel,Opoku,Male,2014-05-20,2023-10-03,Sales Consultant,8,7,0.0294,False
+150,VM-E0150,9,Joseph,sarpong,Female,2024-11-15,,Sales Consultant,4,8,0.0224,True
+151,VM-E0151,13,Kofi,Appiah,Male,2022-09-05,,Sales Consultant,12,12,0.0127,True
+152,VM-E0152,11,Kofi,Antwi,Female,2015-07-25,2023-08-19,Sales Consultant,7,7,0.0126,False
+153,VM-E0153,6,Priscilla,tetteh,Female,2018-03-21,,Sales Consultant,2,8,0.0314,True
+154,VM-E0154,1,Kwame,Osei,Male,2018-11-03,,Sales Consultant,7,9,0.0325,True
+155,VM-E0155,1,Daniel,SARPONG,Male,2018-01-01,,Sales Consultant,10,9,0.0246,True
+156,VM-E0156,4,Daniel,Arthur,Female,2024-12-14,,Senior Sales Consultant,3,14,0.0312,True
+157,VM-E0157,12,Akosua,Owusu,Male,2020-08-22,,,2,8,0.0127,True
+158,VM-E0158,7,Adwoa,Quaye,Male,2020-12-12,,Sales Consultant,4,13,0.0337,True
+159,VM-E0159,9,Samuel,Boateng,Female,2022-02-02,,Senior Sales Consultant,5,13,0.0237,True
+160,VM-E0160,1,Michael,Darko,Male,2019-02-03,,Sales Supervisor,2,7,0.0174,True
+161,VM-E0161,2,Kojo,Quaye,Female,2024-09-06,,Sales Consultant,12,7,0.0296,True
+162,VM-E0162,6,Akosua,Agyeman,Male,2023-04-02,,Fleet Specialist,11,11,0.0145,True
+163,VM-E0163,5,Michael,Frimpong,Female,2018-05-19,,Sales Consultant,4,15,0.0215,True
+164,VM-E0164,8,Yaw,Opoku ,Male,2016-04-15,,Sales Consultant,3,9,0.0323,True
+165,VM-E0165,1,Michael,Frimpong,Female,2019-06-09,,Sales Consultant,0,12,0.0335,True
+166,VM-E0166,5,Samuel,Gyasi,Female,2021-11-23,,Sales Consultant,7,10,0.0324,True
+167,VM-E0167,9001,Efua,Appiah,Male,2021-09-14,2025-04-09,Sales Consultant,11,7,0.0345,False
+168,VM-E0168,6,Priscilla,FRIMPONG,Female,2015-02-26,,Senior Sales Consultant,2,12,0.0314,True
+169,VM-E0169,10,Michael,Owusu,Female,2022-02-17,,Sales Consultant,1,10,0.0231,True
+170,VM-E0170,11,Samuel,Addo,Male,2016-09-11,,Senior Sales Consultant,10,8,0.0214,True
+171,VM-E0171,1,Akosua,Frimpong,Female,2014-01-29,,Senior Sales Consultant,5,15,0.0217,True
+172,VM-E0172,4,Kwame,BOATENG,Female,2020-03-14,2025-05-12,Sales Consultant,7,13,0.0246,False
+173,VM-E0173,7,Kwame,Osei,Female,2015-09-24,,Sales Consultant,3,15,0.0231,True
+174,VM-E0174,10,Abena,Frimpong,Male,2018-12-21,,Sales Supervisor,7,8,0.0330,True
+175,VM-E0175,12,Adwoa,frimpong,Male,2023-11-10,2024-06-17,Sales Consultant,8,9,0.0223,False
+176,VM-E0176,3,Priscilla,Badu,Male,2016-11-21,,Sales Consultant,4,12,0.0126,True
+177,VM-E0177,11,Kojo,Appiah,Male,2016-12-09,,Sales Consultant,11,7,0.0158,True
+178,VM-E0178,4,Kojo,Appiah,Male,2018-10-03,,Sales Consultant,3,11,0.0332,True
+179,VM-E0179,9001,Joseph,Asare,Male,2017-10-20,,Senior Sales Consultant,12,11,0.0264,True
+180,VM-E0180,12,Grace,Appiah,Female,2014-02-01,,Sales Consultant,3,10,0.0265,True
+181,VM-E0181,12,Adwoa,Amankwah,Male,2018-08-23,,,4,7,0.0177,True
+182,VM-E0182,3,Efua,Addo ,Male,2016-01-04,,Sales Consultant,7,15,0.0144,True
+183,VM-E0183,3,Grace,Gyasi,Male,2019-03-11,,Sales Consultant,5,8,0.0206,True
+184,VM-E0184,3,Akosua,Mensah,Female,2020-04-28,,Senior Sales Consultant,2,10,0.0328,True
+185,VM-E0185,5,Kofi,Osei,Male,2017-04-19,2025-04-17,Sales Consultant,12,11,0.0335,False
+186,VM-E0186,8,Daniel,Darko,Female,2015-11-10,,Sales Supervisor,5,7,0.0158,True
+187,VM-E0187,2,Efua,Sarpong,Female,2022-02-28,2025-03-07,Sales Consultant,10,14,0.0164,False
+188,VM-E0188,6,Joseph,appiah,Female,2022-06-04,,Sales Consultant,9,10,0.0318,True
+189,VM-E0189,4,Yaw,Agyeman,Male,2021-08-24,,Sales Supervisor,3,13,0.0236,True
+190,VM-E0190,9001,Priscilla,Osei ,Male,2015-02-03,,Sales Consultant,12,15,0.0234,True
+191,VM-E0191,6,Akosua,Sarpong,Male,2021-04-20,,Sales Consultant,10,10,0.0232,True
+192,VM-E0192,2,Abena,Quaye,Male,2018-10-11,,Senior Sales Consultant,0,13,0.0279,True
+193,VM-E0193,9,Grace,Boateng,Male,2022-12-23,,Sales Consultant,11,15,0.0195,True
+194,VM-E0194,9001,Akosua,Quaye,Female,2017-01-21,,Sales Consultant,3,13,0.0215,True
+195,VM-E0195,9,Adwoa,Asare,Male,2014-11-18,,Sales Consultant,0,13,0.0134,True
+196,VM-E0196,3,Esi,Owusu,Male,2015-11-07,,Fleet Specialist,4,15,0.0184,True
+197,VM-E0197,9,David,Badu,Female,2017-06-16,,Sales Consultant,0,8,0.0251,True
+198,VM-E0198,5,Priscilla,Agyeman,Male,2023-01-15,2023-11-21,Sales Consultant,0,8,0.0195,False
+199,VM-E0199,6,Joseph,Boateng,Female,2022-05-26,,Fleet Specialist,6,14,0.0322,True
+200,VM-E0200,5,Samuel,Arthur,Male,2019-02-10,,Sales Consultant,0,10,0.0220,True
+201,VM-E0201,1,Yaw,Frimpong,Male,2022-09-24,,,4,12,0.0201,True
+202,VM-E0202,5,Abena,Sarpong,Male,2021-02-16,,Senior Sales Consultant,10,9,0.0187,True
+203,VM-E0203,9,Grace,Amankwah,Male,2016-03-09,,,8,7,0.0211,True
+204,VM-E0204,10,Priscilla,Quaye,Male,2017-04-23,,Senior Sales Consultant,13,8,0.0261,True
+205,VM-E0205,2,Adwoa,Quaye,Male,2020-12-24,,Sales Consultant,6,12,0.0177,True
+206,VM-E0206,3,Abena,Antwi,Female,2020-01-24,,Sales Consultant,6,10,0.0198,True
+207,VM-E0207,2,Linda,Addo,Female,2022-11-17,,Sales Consultant,12,15,0.0225,True
+208,VM-E0208,9001,Mabel,Sarpong,Male,2019-05-08,,Fleet Specialist,13,7,0.0304,True
+209,VM-E0209,4,Ama,Agyeman,Female,2015-04-30,,Sales Consultant,5,14,0.0242,True
+210,VM-E0210,3,Akosua,Mensah ,Female,2021-09-08,,Sales Consultant,10,8,0.0197,True
+211,VM-E0211,3,Kojo,MENSAH,Male,2017-11-30,,Sales Supervisor,6,14,0.0147,True
+212,VM-E0212,3,Kofi,Arthur,Male,2022-10-27,,Sales Consultant,0,13,0.0344,True
+213,VM-E0213,1,Linda,Addo,Female,2023-07-08,2025-06-04,Sales Consultant,0,13,0.0343,False
+214,VM-E0214,5,Linda,Acheampong,Female,2021-02-23,,Senior Sales Consultant,6,9,0.0329,True
+215,VM-E0215,1,Joseph,APPIAH,Male,2024-10-19,,Senior Sales Consultant,1,13,0.0298,True
+216,VM-E0216,4,David,ARTHUR,Male,2016-03-05,,Sales Consultant,11,7,0.0316,True
+217,VM-E0217,7,Linda,Asare,Male,2021-12-27,2024-08-14,,6,10,0.0204,False
+218,VM-E0218,7,Daniel,MENSAH,Female,2020-06-21,,Senior Sales Consultant,12,13,0.0314,True
+219,VM-E0219,1,Yaw,Opoku,Male,2024-06-18,,Sales Consultant,8,11,0.0319,True
+220,VM-E0220,1,Akosua,arthur,Female,2018-05-26,,,2,7,0.0204,True
+221,VM-E0221,4,Mabel,Tetteh,Male,2020-09-11,,Sales Consultant,8,15,0.0223,True
+222,VM-E0222,5,Daniel,Darko,Female,2024-05-20,2025-04-13,Sales Consultant,12,12,0.0123,False
+223,VM-E0223,7,Daniel,Osei ,Male,2020-12-13,,Sales Consultant,0,13,0.0159,True
+224,VM-E0224,2,Kofi,Addo,Male,2018-05-23,,Sales Supervisor,4,14,0.0235,True
+225,VM-E0225,2,Kwame,Acheampong,Male,2019-05-26,2024-07-08,Sales Consultant,6,7,0.0342,False

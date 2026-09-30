@@ -1,0 +1,16 @@
+branch_id,branch_code,branch_name,branch_type,address_line,city,region,country_code,opened_date,floor_capacity,service_bay_count,manager_name,active_flag
+1,VM-B01,versalMotors Accra Central,FULL_SERVICE,147 Accra Motor Road,Accra,Greater Accra,GH,2019-02-12,39,5,Michael Owusu,True
+2,VM-B02,Versal Motors Tema Harbour,full_service,121 Tema Motor Road,Tema,Greater Accra,GH,2010-08-15,31,10,Joseph Sarpong,True
+3,VM-B03,versalmotors east legon,Full_Service,25 Accra Motor Road,Accra,Greater Accra,GH,2018-01-28,18,13,Joseph Amankwah,True
+4,VM-B04,versalMotors-Kumasi-Central,full_service,86 Kumasi Motor Road,Kumasi,Ashanti,GH,2008-09-28,52,14,Adwoa Darko,True
+5,VM-B05,Versal Motors Suame,ful,20 Kumasi Motor Road,Kumasi,Ashanti,GH,2021-05-25,28,9,,True
+6,VM-B06,versalMotors Takoradi ,full_service ,62 Takoradi Motor Road,Takoradi,Western,GH,2020-06-01,18,16,,True
+7,VM-B07,versalMotors Cape Coast ,full-service,4 Cape Coast Motor Road,Cape Coast,Central,GH,2018-12-07,53,16,,True
+8,VM-B08,VERSALMOTORS TAMALE,full_service,64 Tamale Motor Road,Tamale,Northern,GH,2013-01-05,63,6,,True
+9,VM-B09,VERSALMOTORS KOFORIDUA,FULL_SERVICE,214 Koforidua Motor Road,Koforidua,Eastern,GH,2015-08-14,46,7,Akosua Tetteh,True
+10,VM-B10,versalMotors-Ho,full_service ,3 Ho Motor Road,Ho,Volta,GH,2016-07-19,35,12,Mabel Opoku,True
+11,VM-B11,versalMotors Sunyani,sales_only,102 Sunyani Motor Road,Sunyani,Bono,GH,2018-06-21,40,0,,True
+12,VM-B12,versalMotors Techiman,Sales_Only,136 Techiman Motor Road,Techiman,Bono East,GH,2009-04-11,35,0,,True
+13,VM-B13,versalmotors wa,sales_only,33 Wa Motor Road,Wa,Upper West,GH,2019-09-26,27,0,Nana Appiah,True
+14,VM-B14,versalMotors Bolgatanga,service_only,181 Bolgatanga Motor Road,Bolgatanga,Upper East,GH,2010-02-20,39,10,,True
+15,VM-B15,versalMotors Kasoa,service_only,199 Kasoa Motor Road,Kasoa,Central,GH,2012-08-26,19,4,,True
