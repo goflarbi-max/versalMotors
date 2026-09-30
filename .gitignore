@@ -1,0 +1,27 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local Streamlit state
+.streamlit/secrets.toml
+
+# Local analytical database and sidecar files
+data/business.duckdb
+data/business.duckdb.wal
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
