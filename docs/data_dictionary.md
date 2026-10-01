@@ -1,5 +1,7 @@
 # versalMotors raw data dictionary
 
+Last profiled: **2026-10-01**, directly from all nine CSV files in `data/raw/` using `scripts/profile_raw_data.py`.
+
 ## Profiling scope and conventions
 
 This document profiles the nine CSV files in `data/raw/` as observed, without using the private generator truth file. The profile was produced from the current files and should be refreshed if they change.

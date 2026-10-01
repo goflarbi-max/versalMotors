@@ -1,5 +1,7 @@
 # versalMotors relationship proposal and open questions
 
+Last reviewed against the complete raw CSV profile: **2026-10-01**.
+
 ## Status
 
 This document intentionally distinguishes observed evidence from decisions that require confirmation. No ambiguous cleaning rule below is treated as approved.
