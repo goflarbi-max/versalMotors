@@ -40,13 +40,13 @@ def render_sidebar_filters(data: AnalyticsData) -> Filters:
         st.caption("Selections persist as you move between pages.")
         selected_dates = st.date_input(
             "Date range", value=(default_start, maximum), min_value=minimum,
-            max_value=maximum, key=f"{_KEY_PREFIX}dates",
+            max_value=maximum, key=f"{_KEY_PREFIX}dates", persist_state="session",
         )
-        branch = st.multiselect("Branch", _options(data.branches, "branch_name"), key=f"{_KEY_PREFIX}branch")
-        brand = st.multiselect("Brand", _options(data.models, "manufacturer"), key=f"{_KEY_PREFIX}brand")
-        model = st.multiselect("Model", _options(data.models, "model_name"), key=f"{_KEY_PREFIX}model")
-        salesperson = st.multiselect("Salesperson", _options(people, "display_name"), key=f"{_KEY_PREFIX}salesperson")
-        status = st.multiselect("Sale status", _options(data.sales, "sale_status"), key=f"{_KEY_PREFIX}status")
+        branch = st.multiselect("Branch", _options(data.branches, "branch_name"), key=f"{_KEY_PREFIX}branch", persist_state="session")
+        brand = st.multiselect("Brand", _options(data.models, "manufacturer"), key=f"{_KEY_PREFIX}brand", persist_state="session")
+        model = st.multiselect("Model", _options(data.models, "model_name"), key=f"{_KEY_PREFIX}model", persist_state="session")
+        salesperson = st.multiselect("Salesperson", _options(people, "display_name"), key=f"{_KEY_PREFIX}salesperson", persist_state="session")
+        status = st.multiselect("Sale status", _options(data.sales, "sale_status"), key=f"{_KEY_PREFIX}status", persist_state="session")
 
     if isinstance(selected_dates, (tuple, list)) and len(selected_dates) == 2:
         start_date, end_date = selected_dates

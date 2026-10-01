@@ -39,6 +39,8 @@ def test_warranty_drilldown_reconciles_summary_branch_and_records():
     assert models.loc[0, "cost_change"] == 250.0
     assert branches["claim_cost"].sum() == models.loc[0, "claim_cost"]
     assert accra_records["approved_amount"].sum() == branches.loc[branches["branch"] == "Accra", "claim_cost"].iloc[0]
+    assert not models["model"].astype(str).str.contains("Unmapped|Model ID", case=False, regex=True).any()
+    assert not branches["branch"].astype(str).str.contains("Unmapped|Model ID", case=False, regex=True).any()
 
 
 def test_warranty_drilldown_preserves_exact_global_filters():

@@ -24,21 +24,27 @@ RECORD_COLUMNS = [
 def _warranty_rows(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
     """Return quality-approved claims enriched for exact global filtering."""
     claims = _valid_fact(data.warranty_claims)
-    inventory_columns = [column for column in ["inventory_id", "model_id"] if column in data.inventory.columns]
+    inventory_columns = [column for column in ["inventory_id", "model_id", "_row_quality_status", "model_id_orphan_flag"] if column in data.inventory.columns]
     if inventory_columns:
+        inventory = data.inventory[inventory_columns].drop_duplicates("inventory_id").rename(
+            columns={"_row_quality_status": "inventory_row_quality_status"})
         claims = claims.merge(
-            data.inventory[inventory_columns].drop_duplicates("inventory_id"),
+            inventory,
             on="inventory_id", how="left", suffixes=("", "_inventory"),
         )
-    model_columns = [column for column in ["model_id", "model_name", "manufacturer"] if column in data.models.columns]
+    model_columns = [column for column in ["model_id", "model_name", "manufacturer", "_row_quality_status"] if column in data.models.columns]
     if model_columns and "model_id" in claims.columns:
+        models = data.models[model_columns].drop_duplicates("model_id").rename(
+            columns={"_row_quality_status": "model_row_quality_status"})
         claims = claims.merge(
-            data.models[model_columns].drop_duplicates("model_id"), on="model_id", how="left",
+            models, on="model_id", how="left",
         )
-    branch_columns = [column for column in ["branch_id", "branch_name", "branch_code"] if column in data.branches.columns]
+    branch_columns = [column for column in ["branch_id", "branch_name", "branch_code", "_row_quality_status"] if column in data.branches.columns]
     if branch_columns:
+        branches = data.branches[branch_columns].drop_duplicates("branch_id").rename(
+            columns={"_row_quality_status": "branch_row_quality_status"})
         claims = claims.merge(
-            data.branches[branch_columns].drop_duplicates("branch_id"), on="branch_id", how="left",
+            branches, on="branch_id", how="left",
         )
     sale_columns = [column for column in ["sale_id", "salesperson_id", "sale_status"] if column in data.sales.columns]
     if sale_columns:
@@ -72,8 +78,20 @@ def _warranty_rows(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
         claims = claims[_exact_match(claims, ["salesperson_id", "employee_code", "salesperson_name"], filters.salesperson)]
     if _values(filters.status):
         claims = claims[_exact_match(claims, ["sale_status"], filters.status)]
-    claims["model"] = claims.get("model_name", pd.Series(pd.NA, index=claims.index)).fillna("Unmapped")
-    claims["branch"] = claims.get("branch_name", pd.Series(pd.NA, index=claims.index)).fillna("Unmapped")
+    if "inventory_row_quality_status" in claims.columns:
+        claims = claims[
+            claims["inventory_row_quality_status"].astype("string").str.upper() != "ERROR"
+        ]
+    if "model_id_orphan_flag" in claims.columns:
+        claims = claims[~claims["model_id_orphan_flag"].fillna(False).astype(bool)]
+    claims["model"] = claims.get("model_name", pd.Series(pd.NA, index=claims.index))
+    claims["branch"] = claims.get("branch_name", pd.Series(pd.NA, index=claims.index))
+    claims = claims.dropna(subset=["model", "branch"])
+    forbidden = r"Model ID|Unmapped"
+    claims = claims[
+        ~claims["model"].astype("string").str.contains(forbidden, case=False, regex=True, na=False)
+        & ~claims["branch"].astype("string").str.contains(forbidden, case=False, regex=True, na=False)
+    ]
     return claims.copy()
 
 

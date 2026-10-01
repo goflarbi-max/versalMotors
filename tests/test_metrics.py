@@ -9,7 +9,10 @@ import duckdb
 import pandas as pd
 import pytest
 
-from src.analytics.metrics import AnalyticsData, Filters, gross_margin, revenue
+from src.analytics.metrics import (
+    AnalyticsData, Filters, gross_margin, gross_margin_by_model, revenue,
+    revenue_by_branch, warranty_claims,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -133,16 +136,18 @@ def test_all_metrics_return_expected_columns_and_rows() -> None:
         # view keeps one row per sale and makes the requested raw SQL check exact.
         connection.execute(
             """
-            CREATE OR REPLACE TEMP VIEW car_sales AS
-            SELECT DISTINCT
-                sale_id,
-                CAST(net_sale_price AS DECIMAL(18, 2)) AS selling_price,
-                gross_price AS list_price,
-                1 AS quantity
-            FROM sales
-            WHERE sale_status = 'completed'
-              AND COALESCE(_row_quality_status, 'VALID') <> 'ERROR'
-            """
+                CREATE OR REPLACE TEMP VIEW car_sales AS
+                SELECT DISTINCT
+                    s.sale_id,
+                    CAST(s.net_sale_price AS DECIMAL(18, 2)) AS selling_price,
+                    s.gross_price AS list_price,
+                    1 AS quantity
+                FROM sales s
+                INNER JOIN inventory i ON s.inventory_id = i.inventory_id
+                WHERE s.sale_status = 'completed'
+                  AND COALESCE(s._row_quality_status, 'VALID') <> 'ERROR'
+                  AND COALESCE(i._row_quality_status, 'VALID') <> 'ERROR'
+                """
         )
         sql_revenue = connection.execute(
             "SELECT COALESCE(SUM(selling_price), 0) AS sql_revenue FROM car_sales"
@@ -161,3 +166,17 @@ def test_all_metrics_return_expected_columns_and_rows() -> None:
     assert set(metric_result.columns) == {"period", "revenue", "transaction_count"}
     assert len(metric_result) > 0
     assert metric_revenue == sql_revenue
+
+    model_margin = gross_margin_by_model(data, Filters())
+    assert not model_margin["model"].astype(str).str.contains(
+        "unresolved|Unmapped", case=False, regex=True
+    ).any()
+
+    branch_revenue = revenue_by_branch(data, Filters())
+    warranty = warranty_claims(data, Filters())
+    assert not branch_revenue["branch"].astype(str).str.contains(
+        "unresolved|Unmapped|Model ID", case=False, regex=True
+    ).any()
+    assert not warranty["model"].astype(str).str.contains(
+        "unresolved|Unmapped|Model ID", case=False, regex=True
+    ).any()

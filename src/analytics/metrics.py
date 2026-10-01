@@ -111,8 +111,13 @@ def _add_dimensions(
     if "inventory_id" in result.columns:
         inventory = _dimension_subset(
             data.inventory,
-            ["inventory_id", "vin", "model_id", "acquisition_cost", "arrival_date", "sold_date", "inventory_status"],
+            [
+                "inventory_id", "vin", "model_id", "acquisition_cost", "arrival_date",
+                "sold_date", "inventory_status", "_row_quality_status",
+                "model_id_orphan_flag",
+            ],
         )
+        inventory = inventory.rename(columns={"_row_quality_status": "inventory_row_quality_status"})
         result = result.merge(inventory, on="inventory_id", how="left", suffixes=("", "_inventory"))
         if "model_id_inventory" in result.columns:
             result["model_id"] = result.get("model_id", pd.Series(index=result.index, dtype="float64")).combine_first(result["model_id_inventory"])
@@ -120,8 +125,9 @@ def _add_dimensions(
     if "model_id" in result.columns:
         models = _dimension_subset(
             data.models,
-            ["model_id", "model_name", "model_name_raw", "manufacturer", "model_year", "trim_name"],
+            ["model_id", "model_name", "model_name_raw", "manufacturer", "model_year", "trim_name", "_row_quality_status"],
         )
+        models = models.rename(columns={"_row_quality_status": "model_row_quality_status"})
         result = result.merge(models, on="model_id", how="left", suffixes=("", "_model"))
         if "model_name" in result.columns:
             raw_model = result["model_name_raw"] if "model_name_raw" in result.columns else pd.Series(pd.NA, index=result.index, dtype="string")
@@ -130,8 +136,9 @@ def _add_dimensions(
     if "branch_id" in result.columns:
         branches = _dimension_subset(
             data.branches,
-            ["branch_id", "branch_code", "branch_name", "branch_name_raw", "city", "region"],
+            ["branch_id", "branch_code", "branch_name", "branch_name_raw", "city", "region", "_row_quality_status"],
         )
+        branches = branches.rename(columns={"_row_quality_status": "branch_row_quality_status"})
         result = result.merge(branches, on="branch_id", how="left", suffixes=("", "_branch"))
         if "branch_name" in result.columns:
             raw_branch = result["branch_name_raw"] if "branch_name_raw" in result.columns else pd.Series(pd.NA, index=result.index, dtype="string")
@@ -149,6 +156,10 @@ def _add_dimensions(
                 + " "
                 + result["last_name"].fillna("").astype(str).str.strip()
             ).str.strip().replace("", pd.NA)
+    if "inventory_row_quality_status" in result.columns:
+        result = result[
+            result["inventory_row_quality_status"].astype("string").str.upper() != "ERROR"
+        ]
     return result
 
 
@@ -187,6 +198,10 @@ def _period(series: pd.Series, frequency: Period) -> pd.Series:
 
 def _sales_for_metric(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
     frame = _add_dimensions(_valid_fact(data.sales), data)
+    if "inventory_row_quality_status" in frame.columns:
+        frame = frame[
+            frame["inventory_row_quality_status"].astype("string").str.upper() != "ERROR"
+        ]
     frame = _apply_filters(frame, filters, date_column="sale_date", status_column="sale_status")
     if not _values(filters.status):
         frame = frame[frame["sale_status"] == "completed"]
@@ -330,7 +345,8 @@ def warranty_claims(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
     if frame.empty:
         return pd.DataFrame(columns=["period", "model", "claim_count", "costed_claim_count", "claim_cost"])
     frame["period"] = _period(frame["claim_date"], filters.period)
-    frame["model"] = frame.get("model_display", pd.Series(pd.NA, index=frame.index)).fillna("Unmapped")
+    frame["model"] = frame.get("model_display", pd.Series(pd.NA, index=frame.index))
+    frame = frame.dropna(subset=["model"])
     frame["costed"] = frame["approved_amount"].notna().astype(int)
     return (
         frame.groupby(["period", "model"], as_index=False, dropna=False)
@@ -421,3 +437,95 @@ def average_satisfaction(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
         .agg(response_count=("overall_score", "count"), average_satisfaction=("overall_score", "mean"))
         .sort_values(["period", "survey_type"], ignore_index=True)
     )
+
+
+def overview_kpis(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
+    """Return current and prior-period values for the Overview KPI cards.
+
+    The comparison is the immediately preceding inclusive range with the same
+    number of days. Each value uses the formula and quality rules documented by
+    its underlying public metric. Change is current minus previous; change rate
+    divides that change by the absolute prior value. Without a complete selected
+    range, comparison values remain null rather than being inferred.
+    """
+    def totals(target: Filters) -> dict[str, float]:
+        revenue_frame = revenue(data, target)
+        margin_frame = gross_margin(data, target)
+        units_frame = units_sold(data, target)
+        discount_frame = discount_rate(data, target)
+        gross_price = discount_frame["gross_price"].sum() if not discount_frame.empty else 0.0
+        discount_amount = discount_frame["discount_amount"].sum() if not discount_frame.empty else 0.0
+        return {
+            "Revenue": revenue_frame["revenue"].sum() if not revenue_frame.empty else 0.0,
+            "Gross margin": margin_frame["gross_margin"].sum() if not margin_frame.empty else 0.0,
+            "Units sold": units_frame["units_sold"].sum() if not units_frame.empty else 0.0,
+            "Discount rate": discount_amount / gross_price if gross_price else float("nan"),
+        }
+
+    current = totals(filters)
+    previous = {metric: float("nan") for metric in current}
+    if filters.start_date is not None and filters.end_date is not None:
+        start, end = pd.Timestamp(filters.start_date), pd.Timestamp(filters.end_date)
+        if end >= start:
+            duration = end - start
+            previous = totals(Filters(
+                start_date=start - duration - pd.Timedelta(days=1),
+                end_date=start - pd.Timedelta(days=1),
+                branch=filters.branch, model=filters.model, brand=filters.brand,
+                salesperson=filters.salesperson, status=filters.status, period=filters.period,
+            ))
+
+    rows = []
+    for metric, value in current.items():
+        prior = previous[metric]
+        change = value - prior if pd.notna(prior) else float("nan")
+        rate = change / abs(prior) if pd.notna(prior) and prior != 0 else float("nan")
+        rows.append({"metric": metric, "value": value, "previous_value": prior, "change": change, "change_rate": rate})
+    return pd.DataFrame(rows)
+
+
+def revenue_by_branch(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
+    """Return revenue and units by branch for the selected period.
+
+    Revenue is ``SUM(net_sale_price)`` and units are distinct inventory IDs. The
+    completed-sale default, exact filters, null handling, and ERROR-row exclusion
+    match :func:`revenue`. Rows without a valid canonical branch are excluded.
+    """
+    frame = _sales_for_metric(data, filters).dropna(subset=["sale_date", "net_sale_price", "inventory_id"])
+    if frame.empty:
+        return pd.DataFrame(columns=["branch", "revenue", "units_sold"])
+    frame["branch"] = frame.get("branch_display", pd.Series(pd.NA, index=frame.index))
+    frame = frame.dropna(subset=["branch"])
+    if frame.empty:
+        return pd.DataFrame(columns=["branch", "revenue", "units_sold"])
+    return (frame.groupby("branch", as_index=False)
+            .agg(revenue=("net_sale_price", "sum"), units_sold=("inventory_id", "nunique"))
+            .sort_values("revenue", ascending=False, ignore_index=True))
+
+
+def gross_margin_by_model(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
+    """Return gross margin and margin rate by model for the selected period.
+
+    Margin is ``SUM(net_sale_price - acquisition_cost)`` and the rate divides it
+    by model revenue. Sales status, quality, and null rules match
+    :func:`gross_margin`; rows without a valid canonical model are excluded.
+    """
+    frame = _sales_for_metric(data, filters).dropna(subset=["sale_date", "net_sale_price", "acquisition_cost"])
+    if "model_id_orphan_flag" in frame.columns:
+        frame = frame[~frame["model_id_orphan_flag"].fillna(False).astype(bool)]
+    if frame.empty:
+        return pd.DataFrame(columns=["model", "revenue", "gross_margin", "gross_margin_rate"])
+    frame["gross_margin"] = frame["net_sale_price"] - frame["acquisition_cost"]
+    frame["model"] = frame.get("model_display", pd.Series(pd.NA, index=frame.index))
+    frame = frame.dropna(subset=["model"])
+    frame = frame[
+        ~frame["model"].astype("string").str.contains(
+            r"Model ID|Unmapped", case=False, regex=True, na=False
+        )
+    ]
+    if frame.empty:
+        return pd.DataFrame(columns=["model", "revenue", "gross_margin", "gross_margin_rate"])
+    result = frame.groupby("model", as_index=False).agg(
+        revenue=("net_sale_price", "sum"), gross_margin=("gross_margin", "sum"))
+    result["gross_margin_rate"] = result["gross_margin"].div(result["revenue"].where(result["revenue"] != 0))
+    return result.sort_values("gross_margin", ascending=False, ignore_index=True)

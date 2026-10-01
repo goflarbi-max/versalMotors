@@ -614,7 +614,11 @@ class CleaningPipeline:
 
     def _assign_quality_status(self) -> None:
         source_boolean_fields = {field for fields in BOOLEAN_COLUMNS.values() for field in fields}
-        error_markers = ("invalid_flag", "parse_error_flag", "negative_flag", "orphan_flag", "out_of_range_flag", "missing_required_fields_flag", "unmapped_flag", "multiple_completed_sale_per_vin_flag")
+        error_markers = (
+            "invalid_flag", "parse_error_flag", "negative_flag", "orphan_flag",
+            "out_of_range_flag", "missing_required_fields_flag", "unmapped_flag",
+            "multiple_completed_sale_per_vin_flag",
+        )
         informational = {"external_service_record_flag", "returned_vehicle_available_flag", "fuel_efficiency_lower_is_better"}
         for table, rows in self.tables.items():
             errors = warnings = 0

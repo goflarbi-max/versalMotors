@@ -70,6 +70,16 @@ class CleaningContractTests(unittest.TestCase):
                 )
                 self.assertEqual(flagged, expected)
 
+    def test_orphan_model_is_not_created_as_a_dimension_member(self) -> None:
+        self.assertEqual(self.scalar("SELECT COUNT(*) FROM models WHERE model_id = 9002"), 0)
+        self.assertEqual(
+            self.scalar(
+                "SELECT COUNT(*) FROM inventory WHERE model_id_raw = 9002 "
+                "AND model_id IS NULL AND model_id_orphan_flag AND _row_quality_status = 'ERROR'"
+            ),
+            12,
+        )
+
     def test_explicit_mapping_behavior(self) -> None:
         self.assertEqual(
             self.scalar("SELECT COUNT(*) FROM branches WHERE branch_name_unmapped_flag AND branch_name IS NOT NULL"),
