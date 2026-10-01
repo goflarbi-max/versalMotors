@@ -9,7 +9,7 @@ parse_numeric_fields,branches,0,Invalid numeric text cannot be analyzed safely,p
 flag_negative_amounts,branches,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,branches,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
 parse_boolean_fields,branches,15,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
-validate_mandatory_fields,branches,8,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+validate_mandatory_fields,branches,0,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
 load_raw,models,54,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
 remove_exact_duplicates,models,0,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,models,54,Blank CSV fields represent missing values,converted_empty_strings_to_null
@@ -131,7 +131,7 @@ validate_foreign_key,satisfaction,0,sale_id must resolve to sales.sale_id; no un
 validate_foreign_key,satisfaction,0,service_id must resolve to service_records.service_id; no unknown member is allowed,orphan_service_id_to_null_preserved_raw_and_flagged
 validate_foreign_key,satisfaction,7,complaint_id must resolve to complaints.complaint_id; no unknown member is allowed,orphan_complaint_id_to_null_preserved_raw_and_flagged
 identify_external_service,service_records,0,Approved decision: external service records are valid,retained_and_marked_informational_not_error
-assign_row_quality_status,branches,8,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=8; warnings=0
+assign_row_quality_status,branches,0,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=0; warnings=0
 assign_row_quality_status,models,42,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=12; warnings=30
 assign_row_quality_status,salespeople,28,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=28; warnings=0
 assign_row_quality_status,inventory,217,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=141; warnings=76
