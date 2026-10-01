@@ -1,0 +1,48 @@
+raw_value,canonical_value,review_status,reason
+Hilux,Hilux,approved,Approved canonical model
+Corolla,Corolla,approved,Approved canonical model
+Camry,Camry,approved,Approved canonical model
+Prado,Prado,approved,Approved canonical model
+Yaris,Yaris,approved,Approved canonical model
+Hiace,Hiace,approved,Approved canonical model
+Fortuner,Fortuner,approved,Approved canonical model
+Corolla Cross,Corolla Cross,approved,Approved canonical model
+Atlas,Hilux,approved,Mapped Atlas to Hilux
+Atlas ,Hilux,approved,Trimmed Atlas
+Atlas Sport,Hilux,approved,Mapped Atlas Sport to Hilux
+Atlas-Sport,Hilux,approved,Hyphen variant
+atlas sport,Hilux,approved,Lowercase
+CARGO,Hiace,approved,Mapped CARGO to Hiace
+Cargo,Hiace,approved,Mapped Cargo to Hiace
+EON,Yaris,approved,Mapped EON to Yaris
+Eon,Yaris,approved,Mapped Eon to Yaris
+Eon X,Yaris,approved,Mapped Eon X to Yaris
+Eon X ,Yaris,approved,Trimmed
+eon x,Yaris,approved,Lowercase
+Familia,Corolla,approved,Mapped Familia to Corolla
+familia,Corolla,approved,Lowercase
+Luma,Corolla,approved,Mapped Luma to Corolla
+Luma ,Corolla,approved,Trimmed
+Luma Cross ,Corolla Cross,approved,Mapped Luma Cross to Corolla Cross
+Luma-Cross,Corolla Cross,approved,Hyphen variant
+Metro,Camry,approved,Mapped Metro to Camry
+metro,Camry,approved,Lowercase
+Pulse,Yaris,approved,Mapped Pulse to Yaris
+pulse,Yaris,approved,Lowercase
+RANGER,Hilux,approved,Mapped RANGER to Hilux
+Ranger,Hilux,approved,Mapped Ranger to Hilux
+SPARK,Yaris,approved,Mapped SPARK to Yaris
+Spark,Yaris,approved,Mapped Spark to Yaris
+Sahara,Prado,approved,Mapped Sahara to Prado
+Sahara ,Prado,approved,Trimmed
+sahara,Prado,approved,Lowercase
+TERRA,Fortuner,approved,Mapped TERRA to Fortuner
+Terra,Fortuner,approved,Mapped Terra to Fortuner
+terra,Fortuner,approved,Lowercase
+TRAIL,Fortuner,approved,Mapped TRAIL to Fortuner
+Trail,Fortuner,approved,Mapped Trail to Fortuner
+Vela,Camry,approved,Mapped Vela to Camry
+Vela ,Camry,approved,Trimmed
+Voyager,Hiace,approved,Mapped Voyager to Hiace
+WORKSTAR,Hilux,approved,Mapped WORKSTAR to Hilux
+Workstar,Hilux,approved,Mapped Workstar to Hilux

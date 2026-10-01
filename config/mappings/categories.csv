@@ -1,0 +1,84 @@
+table,column,raw_value,canonical_value,review_status
+branches,branch_type,full_service,full_service,approved
+branches,branch_type,FULL_SERVICE,full_service,approved
+branches,branch_type,Full_Service,full_service,approved
+branches,branch_type,"full_service ",full_service,approved
+branches,branch_type,full-service,full_service,approved
+branches,branch_type,ful,full_service,approved
+branches,branch_type,sales_only,sales_only,approved
+branches,branch_type,Sales_Only,sales_only,approved
+branches,branch_type,sol,sales_only,approved
+branches,branch_type,service_only,service_only,approved
+inventory,inventory_status,sold,sold,approved
+inventory,inventory_status,SOLD,sold,approved
+inventory,inventory_status,Sold,sold,approved
+inventory,inventory_status,"sold ",sold,approved
+inventory,inventory_status,sol,sold,approved
+inventory,inventory_status,available,available,approved
+inventory,inventory_status,ava,available,approved
+sales,sales_channel,showroom,showroom,approved
+sales,sales_channel,SHOWROOM,showroom,approved
+sales,sales_channel,Showroom,showroom,approved
+sales,sales_channel,"showroom ",showroom,approved
+sales,sales_channel,sho,showroom,approved
+sales,sales_channel,website_lead,website_lead,approved
+sales,sales_channel,WEBSITE_LEAD,website_lead,approved
+sales,sales_channel,Website_Lead,website_lead,approved
+sales,sales_channel,"website_lead ",website_lead,approved
+sales,sales_channel,website-lead,website_lead,approved
+sales,sales_channel,fleet,fleet,approved
+sales,sales_channel,Fleet,fleet,approved
+sales,sales_channel,fle,fleet,approved
+sales,sales_channel,telephone,telephone,approved
+sales,sales_channel,Telephone,telephone,approved
+service_records,service_type,scheduled,scheduled,approved
+service_records,service_type,SCHEDULED,scheduled,approved
+service_records,service_type,Scheduled,scheduled,approved
+service_records,service_type,"scheduled ",scheduled,approved
+service_records,service_type,sch,scheduled,approved
+service_records,service_type,repair,repair,approved
+service_records,service_type,REPAIR,repair,approved
+service_records,service_type,Repair,repair,approved
+service_records,service_type,"repair ",repair,approved
+service_records,service_type,rep,repair,approved
+service_records,service_type,recall,recall,approved
+service_records,service_type,rec,recall,approved
+service_records,service_type,inspection,inspection,approved
+service_records,service_type,Inspection,inspection,approved
+service_records,service_type,bodywork,bodywork,approved
+service_records,service_type,BODYWORK,bodywork,approved
+service_records,service_type,"bodywork ",bodywork,approved
+complaints,complaint_category,product,product,approved
+complaints,complaint_category,PRODUCT,product,approved
+complaints,complaint_category,Product,product,approved
+complaints,complaint_category,"product ",product,approved
+complaints,complaint_category,pro,product,approved
+complaints,complaint_category,warranty,warranty,approved
+complaints,complaint_category,Warranty,warranty,approved
+complaints,complaint_category,"warranty ",warranty,approved
+complaints,complaint_category,war,warranty,approved
+complaints,complaint_category,billing,billing,approved
+complaints,complaint_category,Billing,billing,approved
+complaints,complaint_category,"billing ",billing,approved
+complaints,complaint_category,service_delay,service_delay,approved
+complaints,complaint_category,SERVICE_DELAY,service_delay,approved
+complaints,complaint_category,Service_Delay,service_delay,approved
+complaints,complaint_category,"service_delay ",service_delay,approved
+complaints,complaint_category,ser,service_delay,approved
+complaints,complaint_category,delivery,delivery,approved
+complaints,complaint_category,staff,staff,approved
+complaints,complaint_category,STAFF,staff,approved
+complaints,complaint_category,sta,staff,approved
+satisfaction,response_channel,sms,sms,approved
+satisfaction,response_channel,SMS,sms,approved
+satisfaction,response_channel,Sms,sms,approved
+satisfaction,response_channel,"sms ",sms,approved
+satisfaction,response_channel,email,email,approved
+satisfaction,response_channel,EMAIL,email,approved
+satisfaction,response_channel,"email ",email,approved
+satisfaction,response_channel,ema,email,approved
+satisfaction,response_channel,web,web,approved
+satisfaction,response_channel,WEB,web,approved
+satisfaction,response_channel,Web,web,approved
+satisfaction,response_channel,phone,phone,approved
+satisfaction,response_channel,"phone ",phone,approved

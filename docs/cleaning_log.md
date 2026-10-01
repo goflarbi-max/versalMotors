@@ -1,0 +1,151 @@
+step,table,rows_affected,reason,action_taken
+load_raw,branches,15,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,branches,0,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,branches,8,Blank CSV fields represent missing values,converted_empty_strings_to_null
+map_branch_name,branches,15,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
+map_branch_type,branches,8,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
+parse_dates,branches,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_numeric_fields,branches,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,branches,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,branches,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,branches,15,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,branches,8,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+load_raw,models,54,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,models,0,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,models,54,Blank CSV fields represent missing values,converted_empty_strings_to_null
+map_model_name,models,54,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
+parse_dates,models,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_numeric_fields,models,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,models,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,models,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,models,54,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,models,12,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+load_raw,salespeople,225,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,salespeople,0,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,salespeople,193,Blank CSV fields represent missing values,converted_empty_strings_to_null
+parse_dates,salespeople,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_numeric_fields,salespeople,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,salespeople,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,salespeople,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,salespeople,225,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,salespeople,20,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+load_raw,inventory,25000,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,inventory,0,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,inventory,5205,Blank CSV fields represent missing values,converted_empty_strings_to_null
+map_inventory_status,inventory,20,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
+parse_dates,inventory,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_numeric_fields,inventory,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,inventory,20,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,inventory,65,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,inventory,0,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,inventory,92,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+load_raw,sales,20540,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,sales,20,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,sales,17621,Blank CSV fields represent missing values,converted_empty_strings_to_null
+map_sales_channel,sales,25,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
+parse_dates,sales,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_numeric_fields,sales,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,sales,15,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,sales,16228,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,sales,20520,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,sales,30,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+load_raw,service_records,48060,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,service_records,35,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,service_records,3609,Blank CSV fields represent missing values,converted_empty_strings_to_null
+map_service_type,service_records,24,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
+parse_dates,service_records,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_numeric_fields,service_records,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,service_records,20,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,service_records,40,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,service_records,48025,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,service_records,35,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+load_raw,warranty_claims,3070,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,warranty_claims,12,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,warranty_claims,47,Blank CSV fields represent missing values,converted_empty_strings_to_null
+parse_dates,warranty_claims,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_numeric_fields,warranty_claims,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,warranty_claims,10,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,warranty_claims,20,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,warranty_claims,3058,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,warranty_claims,8,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+load_raw,complaints,1863,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,complaints,8,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,complaints,1605,Blank CSV fields represent missing values,converted_empty_strings_to_null
+map_complaint_category,complaints,18,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
+parse_dates,complaints,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_numeric_fields,complaints,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,complaints,10,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,complaints,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,complaints,1855,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,complaints,7,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+load_raw,satisfaction,15022,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
+remove_exact_duplicates,satisfaction,15,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
+normalize_blank_nulls,satisfaction,15007,Blank CSV fields represent missing values,converted_empty_strings_to_null
+map_response_channel,satisfaction,14,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
+parse_dates,satisfaction,10,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=10; ambiguous_rows=0
+parse_numeric_fields,satisfaction,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
+flag_negative_amounts,satisfaction,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
+flag_missing_amounts,satisfaction,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
+parse_boolean_fields,satisfaction,15007,Boolean variants require consistent typed values,trimmed_and_parsed_true_false_invalid_to_null_and_flagged
+validate_mandatory_fields,satisfaction,10,Approved mandatory-field definitions must be visible,retained_rows_and_added_missing_required_fields_flag
+validate_vin,inventory,35,VIN must be a valid unique 17-character identifier,uppercased_valid_vins_invalid_to_null_preserved_raw_and_flagged; missing=7; invalid=28
+flag_duplicate_vin,inventory,56,Duplicate valid VINs need source review,retained_all_rows_and_flagged_duplicate_valid_vins
+validate_satisfaction_scores,satisfaction,14115,Approved score scale is 1 through 5,out_of_range_clean_scores_to_null_preserved_raw_and_flagged
+validate_service_thresholds,service_records,48,"Approved thresholds: negative odometer invalid, labor over 80h and mileage over 600k questionable",negative_odometer_to_null; retained_high_values_and_flagged
+calculate_sales_amounts,sales,104,Missing totals stay null and GHS 0.02 is the approved reconciliation tolerance,created_calculated_companions_preserved_source_amounts_and_flagged_mismatches
+calculate_service_amounts,service_records,70,Missing totals stay null and GHS 0.02 is the approved reconciliation tolerance,created_calculated_companions_preserved_source_amounts_and_flagged_mismatches
+validate_sales_conditional_fields,sales,8342,"Finance terms are required for finance, allowed for lease, and not applicable to cash",retained_values_and_added_conditional_flags
+validate_model_conditional_fields,models,36,Fuel units and model status rules require explicit interpretation,assigned_powertrain_specific_efficiency_unit_and_flagged_contradictions
+validate_sales_chronology,sales,35,Completed-date hierarchy is authoritative while contradictions remain reviewable,retained_dates_added_chronology_flags_and_authoritative_companion
+retain_pre_2023_lead_in,sales,3,Approved decision: pre-2023 records are valid lead-in history,retained_without_error_flag
+validate_inventory_status_dates,inventory,20,Returned vehicles may legitimately be available with a sold date,retained_rows_and_flagged_only_non_return_contradictions
+validate_service_chronology,service_records,30,Completed service date is authoritative and calculated duration is a companion,retained_source_dates_added_flags_authoritative_date_and_calculated_duration
+validate_claim_chronology,warranty_claims,44,Completed decision date is authoritative and one service may have multiple claims,retained_claims_added_flags_authoritative_date_and_calculated_duration
+retain_pre_2023_lead_in,warranty_claims,20,Approved decision: pre-2023 records are valid lead-in history,retained_without_error_flag
+validate_complaint_chronology,complaints,35,Completed resolution date is authoritative and calculated duration is a companion,retained_source_dates_added_flags_authoritative_date_and_calculated_duration
+validate_survey_chronology,satisfaction,0,Survey should not precede its source interaction,retained_rows_and_flagged_chronology_conflicts
+flag_near_duplicates,sales,40,"Approved candidate rule: same VIN and branch, date within one day, amount within GHS 0.02",retained_rows_and_assigned_near_duplicate_group_id
+flag_near_duplicates,service_records,50,"Approved candidate rule: same VIN and branch, date within one day, amount within GHS 0.02",retained_rows_and_assigned_near_duplicate_group_id
+flag_near_duplicates,warranty_claims,16,"Approved candidate rule: same VIN and branch, date within one day, amount within GHS 0.02",retained_rows_and_assigned_near_duplicate_group_id
+flag_near_duplicates,complaints,10,"Approved candidate rule: same VIN and branch, date within one day, amount within GHS 0.02",retained_rows_and_assigned_near_duplicate_group_id
+validate_one_completed_sale_per_vin,sales,78,Approved business rule: one completed sale per VIN,retained_questionable_rows_and_flagged_all_conflicting_sales
+validate_foreign_key,salespeople,8,branch_id must resolve to branches.branch_id; no unknown member is allowed,orphan_branch_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,inventory,12,model_id must resolve to models.model_id; no unknown member is allowed,orphan_model_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,inventory,10,branch_id must resolve to branches.branch_id; no unknown member is allowed,orphan_branch_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,sales,0,inventory_id must resolve to inventory.inventory_id; no unknown member is allowed,orphan_inventory_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,sales,0,branch_id must resolve to branches.branch_id; no unknown member is allowed,orphan_branch_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,sales,15,salesperson_id must resolve to salespeople.salesperson_id; no unknown member is allowed,orphan_salesperson_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,service_records,0,inventory_id must resolve to inventory.inventory_id; no unknown member is allowed,orphan_inventory_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,service_records,0,branch_id must resolve to branches.branch_id; no unknown member is allowed,orphan_branch_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,service_records,0,sale_id must resolve to sales.sale_id; no unknown member is allowed,orphan_sale_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,warranty_claims,0,service_id must resolve to service_records.service_id; no unknown member is allowed,orphan_service_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,warranty_claims,0,inventory_id must resolve to inventory.inventory_id; no unknown member is allowed,orphan_inventory_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,warranty_claims,0,sale_id must resolve to sales.sale_id; no unknown member is allowed,orphan_sale_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,warranty_claims,0,branch_id must resolve to branches.branch_id; no unknown member is allowed,orphan_branch_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,complaints,0,branch_id must resolve to branches.branch_id; no unknown member is allowed,orphan_branch_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,complaints,0,sale_id must resolve to sales.sale_id; no unknown member is allowed,orphan_sale_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,complaints,0,service_id must resolve to service_records.service_id; no unknown member is allowed,orphan_service_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,complaints,8,claim_id must resolve to warranty_claims.claim_id; no unknown member is allowed,orphan_claim_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,satisfaction,0,branch_id must resolve to branches.branch_id; no unknown member is allowed,orphan_branch_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,satisfaction,0,sale_id must resolve to sales.sale_id; no unknown member is allowed,orphan_sale_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,satisfaction,0,service_id must resolve to service_records.service_id; no unknown member is allowed,orphan_service_id_to_null_preserved_raw_and_flagged
+validate_foreign_key,satisfaction,7,complaint_id must resolve to complaints.complaint_id; no unknown member is allowed,orphan_complaint_id_to_null_preserved_raw_and_flagged
+identify_external_service,service_records,0,Approved decision: external service records are valid,retained_and_marked_informational_not_error
+assign_row_quality_status,branches,8,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=8; warnings=0
+assign_row_quality_status,models,42,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=12; warnings=30
+assign_row_quality_status,salespeople,28,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=28; warnings=0
+assign_row_quality_status,inventory,217,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=141; warnings=76
+assign_row_quality_status,sales,17996,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=123; warnings=17873
+assign_row_quality_status,service_records,233,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=59; warnings=174
+assign_row_quality_status,warranty_claims,96,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=18; warnings=78
+assign_row_quality_status,complaints,70,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=25; warnings=45
+assign_row_quality_status,satisfaction,14118,Approved severity precedence is ERROR > WARNING > VALID with independent flags,assigned_status_from_independent_flags; errors=14118; warnings=0
+write_cleaned_table,branches,15,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/branches.csv
+write_cleaned_table,models,54,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/models.csv
+write_cleaned_table,salespeople,225,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/salespeople.csv
+write_cleaned_table,inventory,25000,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/inventory.csv
+write_cleaned_table,sales,20520,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/sales.csv
+write_cleaned_table,service_records,48025,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/service_records.csv
+write_cleaned_table,warranty_claims,3058,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/warranty_claims.csv
+write_cleaned_table,complaints,1855,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/complaints.csv
+write_cleaned_table,satisfaction,15007,Publish auditable cleaned output,wrote_C:/Users/Kwabena/Desktop/VersalMotors/data/cleaned/satisfaction.csv
