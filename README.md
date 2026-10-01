@@ -86,19 +86,12 @@ The raw data intentionally includes missing values, duplicates, name and categor
 
 ## Daily Progress Log
 
-### Day 2 - 2026-10-01 - Analytics, Overview & Drill-Down
+### Day 2 - 2026-10-01 - README, Analytics, Overview & Drill-Down
 
-- Done: Built the audited cleaning and DuckDB pipeline, tested core metrics, persistent business filters, period-over-period management KPIs, responsive Overview charts, and warranty drill-down from model to branch to downloadable claims; corrected orphan and branch mapping issues so invalid relationships do not become management categories.
-- Files: `src/data/cleaning.py`, `scripts/build_database.py`, `src/analytics/metrics.py`, `src/analytics/drilldown.py`, `src/ui/filters.py`, `pages/overview.py`, `pages/investigate.py`, `tests/`, `docs/cleaning_log.csv`, `docs/ai_mistakes.md`.
-- Commit: `b6b881e Add drill-down investigation` (latest completed commit before this update)
+- Done: Rebuilt the README to satisfy the required 14-section structure; built the audited cleaning and DuckDB pipeline, tested core metrics, persistent business filters, period-over-period management KPIs, responsive Overview charts, and warranty drill-down from model to branch to downloadable claims; corrected orphan and branch mapping issues so invalid relationships do not become management categories.
+- Files: `README.md`, `src/data/cleaning.py`, `scripts/build_database.py`, `src/analytics/metrics.py`, `src/analytics/drilldown.py`, `src/ui/filters.py`, `pages/overview.py`, `pages/investigate.py`, `tests/`, `docs/cleaning_log.csv`, `docs/ai_mistakes.md`.
+- Commits: `5d9dda9 Update README for submission requirements`; `b6b881e Add drill-down investigation`; `055841d Complete Day 2 analytics and dashboard`.
 - Next: Build the Data Quality page, then ground Ask the Business and Management Brief in tested database evidence.
-
-### Day 2 - 2026-09-30 - README Submission Compliance
-
-- Done: Rebuilt the README with the required 14-section structure, documented only repository-backed capabilities, and established the newest-first daily progress log.
-- Files: `README.md`.
-- Commit: `5d9dda9 Update README for submission requirements`
-- Next: Confirm cleaning rules and build the auditable DuckDB data pipeline.
 
 ### Day 1 - 2026-09-30 - Streamlit App Skeleton
 
