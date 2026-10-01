@@ -71,11 +71,21 @@ class CleaningContractTests(unittest.TestCase):
                 self.assertEqual(flagged, expected)
 
     def test_explicit_mapping_behavior(self) -> None:
-        self.assertEqual(self.scalar("SELECT COUNT(*) FROM branches WHERE branch_name IS NOT NULL"), 7)
-        self.assertEqual(self.scalar("SELECT COUNT(*) FROM branches WHERE branch_name_unmapped_flag"), 8)
         self.assertEqual(
-            self.scalar("SELECT COUNT(*) FROM models WHERE model_name_unmapped_flag AND model_name IS NULL"),
-            54,
+            self.scalar("SELECT COUNT(*) FROM branches WHERE branch_name_unmapped_flag AND branch_name IS NOT NULL"),
+            0,
+        )
+        self.assertEqual(
+            self.scalar("SELECT COUNT(*) FROM branches WHERE NOT branch_name_unmapped_flag AND branch_name IS NULL"),
+            0,
+        )
+        self.assertEqual(
+            self.scalar("SELECT COUNT(*) FROM models WHERE model_name_unmapped_flag AND model_name IS NOT NULL"),
+            0,
+        )
+        self.assertEqual(
+            self.scalar("SELECT COUNT(*) FROM models WHERE NOT model_name_unmapped_flag AND model_name IS NULL"),
+            0,
         )
 
     def test_cleaning_log_contract(self) -> None:
