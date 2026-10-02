@@ -57,6 +57,7 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Keeping the private generator answer key out of the public repository while retaining it locally for verification.
 - Preventing invalid dimension relationships from appearing as legitimate `Unmapped` categories without discarding otherwise valid records.
 - Keeping KPI totals consistent between pandas calculations and independent DuckDB SQL checks.
+- Tracing recurring `Unmapped` chart values back through sales, inventory, and model joins, then enforcing orphan exclusion at the shared enrichment boundary instead of applying a cosmetic chart-only fix.
 
 ## AI Mistakes
 
@@ -86,9 +87,9 @@ The raw data intentionally includes missing values, duplicates, name and categor
 
 ## Daily Progress Log
 
-### Day 2 - 2026-10-01 - README, Analytics, Overview & Drill-Down
+### Day 2 - 2026-10-02 - README, Analytics, Overview & Drill-Down
 
-- Done: Rebuilt the README to satisfy the required 14-section structure; built the audited cleaning and DuckDB pipeline, tested core metrics, persistent business filters, period-over-period management KPIs, responsive Overview charts, and warranty drill-down from model to branch to downloadable claims; corrected orphan and branch mapping issues so invalid relationships do not become management categories.
+- Done: Rebuilt the README to satisfy the required 14-section structure; built the audited cleaning and DuckDB pipeline, tested core metrics, persistent business filters, period-over-period management KPIs, responsive Overview charts, and warranty drill-down from model to branch to downloadable claims; corrected orphan and branch mapping issues, and added an explicit orphan-model guard in shared dimension enrichment so invalid relationships do not become management categories.
 - Files: `README.md`, `src/data/cleaning.py`, `scripts/build_database.py`, `src/analytics/metrics.py`, `src/analytics/drilldown.py`, `src/ui/filters.py`, `pages/overview.py`, `pages/investigate.py`, `tests/`, `docs/cleaning_log.csv`, `docs/ai_mistakes.md`.
 - Commits: `5d9dda9 Update README for submission requirements`; `b6b881e Add drill-down investigation`; `055841d Complete Day 2 analytics and dashboard`.
 - Next: Build the Data Quality page, then ground Ask the Business and Management Brief in tested database evidence.
