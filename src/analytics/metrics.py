@@ -119,6 +119,8 @@ def _add_dimensions(
         )
         inventory = inventory.rename(columns={"_row_quality_status": "inventory_row_quality_status"})
         result = result.merge(inventory, on="inventory_id", how="left", suffixes=("", "_inventory"))
+        if "model_id_orphan_flag" in result.columns:
+            result = result[result["model_id_orphan_flag"] != True]
         if "model_id_inventory" in result.columns:
             result["model_id"] = result.get("model_id", pd.Series(index=result.index, dtype="float64")).combine_first(result["model_id_inventory"])
 
