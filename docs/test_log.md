@@ -104,3 +104,28 @@ Scope: Critical and High failures only. All destructive data shocks were applied
 - Critical failures found: 0.
 - High failures found and fixed: 4 groups (missing schema, chronology flags, unsupported AI input, Data Quality rerun performance).
 - Final automated suite: 35 tests passed, 24 subtests passed; all five Streamlit pages rendered without exceptions.
+
+---
+
+# Final SQL Metric Reconciliation
+
+Date: 2026-10-04
+
+Scope: Unfiltered completed sales using the production metric rules. Both paths exclude `ERROR` sales, `ERROR` inventory, and orphan model relationships. Revenue uses `net_sale_price`; units use distinct `inventory_id`; gross margin uses `net_sale_price - acquisition_cost` and excludes rows missing either amount.
+
+| Metric | Analytics result | Direct DuckDB SQL | Result |
+|---|---:|---:|---|
+| Total revenue | GHS 5,554,215,470.18 | GHS 5,554,215,470.18 | PASS — exact to GHS 0.01 |
+| Units sold | 19,646 | 19,646 | PASS — exact |
+| Gross margin | GHS 742,414,300.62 | GHS 742,414,300.62 | PASS — exact to GHS 0.01 |
+
+The SQL joined `sales` to `inventory` once on `inventory_id`, applied the same completed-sale and quality predicates, and aggregated directly in DuckDB. This independently verifies that the analytics layer is not substituting list price and is not multiplying sales through dimension joins.
+
+## Clean-install and fresh-clone verification
+
+- Created a separate Python virtual environment with no project packages preinstalled.
+- Installed `requirements.txt`; `pip check` reported no broken requirements and all direct imports succeeded with Streamlit 1.65.0.
+- Cloned the tracked repository into an isolated directory and confirmed `data/business.duckdb` was absent initially.
+- Ran `scripts/build_database.py` using only files available in the clone. It rebuilt all nine cleaned tables and DuckDB successfully, including 20,520 sales and 48,025 service records.
+- Used Streamlit `AppTest` from the clean environment to start `app.py` and render Overview, Investigate, Ask the Business, Management Brief, and Data Quality. Every page passed without an exception.
+- Re-ran the repository suite after the documentation and dependency updates: 35 tests passed, 24 subtests passed. Two non-failing warnings concerned a Google SDK deprecation and pytest cache creation.

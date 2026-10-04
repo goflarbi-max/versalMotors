@@ -10,9 +10,28 @@ versalMotors has sales, inventory, service, warranty, complaint, and customer-sa
 
 This project provides a multipage business-intelligence application that turns operational records into auditable management metrics. The implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, a filterable management Overview, warranty-cost drill-down, data-quality monitoring, evidence-backed business questions, and downloadable management briefs.
 
+### Run locally
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe scripts\build_database.py
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+The database and cleaned CSVs are generated artifacts, so the build command is required once after a fresh clone. Gemini is optional; copy `.env.example` to `.env` only when AI narration is wanted.
+
+### Testing
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+The Day 4 stress suite records 35 passing tests and 24 passing subtests across calculations, degraded schemas, bad chronology, filters, AI failures, unsupported questions, large data, and all five Streamlit pages. Full results and limitations are in `docs/test_log.md`.
+
 ## Dataset
 
-The repository contains nine synthetic raw CSV tables covering branches, models, salespeople, inventory, sales, service records, warranty claims, complaints, and satisfaction. The data spans approximately 2.5 years, uses Ghanaian cedi (`GHS`), and deliberately contains realistic quality problems for testing. Cleaned outputs are generated locally in `data/cleaned/` and loaded into `data/business.duckdb`; both are excluded from Git and can be rebuilt from source. `docs/data_dictionary.md` records the observed schema and profile.
+The repository contains nine synthetic raw CSV tables covering branches, models, salespeople, inventory, sales, service records, warranty claims, complaints, and satisfaction. The data spans approximately 2.5 years, uses Ghanaian cedi (`GHS`), and deliberately contains realistic quality problems for testing. Raw CSVs are committed so a fresh clone can rebuild the application without access to private files. Cleaned outputs are generated locally in `data/cleaned/` and loaded into `data/business.duckdb`; both are excluded from Git. `docs/data_dictionary.md` records the observed schema and profile.
 
 ## How the System Works
 
@@ -27,11 +46,11 @@ The repository contains nine synthetic raw CSV tables covering branches, models,
 ## Architecture
 
 ```text
-Business Data -> Data Processing -> Database -> Analysis -> AI Layer        -> Dashboard -> Management
-Raw CSVs      -> Audited Cleaning -> DuckDB   -> Metrics  -> Optional Gemini -> Streamlit -> Decisions
+Business Data -> Data Processing -> Database -> Analysis -> Evidence -> AI & Guardrails -> Dashboard -> Management
+Raw CSVs      -> Audited Cleaning -> DuckDB   -> Metrics  -> Objects  -> Optional Gemini  -> Streamlit -> Decisions
 ```
 
-The AI layer is optional: reviewed database queries and deterministic summaries keep the dashboard operational during missing credentials, timeouts, rate limits, invalid generated SQL, and Gemini service failures. See `docs/architecture.md` for the detailed request and fallback flow.
+The AI layer is optional: reviewed database queries and deterministic summaries keep the dashboard operational during missing credentials, timeouts, rate limits, invalid generated SQL, and Gemini service failures. See `docs/architecture.md` for the Mermaid diagrams and exported PNG.
 
 ## Technologies (What + Why)
 
@@ -50,7 +69,7 @@ AI has assisted development by drafting code, documentation, dataset patterns, t
 
 ## Data Quality
 
-The raw data intentionally includes missing values, duplicates, name and category variants, invalid dates, negative amounts, malformed VINs, arithmetic inconsistencies, and orphan references. Raw files remain unchanged. The cleaning pipeline preserves raw companions, removes only exact duplicates, uses reviewed exact mappings rather than fuzzy guesses, converts invalid values to null with flags, and assigns `ERROR`, `WARNING`, or `VALID` status. Every action is recorded in `docs/cleaning_log.csv`. Orphan model references such as raw model ID `9002` remain flagged and are excluded from management metrics rather than displayed as a real model.
+The raw data intentionally includes missing values, duplicates, name and category variants, invalid dates, negative amounts, malformed VINs, arithmetic inconsistencies, and orphan references. Raw files remain unchanged. As recorded in `docs/cleaning_log.md`, the pipeline removes only exact duplicates—20 sales, 35 service records, 12 warranty claims, 8 complaints, and 15 satisfaction rows—while retaining questionable non-duplicates with flags. It nulls and flags 20 negative inventory amounts, 15 negative sales amounts, 20 negative service amounts, 10 negative warranty amounts, and 10 negative complaint amounts instead of treating them as credits. Reviewed exact mappings replace fuzzy guessing; invalid values retain raw companions; missing amounts remain null; and row severity follows `ERROR > WARNING > VALID`. Orphan references remain auditable and are excluded from management calculations when the relationship is required. Every action is recorded in `docs/cleaning_log.csv`.
 
 ## Challenges
 
@@ -68,15 +87,37 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Keeping implementation-level SQL hidden from the user interface while retaining evidence tables and internal auditability.
 - Managing Streamlit widget state so a persistent quick-question selection cannot override typed follow-ups, repeat an old answer, or make another quick-question control appear unresponsive.
 - Selecting management priorities from comparable periods and valid relationships without treating synthetic-data ground truth as business evidence or implying causation from associations.
+- Implementing the approved DD/MM-first date rule while retaining ambiguous inputs and invalid-date flags rather than silently choosing a convenient interpretation.
+- Keeping missing totals null while exposing calculated companion values, so management metrics never confuse reconstruction with a source-recorded amount.
+- Enforcing the approved one-completed-sale-per-VIN and near-duplicate rules without automatically deleting legitimate transactions that merely look similar.
 
 ## AI Mistakes
 
-- **Situation:** An AI-assisted `git add .` included the private generator answer key in an early public commit.
-- **How discovered:** The committed-file list showed `data/generator_truth.md` among the published files.
-- **How corrected:** The file was added to `.gitignore`, removed from current Git tracking, and retained locally. It still exists in earlier Git history, so a history rewrite would be required for complete removal.
-- **Situation:** An attempted orphan-model fix created a synthetic `Model ID 9002 (unresolved)` category, moving a source-data error into the management chart.
-- **How discovered:** Raw-to-dimension reconciliation and the Gross margin by model chart showed that 12 inventory records referenced model ID `9002`, which does not exist in the model source.
-- **How corrected:** The synthetic member was removed. The raw ID is preserved for audit, the cleaned relationship is null and flagged as an error, affected records are excluded before margin aggregation, and explicit regression tests prevent `Unmapped` or placeholder model labels from reaching management results.
+The following is reproduced verbatim from `docs/ai_mistakes.md`:
+
+```text
+## Metrics verification - Oct 1 2026
+Checked for double-counting, list_price vs net_sale_price mix, nulls dropped.
+Result: Fixed import path and schema. Verified revenue via raw SQL vs metrics.py - exact match. 3/3 tests passed.
+
+## Decisions confirmed - Oct 2 2026
+1. Complaint co-occurrence: Combined rule - same sale_id OR same customer_id within 30 days.
+2. Default scan: Report latest complete month, use up to 12 prior months as context for trends.
+3. Severity threshold: Suppress <40 from management output, retain when include_low_severity=True.
+4. Inventory categories: Use vehicle_segment + condition only, exclude branch initially for stronger sample sizes.
+
+## AI Mistakes Log - Day 3 onwards
+Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
+
+
+
+- Error on 'Which branch has highest complaints?': 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+## Stress-test timing attribution
+
+- **Situation:** I initially treated a 24.4-second subprocess measurement as Data Quality page load time.
+- **How discovered:** A phased `AppTest` measurement separated Streamlit shell startup from child-page rendering and showed 11.9 seconds of test-shell startup, 3.625 seconds for the cold page, and 1.182 seconds for a cached rerun.
+- **How corrected:** I recorded the isolated timings in `docs/test_log.md`, retained the useful caching/query-batching improvements, and stopped attributing process startup overhead to the page itself.
+```
 
 ## What You Learned
 
@@ -96,13 +137,14 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Expand the deterministic question registry beyond the four reviewed offline questions.
 - Complete the evidence-object schema and strengthen prompt-injection testing.
 - Add browser-level mobile testing and deployment checks.
+- Add normalized service-volume and model-population denominators to strengthen the management investigations in `docs/management_brief.md`.
 
 ## Daily Progress Log
 
 ### Day 4 - 2026-10-04 - Resilient AI Model Failover
 
-- Done: Added bounded retry and lighter-model failover for Gemini `429`, `5xx`, and timeout failures; routed missing credentials, exhausted models, and rejected generated SQL through reviewed offline queries; generated concrete grounded answers for revenue trend, best branch, aged inventory, and complaints; replaced stateful suggestion controls with reliable buttons that run reviewed queries without waiting for Gemini; prevented raw provider errors and `FACTS` labels from reaching users; preserved typed-question AI handling; documented the complete architecture; and produced an evidence-backed Management Brief selecting aged inventory, rising complaint incidence, and concentrated warranty exposure as the three priorities for investigation.
-- Files: `src/ai/gemini_client.py`, `src/ai/fallback.py`, `src/ai/guardrails.py`, `pages/ask_the_business.py`, `tests/test_ai_fallback.py`, `tests/test_ask_business_resilience.py`, `.env.example`, `docs/architecture.md`, `docs/management_brief.md`, `README.md`.
+- Done: Added bounded retry and lighter-model failover for Gemini `429`, `5xx`, and timeout failures; routed missing credentials, exhausted models, and rejected generated SQL through reviewed offline queries; generated concrete grounded answers for revenue trend, best branch, aged inventory, and complaints; replaced stateful suggestion controls with reliable buttons that run reviewed queries without waiting for Gemini; prevented raw provider errors and `FACTS` labels from reaching users; preserved typed-question AI handling; produced an evidence-backed Management Brief; completed the Mermaid architecture and PNG export; documented clean-clone build and test steps; and audited secrets, generated data, dependencies, SQL totals, and private-file history.
+- Files: `src/ai/gemini_client.py`, `src/ai/fallback.py`, `src/ai/guardrails.py`, `pages/ask_the_business.py`, `tests/test_ai_fallback.py`, `tests/test_ask_business_resilience.py`, `.env.example`, `docs/architecture.md`, `docs/screenshots/architecture.png`, `scripts/render_architecture.py`, `docs/management_brief.md`, `docs/test_log.md`, `requirements.txt`, `README.md`.
 - Commit: Current Day 4 AI resilience and question-flow commit.
 - Next: Add drill-downs and normalized monitoring for the three priorities in the Management Brief.
 

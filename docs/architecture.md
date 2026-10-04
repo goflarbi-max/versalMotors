@@ -1,90 +1,95 @@
 # VersalMotors Architecture
 
-## System flow
+## End-to-end architecture
 
-```text
-Raw automotive CSVs
-        |
-        v
-Profile and audited cleaning ----> Cleaning log and quality flags
-        |
-        v
-Cleaned CSVs ----> DuckDB ----> Pure analytics metrics
-                                  |
-                                  v
-                         Evidence and drill-downs
-                                  |
-                                  v
-                    Streamlit management application
+```mermaid
+flowchart LR
+    RAW[Raw CSV data<br/>9 operational tables] --> CLEAN[Audited cleaning<br/>explicit mappings, safe parsing,<br/>quality flags and cleaning log]
+    CLEAN --> FILES[Cleaned CSVs]
+    FILES --> DB[(DuckDB<br/>business.duckdb)]
+
+    DB --> ANALYTICS[Analytics and deterministic insight engine<br/>metrics.py, drilldown.py, fallback registry]
+    ANALYTICS --> EVIDENCE[Evidence objects<br/>facts, values, filters and source tables]
+
+    EVIDENCE --> TOOLS[AI tools<br/>reviewed SQL boundary and optional Gemini]
+    TOOLS --> GUARDS[Guardrails<br/>input validation, SQL allowlist,<br/>number grounding, retry and fallback]
+
+    GUARDS --> UI[Streamlit pages<br/>Overview, Investigate, Ask the Business,<br/>Management Brief, Data Quality]
+    UI --> MGMT[Management<br/>monitor, investigate and decide]
+
+    CLEAN -. audit trail .-> UI
+    EVIDENCE -. deterministic fallback .-> UI
 ```
 
-The nine source tables are preserved in `data/raw/`. The cleaning pipeline writes flagged, standardised tables to `data/cleaned/`, and `scripts/build_database.py` loads them into DuckDB. Pure functions in `src/analytics/metrics.py` define business calculations. Streamlit pages consume those results and never silently repair source data.
+![VersalMotors architecture](screenshots/architecture.png)
+
+## Components and responsibilities
+
+| Layer | Implementation | Responsibility |
+|---|---|---|
+| Raw data | `data/raw/*.csv` | Nine reproducible operational datasets remain unchanged for audit. |
+| Cleaning | `src/data/cleaning.py`, `src/data/cleaning_log.py` | Applies reviewed mappings, parses types safely, removes only exact duplicates, preserves raw companions, and flags questionable rows. |
+| Build | `scripts/build_database.py` | Recreates `data/cleaned/`, `docs/cleaning_log.csv`, and the local DuckDB database. |
+| Database | `data/business.duckdb` | Holds the cleaned analytical tables; it is generated locally and not committed. |
+| Analytics and insights | `src/analytics/metrics.py`, `src/analytics/drilldown.py`, `src/ai/fallback.py` | Calculates management metrics, supports claim drill-down, and maps reviewed questions to deterministic evidence. |
+| Evidence | Dictionaries and DataFrames returned by analytics/AI tools | Carries the fact, value, filters, and source context used to support an answer. |
+| AI tools | `src/ai/gemini_client.py`, `src/database/connection.py` | Optionally interprets questions and executes only approved read-only business queries. |
+| Guardrails | `src/ai/guardrails.py`, retry/fallback logic | Rejects unsafe input and SQL, verifies narrative numbers, retries transient failures, and falls back without exposing provider errors. |
+| User interface | `app.py`, `pages/`, `src/ui/` | Presents persistent filters, KPIs, charts, drill-downs, evidence, quality results, and PDF downloads. |
+| Management | Application users | Use evidence to choose investigations and actions; AI does not make decisions for them. |
+
+## Data and build flow
+
+1. `scripts/generate_dataset.py` can reproduce the synthetic raw source with its fixed seed.
+2. `scripts/build_database.py` calls the cleaning pipeline, writes cleaned CSVs, verifies table row counts, and loads DuckDB.
+3. Pure pandas functions calculate metrics from cleaned tables. Question and drill-down tools query the same governed data.
+4. Evidence objects are passed to optional AI narration and to deterministic fallback summaries.
+5. Streamlit renders the result and lets management inspect supporting records.
 
 ## Resilient Ask the Business flow
 
-```text
-Business question
-      |
-      v
-Input guardrails
-      |
-      v
-Gemini primary model --429/5xx/timeout--> bounded retry
-      |                                      |
-      |                                      v
-      |                              lighter Gemini model
-      |                                      |
-      +----------------------+---------------+
-                             |
-                   unavailable or invalid SQL
-                             |
-                             v
-                  Reviewed fallback registry
-                             |
-                             v
-                    Read-only SQL boundary
-                             |
-                             v
-                  Structured evidence objects
-                             |
-             +---------------+----------------+
-             |                                |
-       verified AI text              deterministic summary
-             |                                |
-             +---------------+----------------+
-                             v
-                    Evidence table and answer
+```mermaid
+flowchart TD
+    Q[Business question] --> INPUT{Input is valid and in scope?}
+    INPUT -- No --> SAFE[Safe guidance; no model call]
+    INPUT -- Yes --> ROUTE{Reviewed offline question?}
+    ROUTE -- Yes --> QUERY[Reviewed read-only query]
+    ROUTE -- No --> GEMINI[Gemini primary model]
+    GEMINI -- 429, 5xx or timeout --> RETRY[Bounded retry and lighter-model failover]
+    GEMINI -- SQL proposed --> SQL[SQL safety allowlist]
+    RETRY --> SQL
+    SQL -- Rejected or unavailable --> FALLBACK[Reviewed fallback registry]
+    SQL -- Approved --> QUERY
+    FALLBACK --> QUERY
+    QUERY --> EV[Structured evidence objects]
+    EV --> VERIFY{All narrative numbers grounded?}
+    VERIFY -- Yes --> ANSWER[Verified answer and evidence]
+    VERIFY -- No --> DET[Deterministic evidence summary]
+    DET --> ANSWER
 ```
 
-`src/ai/gemini_client.py` owns API retry and model failover. It retries only transient failures and returns structured status without exposing provider errors. Model order and attempt limits are environment-configurable.
-
-`src/ai/fallback.py` is the reviewed offline registry. It contains allowlisted queries for supported questions, converts tool results into fact evidence objects, and provides summaries that use only returned values. Invalid generated SQL also enters this path.
-
-`src/database/connection.py` permits a single read-only `SELECT` or `WITH` query against approved business tables and blocks mutation, attachment, extension, and filesystem-reading operations.
-
-`src/ai/guardrails.py` checks narrative numbers against the evidence from that request. Missing, unavailable, or unverified AI output is replaced with the deterministic response. Gemini is therefore an optional interpretation layer rather than a dependency for business facts.
-
-## Configuration
-
-```dotenv
-GEMINI_MODEL=gemini-3.8-flash
-GEMINI_FALLBACK_MODELS=gemini-3.5-flash-lite
-GEMINI_MAX_ATTEMPTS=2
-```
-
-No API key is required for registered offline questions or deterministic management briefs. Secrets belong in `.env` or Streamlit secrets and are never committed.
+`src/ai/gemini_client.py` owns bounded retry and model failover. `src/database/connection.py` accepts a single `SELECT` or `WITH` statement against allowlisted business tables and blocks mutation, attachment, extensions, and file-reading functions. `src/ai/guardrails.py` checks response numbers against the request evidence. Gemini is therefore an optional interpretation layer, not the source of business facts.
 
 ## Failure behavior
 
-| Condition | Result |
+| Condition | User-visible result |
 |---|---|
-| Primary model returns `429`, `5xx`, or timeout | Retry with bounded backoff, then try the lighter model |
-| API key is absent | Skip Gemini and use the reviewed fallback |
-| Every model is unavailable | Show verified database evidence and a deterministic statement |
-| Generated SQL is rejected | Run the reviewed fallback query through the same read-only boundary |
-| AI narrative contains an unsupported number | Suppress it and show the deterministic statement |
-| No reviewed route exists | Explain the supported question types without guessing |
+| API key absent | Reviewed deterministic query and grounded summary where supported. |
+| Gemini returns `429`, `5xx`, or timeout | Bounded retry, lighter-model failover, then deterministic fallback. |
+| Generated SQL is unsafe or invalid | SQL is rejected and the reviewed fallback is attempted. |
+| AI narrative contains an unsupported number | Narrative is suppressed and evidence is summarized deterministically. |
+| Question is unsupported by available data | The limitation is explained without guessing. |
+| Filters return no rows | A no-data message is shown without a page crash. |
 
-## Testing boundary
+## Security and configuration
 
-Pure retry and fallback behavior is covered in `tests/test_ai_fallback.py`. The tests simulate `503` and `429` responses, model failover, missing credentials, rejected generated SQL, grounded evidence, and empty results. Streamlit page tests confirm that the user interface renders without uncaught exceptions.
+Secrets are loaded from `.env` or Streamlit secrets and are excluded from Git. Model name, fallback models, and retry limits are configurable through `.env.example`. The database and cleaned CSVs are generated artifacts; a fresh clone builds them with:
+
+```powershell
+python scripts/build_database.py
+python -m streamlit run app.py
+```
+
+## Verification boundary
+
+Formula tests use hand-calculated fixtures. Integration tests independently compare revenue, units, and gross margin with direct DuckDB SQL. Streamlit `AppTest` exercises all five pages and AI failure paths. The full stress-test record and limitations are maintained in `docs/test_log.md`.
