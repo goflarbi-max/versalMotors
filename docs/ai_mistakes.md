@@ -14,3 +14,8 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 
 
 - Error on 'Which branch has highest complaints?': 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+## Stress-test timing attribution
+
+- **Situation:** I initially treated a 24.4-second subprocess measurement as Data Quality page load time.
+- **How discovered:** A phased `AppTest` measurement separated Streamlit shell startup from child-page rendering and showed 11.9 seconds of test-shell startup, 3.625 seconds for the cold page, and 1.182 seconds for a cached rerun.
+- **How corrected:** I recorded the isolated timings in `docs/test_log.md`, retained the useful caching/query-batching improvements, and stopped attributing process startup overhead to the page itself.

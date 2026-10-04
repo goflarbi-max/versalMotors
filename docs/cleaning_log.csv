@@ -4,7 +4,7 @@ remove_exact_duplicates,branches,0,Exact byte-equivalent business rows are redun
 normalize_blank_nulls,branches,8,Blank CSV fields represent missing values,converted_empty_strings_to_null
 map_branch_name,branches,15,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
 map_branch_type,branches,8,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
-parse_dates,branches,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_dates,branches,0,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,branches,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,branches,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,branches,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
@@ -14,7 +14,7 @@ load_raw,models,54,Load source without type coercion,loaded_all_columns_as_text_
 remove_exact_duplicates,models,0,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,models,54,Blank CSV fields represent missing values,converted_empty_strings_to_null
 map_model_name,models,54,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
-parse_dates,models,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_dates,models,0,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,models,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,models,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,models,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
@@ -23,7 +23,7 @@ validate_mandatory_fields,models,12,Approved mandatory-field definitions must be
 load_raw,salespeople,225,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
 remove_exact_duplicates,salespeople,0,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,salespeople,193,Blank CSV fields represent missing values,converted_empty_strings_to_null
-parse_dates,salespeople,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_dates,salespeople,0,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,salespeople,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,salespeople,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,salespeople,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
@@ -33,7 +33,7 @@ load_raw,inventory,25000,Load source without type coercion,loaded_all_columns_as
 remove_exact_duplicates,inventory,0,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,inventory,5205,Blank CSV fields represent missing values,converted_empty_strings_to_null
 map_inventory_status,inventory,20,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
-parse_dates,inventory,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_dates,inventory,0,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,inventory,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,inventory,20,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,inventory,65,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
@@ -43,7 +43,7 @@ load_raw,sales,20540,Load source without type coercion,loaded_all_columns_as_tex
 remove_exact_duplicates,sales,20,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,sales,17621,Blank CSV fields represent missing values,converted_empty_strings_to_null
 map_sales_channel,sales,25,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
-parse_dates,sales,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_dates,sales,0,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,sales,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,sales,15,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,sales,16228,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
@@ -53,7 +53,7 @@ load_raw,service_records,48060,Load source without type coercion,loaded_all_colu
 remove_exact_duplicates,service_records,35,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,service_records,3609,Blank CSV fields represent missing values,converted_empty_strings_to_null
 map_service_type,service_records,24,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
-parse_dates,service_records,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_dates,service_records,0,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,service_records,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,service_records,20,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,service_records,40,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
@@ -62,7 +62,7 @@ validate_mandatory_fields,service_records,35,Approved mandatory-field definition
 load_raw,warranty_claims,3070,Load source without type coercion,loaded_all_columns_as_text_and_added_source_metadata
 remove_exact_duplicates,warranty_claims,12,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,warranty_claims,47,Blank CSV fields represent missing values,converted_empty_strings_to_null
-parse_dates,warranty_claims,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_dates,warranty_claims,0,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,warranty_claims,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,warranty_claims,10,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,warranty_claims,20,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
@@ -72,7 +72,7 @@ load_raw,complaints,1863,Load source without type coercion,loaded_all_columns_as
 remove_exact_duplicates,complaints,8,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,complaints,1605,Blank CSV fields represent missing values,converted_empty_strings_to_null
 map_complaint_category,complaints,18,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
-parse_dates,complaints,0,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0
+parse_dates,complaints,0,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=0; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,complaints,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,complaints,10,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,complaints,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation
@@ -82,7 +82,7 @@ load_raw,satisfaction,15022,Load source without type coercion,loaded_all_columns
 remove_exact_duplicates,satisfaction,15,Exact byte-equivalent business rows are redundant,kept_first_physical_source_row_removed_later_exact_matches
 normalize_blank_nulls,satisfaction,15007,Blank CSV fields represent missing values,converted_empty_strings_to_null
 map_response_channel,satisfaction,14,Use reviewed exact mappings without fuzzy guessing,set_approved_canonical_value_else_null_preserved_raw_and_flagged
-parse_dates,satisfaction,10,DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags,parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=10; ambiguous_rows=0
+parse_dates,satisfaction,10,"DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags",parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows=10; ambiguous_rows=0; future_rows=0
 parse_numeric_fields,satisfaction,0,Invalid numeric text cannot be analyzed safely,parsed_nullable_numeric_invalid_to_null_and_flagged
 flag_negative_amounts,satisfaction,0,"Approved decision: negative monetary values are errors, not credits",set_clean_amount_to_null_preserved_raw_and_flagged
 flag_missing_amounts,satisfaction,0,Approved decision: missing amounts remain null,retained_null_added_missing_flag_no_statistical_imputation

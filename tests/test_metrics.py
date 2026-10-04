@@ -149,6 +149,29 @@ def test_missing_and_heavily_null_prices_do_not_crash_metrics(small_frames: Anal
     }
 
 
+def test_empty_single_day_and_all_filters_together(small_frames: AnalyticsData) -> None:
+    assert revenue(
+        small_frames, Filters(branch=("Does not exist",))
+    ).empty
+
+    single_day = revenue(
+        small_frames,
+        Filters(start_date="2024-01-10", end_date="2024-01-10"),
+    )
+    assert single_day["revenue"].sum() == 10_000.0
+
+    fully_filtered = revenue(
+        small_frames,
+        Filters(
+            start_date="2024-01-10", end_date="2024-01-11",
+            branch=("Accra",), brand=("Toyota",), model=("Corolla",),
+            salesperson=("Ama Mensah",), status=("completed",),
+        ),
+    )
+    assert fully_filtered["revenue"].sum() == 25_000.0
+    assert fully_filtered["transaction_count"].sum() == 2
+
+
 def test_all_metrics_return_expected_columns_and_rows() -> None:
     """Metric revenue must exactly match one-row-per-sale raw SQL revenue."""
     assert DATABASE_PATH.exists(), "Run scripts/build_database.py before pytest."
