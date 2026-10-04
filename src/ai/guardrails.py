@@ -8,6 +8,11 @@ from typing import Any
 NUMBER_RE = re.compile(r"(?:GHS\s*)?\b\d[\d,]*\.?\d*\b%?")
 INJECTION_PATTERNS = ("ignore your instructions", "ignore previous", "system prompt", "drop table", "delete from", ";--")
 UNANSWERABLE_KEYWORDS = ("weather", "football", "president", "celebrity", "recipe", "joke")
+UNANSWERABLE_PHRASES = (
+    "competitor", "competition", "predict", "forecast", "next year's sales",
+    "next year sales",
+)
+KNOWN_GIBBERISH = {"asdf", "qwerty", "asdfgh", "lorem ipsum"}
 
 
 def validate_question(question: str) -> tuple[bool, str]:
@@ -17,6 +22,8 @@ def validate_question(question: str) -> tuple[bool, str]:
     if len(text) > 500:
         return False, "Question too long (maximum 500 characters)."
     lowered = text.lower()
+    if lowered in KNOWN_GIBBERISH:
+        return False, "Please ask a specific versalMotors business question."
     for pattern in INJECTION_PATTERNS:
         if pattern in lowered:
             return False, "The question contains a disallowed instruction."
@@ -24,8 +31,14 @@ def validate_question(question: str) -> tuple[bool, str]:
 
 
 def handle_unanswerable(question: str) -> str | None:
-    if any(word in question.lower() for word in UNANSWERABLE_KEYWORDS):
+    lowered = question.lower()
+    if any(word in lowered for word in UNANSWERABLE_KEYWORDS):
         return "I can only answer questions supported by versalMotors business data."
+    if any(phrase in lowered for phrase in UNANSWERABLE_PHRASES):
+        return (
+            "The available versalMotors data cannot support competitor comparisons "
+            "or future forecasts. I can report verified historical performance instead."
+        )
     return None
 
 
