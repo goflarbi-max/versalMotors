@@ -145,26 +145,26 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 
 - Done: Added bounded retry and lighter-model failover for Gemini `429`, `5xx`, and timeout failures; routed missing credentials, exhausted models, and rejected generated SQL through reviewed offline queries; generated concrete grounded answers for revenue trend, best branch, aged inventory, and complaints; replaced stateful suggestion controls with reliable buttons that run reviewed queries without waiting for Gemini; prevented raw provider errors and `FACTS` labels from reaching users; preserved typed-question AI handling; produced an evidence-backed Management Brief; completed the Mermaid architecture and PNG export; documented clean-clone build and test steps; and audited secrets, generated data, dependencies, SQL totals, and private-file history.
 - Files: `src/ai/gemini_client.py`, `src/ai/fallback.py`, `src/ai/guardrails.py`, `pages/ask_the_business.py`, `tests/test_ai_fallback.py`, `tests/test_ask_business_resilience.py`, `.env.example`, `docs/architecture.md`, `docs/screenshots/architecture.png`, `scripts/render_architecture.py`, `docs/management_brief.md`, `docs/test_log.md`, `requirements.txt`, `README.md`.
-- Commit: Current Day 4 AI resilience and question-flow commit.
+- Commits: `679a6d2 Make business question buttons deterministic`; `91a4d59 Add evidence-backed management brief`; `e273ab5 Complete architecture and verification documentation`.
 - Next: Add drill-downs and normalized monitoring for the three priorities in the Management Brief.
 
 ### Day 3 - 2026-10-03 - Governed AI, Data Quality & Management Reporting
 
 - Done: Completed the Data Quality and Management Brief pages; secured Ask the Business with read-only SQL allowlists and numerical evidence checks; upgraded the configurable model to Gemini 3.8 Flash; added retries for transient API failures and deterministic no-Gemini fallbacks; removed SQL code from the user-facing evidence view; and added genuine PDF downloads for briefs, claims, and quality reports.
 - Files: `pages/ask_the_business.py`, `pages/management_brief.py`, `pages/data_quality.py`, `src/ai/guardrails.py`, `src/ai/gemini_client.py`, `src/ai/fallback.py`, `src/ai/brief.py`, `src/database/connection.py`, `src/ui/pdf_exports.py`, `tests/test_ai_fallback.py`, `docs/day3_audit.md`, `docs/test_log.md`, `requirements.txt`, `.env.example`.
-- Commits: `e2d7589 fix guardrails integration - complete Step 3`; `b689bfb Add management brief`; `1b5e938 Add data quality page`; current Day 3 resilience and reporting update.
+- Commits: `133e09e fix guardrails integration - complete Step 3`; `e522efa Add management brief`; `0c21203 Add data quality page`; `b614136 Add resilient AI reporting and Day 3 documentation`.
 - Next: Consolidate remaining AI-page metrics in `src/analytics/metrics.py`, complete the deterministic insights registry, and broaden drill-down coverage.
 
 ### Day 2 - 2026-10-02 - README, Analytics, Overview & Drill-Down
 
 - Done: Rebuilt the README to satisfy the required 14-section structure; built the audited cleaning and DuckDB pipeline, tested core metrics, persistent business filters, period-over-period management KPIs, responsive Overview charts, and warranty drill-down from model to branch to downloadable claims; corrected orphan and branch mapping issues, and added an explicit orphan-model guard in shared dimension enrichment so invalid relationships do not become management categories.
 - Files: `README.md`, `src/data/cleaning.py`, `scripts/build_database.py`, `src/analytics/metrics.py`, `src/analytics/drilldown.py`, `src/ui/filters.py`, `pages/overview.py`, `pages/investigate.py`, `tests/`, `docs/cleaning_log.csv`, `docs/ai_mistakes.md`.
-- Commits: `5d9dda9 Update README for submission requirements`; `b6b881e Add drill-down investigation`; `055841d Complete Day 2 analytics and dashboard`.
+- Commits: `53ce936 Update README for submission requirements`; `6d7a108 Add drill-down investigation`; `93e6e9b Complete Day 2 analytics and dashboard`.
 - Next: Build the Data Quality page, then ground Ask the Business and Management Brief in tested database evidence.
 
 ### Day 1 - 2026-09-30 - Streamlit App Skeleton
 
 - Done: Generated and profiled the synthetic automotive dataset, documented its structure and assumptions, and launched a Streamlit shell on `localhost:8501` with Overview, Investigate, Ask the Business, Management Brief, and Data Quality pages.
 - Files: `app.py`, `pages/`, `data/raw/`, `docs/data_dictionary.md`, `docs/assumptions.md`, `scripts/generate_dataset.py`, `scripts/profile_raw_data.py`, `.env.example`, `.gitignore`, `requirements.txt`.
-- Commit: `cca4a75 Create Streamlit app skeleton`
+- Commit: `23fcbcb Create Streamlit app skeleton`
 - Next: Confirm cleaning rules and build the auditable DuckDB data pipeline.
