@@ -50,4 +50,7 @@ def build_grounded_response(raw_response: str, evidence: list[dict[str, Any]], f
     verified, missing = verify_facts_against_evidence(facts.group(1) if facts else raw_response, evidence)
     if not verified:
         return {"status": "unverified", "response": fallback_insights or "Use the evidence table as the verified result.", "missing": missing}
-    return {"status": "verified", "response": raw_response, "missing": []}
+    display_response = re.sub(
+        r"^\s*FACTS:\s*", "", raw_response, count=1, flags=re.IGNORECASE
+    ).strip()
+    return {"status": "verified", "response": display_response, "missing": []}

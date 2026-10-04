@@ -4,10 +4,30 @@ import os
 
 import streamlit as st
 
-from src.ai.fallback import fallback_sql_for_question
+from src.ai.fallback import (
+    build_fallback_evidence,
+    fallback_response,
+    run_with_reviewed_fallback,
+)
 from src.ai.gemini_client import generate_text
 from src.ai.guardrails import build_grounded_response, handle_unanswerable, validate_question
 from src.database.connection import get_connection, run_readonly_sql
+
+
+SUGGESTIONS = {
+    "Revenue trend": "How did completed-sale revenue change by month?",
+    "Best branch": "Which branch had the highest completed-sale revenue?",
+    "Aged inventory": "Which available vehicles have been in inventory over 90 days?",
+    "Complaints": "Which branch had the most valid complaints?",
+}
+
+
+def queue_business_suggestion() -> None:
+    """Consume a pill selection once so it cannot override later questions."""
+    selected = st.session_state.get("business_suggestion")
+    if selected in SUGGESTIONS:
+        st.session_state["pending_business_question"] = SUGGESTIONS[selected]
+    st.session_state["business_suggestion"] = None
 
 
 @st.cache_data(show_spinner="Loading business context…")
@@ -38,6 +58,8 @@ st.session_state.setdefault("business_messages", [])
 with st.sidebar:
     if st.button("Clear chat", icon=":material/delete:", width="stretch"):
         st.session_state.business_messages = []
+        st.session_state.pop("pending_business_question", None)
+        st.session_state["business_suggestion"] = None
         st.rerun()
 
 st.title("Ask the Business")
@@ -51,18 +73,20 @@ with st.container(horizontal=True):
 
 ask_tab, history_tab = st.tabs(["Ask", "History"])
 with ask_tab:
-    suggestions = {
-        "Revenue trend": "How did completed-sale revenue change by month?",
-        "Best branch": "Which branch had the highest completed-sale revenue?",
-        "Aged inventory": "Which available vehicles have been in inventory over 90 days?",
-        "Complaints": "Which branch had the most valid complaints?",
-    }
-    selected = st.pills("Quick questions", list(suggestions), key="business_suggestion")
+    pending_question = st.session_state.pop("pending_business_question", None)
+    st.pills(
+        "Quick questions",
+        list(SUGGESTIONS),
+        key="business_suggestion",
+        on_change=queue_business_suggestion,
+    )
     for message in st.session_state.business_messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     submitted = st.chat_input("Ask about the business", submit_mode="disable")
-    question = suggestions.get(selected) if selected else submitted
+    # Typed input always wins. Quick-question state must never override a later
+    # question on Streamlit's next top-to-bottom rerun.
+    question = submitted or pending_question
     if question:
         valid, error = validate_question(question)
         out_of_scope = handle_unanswerable(question)
@@ -72,6 +96,8 @@ with ask_tab:
             st.warning(out_of_scope)
         else:
             st.session_state.business_messages.append({"role": "user", "content": question})
+            with st.chat_message("user"):
+                st.markdown(question)
             with st.chat_message("assistant"):
                 try:
                     model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
@@ -79,25 +105,30 @@ with ask_tab:
                     sql_result = generate_text(prompt, api_key=key(), model=model)
                     if sql_result["ok"]:
                         sql = sql_result["text"].replace("```sql", "").replace("```", "").strip()
-                        mode_message = "Gemini query succeeded."
                     else:
-                        sql, mode_message = fallback_sql_for_question(question)
-                    if not sql:
+                        sql = None
+                    result, mode_message, used_fallback = run_with_reviewed_fallback(
+                        question, sql, run_readonly_sql
+                    )
+                    if result is None:
                         st.info(mode_message)
                         st.session_state.business_messages.append({"role": "assistant", "content": mode_message})
                         st.stop()
-                    result = run_readonly_sql(sql)
                     st.dataframe(result, hide_index=True, width="stretch")
-                    evidence = [{str(k): v for k, v in row.items()} for row in result.to_dict("records")]
-                    answer_prompt = f"Question: {question}\nEvidence: {result.to_json(orient='records')[:12000]}\nStart with FACTS:. Use only numbers in evidence."
-                    answer_result = generate_text(answer_prompt, api_key=key(), model=model)
-                    fallback_answer = f"{mode_message} The table above is the verified database result."
+                    evidence = build_fallback_evidence(question, result)
+                    answer_prompt = f"Question: {question}\nEvidence: {result.to_json(orient='records', date_format='iso')[:12000]}\nAnswer directly and concisely. Use only numbers in evidence; do not add a FACTS heading."
+                    answer_result = (
+                        {"ok": False, "text": "", "reason": "deterministic_fallback"}
+                        if used_fallback
+                        else generate_text(answer_prompt, api_key=key(), model=model)
+                    )
+                    fallback_answer = fallback_response(question, evidence)
                     grounded = build_grounded_response(answer_result["text"], evidence, fallback_answer)
                     if grounded["status"] != "verified":
-                        st.info("AI is unavailable or unverified; showing the deterministic database result.")
+                        st.info("AI is temporarily unavailable. Showing the verified database result.")
                     st.markdown(grounded["response"])
                     st.session_state.business_messages.append({"role": "assistant", "content": grounded["response"]})
-                except Exception as exc:
+                except Exception:
                     safe_message = "The request could not be answered safely. Try one of the reviewed quick questions."
                     st.warning(safe_message)
                     st.session_state.business_messages.append({"role": "assistant", "content": safe_message})

@@ -22,7 +22,7 @@ The repository contains nine synthetic raw CSV tables covering branches, models,
 4. `scripts/build_database.py` rebuilds the cleaned CSVs and local DuckDB database.
 5. `src/analytics/metrics.py` calculates tested business metrics without UI or database side effects.
 6. Streamlit presents persistent filters, management KPIs, period comparisons, charts, warranty drill-down evidence, data-quality checks, and PDF exports.
-7. The optional Gemini layer turns reviewed evidence into narrative answers; deterministic queries and brief templates remain available when Gemini is missing or unavailable.
+7. The optional Gemini layer tries a primary model and lighter fallback model with bounded transient-error retries. Reviewed queries and deterministic evidence summaries remain available when every model is unavailable.
 
 ## Architecture
 
@@ -31,7 +31,7 @@ Business Data -> Data Processing -> Database -> Analysis -> AI Layer        -> D
 Raw CSVs      -> Audited Cleaning -> DuckDB   -> Metrics  -> Optional Gemini -> Streamlit -> Decisions
 ```
 
-The AI layer is optional: reviewed database queries and deterministic summaries keep the dashboard operational during missing credentials, timeouts, rate limits, and Gemini service failures.
+The AI layer is optional: reviewed database queries and deterministic summaries keep the dashboard operational during missing credentials, timeouts, rate limits, invalid generated SQL, and Gemini service failures. See `docs/architecture.md` for the detailed request and fallback flow.
 
 ## Technologies (What + Why)
 
@@ -46,7 +46,7 @@ The AI layer is optional: reviewed database queries and deterministic summaries 
 
 ## AI Usage
 
-AI has assisted development by drafting code, documentation, dataset patterns, tests, and quality checks. At runtime, Gemini can translate supported business questions into read-only queries and turn returned evidence into concise narratives. Every generated query passes through table and operation allowlists, and response numbers are checked against request evidence. If Gemini has no key or returns a transient error such as `503`, the app retries and then uses reviewed deterministic queries and brief templates. AI does not calculate source metrics, make business decisions, silently repair ambiguous records, or replace database evidence.
+AI has assisted development by drafting code, documentation, dataset patterns, tests, and quality checks. At runtime, Gemini can translate supported business questions into read-only queries and turn returned evidence into concise narratives. Every generated query passes through table and operation allowlists, and response numbers are checked against request evidence. For `429`, `5xx`, and timeout failures, the client uses bounded retries and then tries a configured lighter model. If all models fail, credentials are absent, SQL is rejected, or a narrative is unverified, reviewed deterministic queries and evidence summaries take over without exposing provider errors. AI does not calculate source metrics, make business decisions, silently repair ambiguous records, or replace database evidence.
 
 ## Data Quality
 
@@ -66,6 +66,7 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Verifying every AI-reported number against request evidence and suppressing narratives that cannot be grounded.
 - Producing genuine PDF downloads instead of renaming plain text with a `.pdf` extension.
 - Keeping implementation-level SQL hidden from the user interface while retaining evidence tables and internal auditability.
+- Managing Streamlit widget state so a persistent quick-question selection cannot override typed follow-ups, repeat an old answer, or make another quick-question control appear unresponsive.
 
 ## AI Mistakes
 
@@ -96,6 +97,13 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Add browser-level mobile testing and deployment checks.
 
 ## Daily Progress Log
+
+### Day 4 - 2026-10-04 - Resilient AI Model Failover
+
+- Done: Added bounded retry and lighter-model failover for Gemini `429`, `5xx`, and timeout failures; routed missing credentials, exhausted models, and rejected generated SQL through reviewed offline queries; generated concrete grounded answers for revenue trend, best branch, aged inventory, and complaints; prevented raw provider errors and `FACTS` labels from reaching users; repaired quick-question and typed-follow-up session state; and documented the complete architecture.
+- Files: `src/ai/gemini_client.py`, `src/ai/fallback.py`, `src/ai/guardrails.py`, `pages/ask_the_business.py`, `tests/test_ai_fallback.py`, `tests/test_ask_business_resilience.py`, `.env.example`, `docs/architecture.md`, `README.md`.
+- Commit: Current Day 4 AI resilience and question-flow commit.
+- Next: Expand the reviewed offline question registry and consolidate remaining AI-page KPIs through `src/analytics/metrics.py`.
 
 ### Day 3 - 2026-10-03 - Governed AI, Data Quality & Management Reporting
 
