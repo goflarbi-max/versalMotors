@@ -10,6 +10,7 @@ st.caption("Built from cleaning log + live validation checks: missing values, du
 
 
 
+@st.cache_data(ttl="5m", max_entries=2, show_spinner=False)
 def read_cleaning_log():
     log_text=""; issues=[]
     for p in ["logs/cleaning_log.json","data/cleaning_log.json","logs/cleaning.log","data/cleaning.log"] + glob.glob("**/*clean*.log", recursive=True):
@@ -20,6 +21,7 @@ def read_cleaning_log():
             except: pass
     return log_text, issues
 
+@st.cache_data(ttl="5m", max_entries=2, show_spinner="Checking data quality...")
 def run_live_checks():
     con = get_connection(read_only=True)
     tables=[t[0] for t in con.execute("SHOW TABLES").fetchall()]
@@ -27,22 +29,31 @@ def run_live_checks():
     def add(table,issue,count,total,impact):
         share=(count/total*100) if total else 0
         results.append({"table":table,"issue":issue,"count":int(count),"total_rows":int(total),"share_pct":round(share,2),"impact":impact})
+    primary_keys = {
+        "branches": "branch_id", "models": "model_id", "salespeople": "salesperson_id",
+        "inventory": "inventory_id", "sales": "sale_id", "service_records": "service_id",
+        "warranty_claims": "claim_id", "complaints": "complaint_id", "satisfaction": "survey_id",
+    }
     for t in tables:
         try:
             total=con.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] or 0
             if total==0: continue
             cols=[c[0] for c in con.execute(f"DESCRIBE {t}").fetchall()]
             col_low=[c.lower() for c in cols]
-            for c in cols:
-                try:
-                    miss=con.execute(f"SELECT COUNT(*) FROM {t} WHERE {c} IS NULL").fetchone()[0]
-                    if miss>0: add(t,f"Missing values in {c}",miss,total,f"Affects KPIs if {c} is revenue/date. Analyses filtering on {c} will undercount [EV-001].")
-                except: pass
-            try:
-                dup_q=f"SELECT SUM(cnt-1) FROM (SELECT COUNT(*) as cnt FROM {t} GROUP BY {', '.join(cols)} HAVING COUNT(*)>1) sub"
-                dup=con.execute(dup_q).fetchone()[0]
-                if dup and dup>0: add(t,"Duplicate rows removed",dup,total,"Inflates sales counts and revenue if not removed. Impacts Top branch / monthly trends [EV-004][EV-005].")
-            except: pass
+            null_sql = "SELECT " + ", ".join(
+                f'COUNT(*) FILTER (WHERE "{c}" IS NULL)' for c in cols
+            ) + f' FROM "{t}"'
+            null_counts = con.execute(null_sql).fetchone()
+            for c, miss in zip(cols, null_counts):
+                if miss > 0:
+                    add(t,f"Missing values in {c}",miss,total,f"Affects KPIs if {c} is revenue/date. Analyses filtering on {c} will undercount [EV-001].")
+            primary_key = primary_keys.get(t.lower())
+            if primary_key and primary_key in cols:
+                dup = con.execute(
+                    f'SELECT COUNT(*) - COUNT(DISTINCT "{primary_key}") FROM "{t}"'
+                ).fetchone()[0]
+                if dup > 0:
+                    add(t,"Duplicate primary keys",dup,total,"Can inflate counts and financial totals if not resolved.")
             if "model" in col_low:
                 mc=cols[col_low.index("model")]
                 try:
@@ -79,7 +90,12 @@ if checks:
     st.divider()
     st.subheader("Validation Checks")
     st.dataframe(df[["table","issue","count","total_rows","share_pct","impact"]].rename(columns={"share_pct":"share_%_of_table","impact":"which_conclusions_it_might_affect"}), width="stretch")
-    for _,row in df.iterrows():
+    detail_rows = df.sort_values(["share_pct", "count"], ascending=False).head(25)
+    st.caption(
+        f"Showing detailed expanders for the {len(detail_rows)} highest-impact checks; "
+        "the table and downloads contain all checks."
+    )
+    for _,row in detail_rows.iterrows():
         with st.expander(f"{row['table']} — {row['issue']} — {row['count']} rows ({row['share_pct']}%)"):
             col1,col2=st.columns([1,2])
             with col1: st.metric("Count",row['count']); st.metric("Share",f"{row['share_pct']}%"); st.metric("Total Rows",row['total_rows'])
