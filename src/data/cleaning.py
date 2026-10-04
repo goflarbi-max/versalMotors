@@ -259,6 +259,7 @@ class CleaningPipeline:
     def _parse_dates(self, table: str, rows: list[dict[str, Any]]) -> None:
         invalid_rows: set[int] = set()
         ambiguous_rows: set[int] = set()
+        future_rows: set[int] = set()
         for row in rows:
             for column in DATE_COLUMNS.get(table, []):
                 raw = row.get(column)
@@ -267,11 +268,15 @@ class CleaningPipeline:
                 row[column] = parsed
                 row[f"{column}_invalid_flag"] = invalid
                 row[f"{column}_ambiguous_flag"] = ambiguous
+                parsed_date = _as_date(parsed)
+                row[f"{column}_future_flag"] = bool(parsed_date and parsed_date > date.today())
                 if invalid:
                     invalid_rows.add(id(row))
                 if ambiguous:
                     ambiguous_rows.add(id(row))
-        self.log.append(step="parse_dates", table=table, rows_affected=len(invalid_rows | ambiguous_rows), reason="DD/MM/YYYY is primary; invalid and ambiguous dates require explicit flags", action_taken=f"parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows={len(invalid_rows)}; ambiguous_rows={len(ambiguous_rows)}")
+                if row[f"{column}_future_flag"]:
+                    future_rows.add(id(row))
+        self.log.append(step="parse_dates", table=table, rows_affected=len(invalid_rows | ambiguous_rows | future_rows), reason="DD/MM/YYYY is primary; invalid, ambiguous, and future dates require explicit flags", action_taken=f"parsed_dd_mm_primary_and_iso_fallback_invalid_to_null; invalid_rows={len(invalid_rows)}; ambiguous_rows={len(ambiguous_rows)}; future_rows={len(future_rows)}")
 
     def _parse_numbers(self, table: str, rows: list[dict[str, Any]]) -> None:
         parse_errors: set[int] = set()
@@ -467,12 +472,15 @@ class CleaningPipeline:
         returned_inventory = {row.get("inventory_id") for row in self.tables["sales"] if row.get("sale_status") == "returned"}
         for row in self.tables["sales"]:
             sale_date = _as_date(row.get("sale_date")); delivery = _as_date(row.get("delivery_date"))
-            arrival = _as_date(inventory_by_id.get(row.get("inventory_id"), {}).get("arrival_date"))
+            inventory = inventory_by_id.get(row.get("inventory_id"), {})
+            arrival = _as_date(inventory.get("arrival_date"))
+            acquisition = _as_date(inventory.get("acquisition_date"))
             row["sale_before_arrival_flag"] = bool(sale_date and arrival and sale_date < arrival)
+            row["sale_before_acquisition_flag"] = bool(sale_date and acquisition and sale_date < acquisition)
             row["delivery_before_sale_flag"] = bool(delivery and sale_date and delivery < sale_date)
             row["authoritative_event_date"] = row.get("delivery_date") if row.get("sale_status") == "completed" and delivery else row.get("sale_date")
             pre_2023 += bool(sale_date and sale_date < date(2023, 1, 1))
-            affected += row["sale_before_arrival_flag"] or row["delivery_before_sale_flag"]
+            affected += row["sale_before_arrival_flag"] or row["sale_before_acquisition_flag"] or row["delivery_before_sale_flag"]
         self.log.append(step="validate_sales_chronology", table="sales", rows_affected=affected, reason="Completed-date hierarchy is authoritative while contradictions remain reviewable", action_taken="retained_dates_added_chronology_flags_and_authoritative_companion")
         self.log.append(step="retain_pre_2023_lead_in", table="sales", rows_affected=pre_2023, reason="Approved decision: pre-2023 records are valid lead-in history", action_taken="retained_without_error_flag")
 
@@ -498,12 +506,14 @@ class CleaningPipeline:
         for row in self.tables["warranty_claims"]:
             claim = _as_date(row.get("claim_date")); decision = _as_date(row.get("decision_date"))
             opened = _as_date(service_by_id.get(row.get("service_id"), {}).get("service_open_date"))
+            sale_date = _as_date(sale_by_id.get(row.get("sale_id"), {}).get("sale_date"))
             row["claim_before_service_flag"] = bool(claim and opened and claim < opened)
+            row["claim_before_sale_flag"] = bool(claim and sale_date and claim < sale_date)
             row["approved_claim_missing_decision_flag"] = row.get("claim_status") == "approved" and decision is None
             row["authoritative_event_date"] = row.get("decision_date") if decision else row.get("claim_date")
             row["days_to_resolution_calculated"] = (decision - claim).days if claim and decision and decision >= claim else None
             claim_pre_2023 += bool(claim and claim < date(2023, 1, 1))
-            claim_affected += row["claim_before_service_flag"] or row["approved_claim_missing_decision_flag"]
+            claim_affected += row["claim_before_service_flag"] or row["claim_before_sale_flag"] or row["approved_claim_missing_decision_flag"]
         self.log.append(step="validate_claim_chronology", table="warranty_claims", rows_affected=claim_affected, reason="Completed decision date is authoritative and one service may have multiple claims", action_taken="retained_claims_added_flags_authoritative_date_and_calculated_duration")
         self.log.append(step="retain_pre_2023_lead_in", table="warranty_claims", rows_affected=claim_pre_2023, reason="Approved decision: pre-2023 records are valid lead-in history", action_taken="retained_without_error_flag")
 

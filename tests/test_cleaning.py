@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import unittest
+from datetime import date, timedelta
 from pathlib import Path
 
 import duckdb
+
+from src.data.cleaning import CleaningPipeline
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -140,6 +143,44 @@ class CleaningContractTests(unittest.TestCase):
                     self.scalar(f"SELECT COUNT(*) FROM {table} WHERE _possible_near_duplicate_flag"),
                     0,
                 )
+
+
+class CleaningStressTests(unittest.TestCase):
+    def test_future_dates_are_flagged(self) -> None:
+        pipeline = CleaningPipeline()
+        future = (date.today() + timedelta(days=30)).isoformat()
+        rows = [{"sale_date": future, "delivery_date": None, "created_at": None}]
+
+        pipeline._parse_dates("sales", rows)
+
+        self.assertTrue(rows[0]["sale_date_future_flag"])
+
+    def test_sale_before_acquisition_and_claim_before_sale_are_flagged(self) -> None:
+        pipeline = CleaningPipeline()
+        pipeline.tables = {
+            "inventory": [{
+                "inventory_id": 1, "acquisition_date": "2025-02-01",
+                "arrival_date": "2025-02-02", "inventory_status": "sold",
+                "sold_date": "2025-02-03",
+            }],
+            "sales": [{
+                "sale_id": 1, "inventory_id": 1, "sale_date": "2025-01-01",
+                "delivery_date": None, "sale_status": "completed",
+            }],
+            "service_records": [],
+            "warranty_claims": [{
+                "claim_id": 1, "sale_id": 1, "service_id": None,
+                "claim_date": "2024-12-01", "decision_date": None,
+                "claim_status": "submitted",
+            }],
+            "complaints": [],
+            "satisfaction": [],
+        }
+
+        pipeline._validate_chronology()
+
+        self.assertTrue(pipeline.tables["sales"][0]["sale_before_acquisition_flag"])
+        self.assertTrue(pipeline.tables["warranty_claims"][0]["claim_before_sale_flag"])
 
 
 if __name__ == "__main__":
