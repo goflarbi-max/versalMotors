@@ -129,3 +129,11 @@ The SQL joined `sales` to `inventory` once on `inventory_id`, applied the same c
 - Ran `scripts/build_database.py` using only files available in the clone. It rebuilt all nine cleaned tables and DuckDB successfully, including 20,520 sales and 48,025 service records.
 - Used Streamlit `AppTest` from the clean environment to start `app.py` and render Overview, Investigate, Ask the Business, Management Brief, and Data Quality. Every page passed without an exception.
 - Re-ran the repository suite after the documentation and dependency updates: 35 tests passed, 24 subtests passed. Two non-failing warnings concerned a Google SDK deprecation and pytest cache creation.
+
+## Streamlit Cloud first-start regression
+
+- Reproduced the hosted environment in a clean temporary project copy containing source code and the nine raw CSVs, with no `data/business.duckdb` and no `data/cleaned/` directory.
+- Started `app.py` through Streamlit `AppTest`. The entrypoint invoked the deployment bootstrap, rebuilt all nine tables, validated the resulting schema, and rendered Overview without an error.
+- First-start build completed in approximately 46 seconds in the local deployment simulation. Later reruns only perform the inexpensive schema-readiness check.
+- Added unit coverage for missing, complete, and incomplete database states in `tests/test_database_bootstrap.py`.
+- Final suite after the hosting fix: 38 tests passed, 24 subtests passed; the two warnings are non-failing SDK deprecation and pytest-cache warnings.

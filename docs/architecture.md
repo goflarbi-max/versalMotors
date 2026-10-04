@@ -83,7 +83,7 @@ flowchart TD
 
 ## Security and configuration
 
-Secrets are loaded from `.env` or Streamlit secrets and are excluded from Git. Model name, fallback models, and retry limits are configurable through `.env.example`. The database and cleaned CSVs are generated artifacts; a fresh clone builds them with:
+Secrets are loaded from `.env` or Streamlit secrets and are excluded from Git. Model name, fallback models, and retry limits are configurable through `.env.example`. The database and cleaned CSVs are generated artifacts. `app.py` calls `src/database/bootstrap.py` before page navigation. If DuckDB is missing or incomplete, a process lock permits one first-start build from the committed raw CSVs and the result is accepted only after all nine managed tables are present. This makes Streamlit Cloud self-starting without committing a large database. Developers can also rebuild explicitly with:
 
 ```powershell
 python scripts/build_database.py
