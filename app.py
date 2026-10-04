@@ -1,5 +1,8 @@
 """versalMotors Business Intelligence application shell."""
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import streamlit as st
 
 

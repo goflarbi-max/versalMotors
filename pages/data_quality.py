@@ -1,16 +1,14 @@
 import streamlit as st
-import duckdb, os, glob, json, re
+from src.ui.pdf_exports import dataframe_to_pdf
+import os, glob, json, re
+from src.database.connection import get_connection
 import pandas as pd
 
 st.set_page_config(layout="wide")
 st.title("🛡️ Data Quality Report")
 st.caption("Built from cleaning log + live validation checks: missing values, duplicates removed, unknown models, invalid dates, orphan records.")
 
-def find_db():
-    for p in ["data/business.duckdb","business.duckdb"] + glob.glob("**/*.duckdb", recursive=True):
-        if os.path.exists(p): return p
-    return None
-DB_PATH = find_db()
+
 
 def read_cleaning_log():
     log_text=""; issues=[]
@@ -23,8 +21,7 @@ def read_cleaning_log():
     return log_text, issues
 
 def run_live_checks():
-    if not DB_PATH: return []
-    con = duckdb.connect(DB_PATH, read_only=True)
+    con = get_connection(read_only=True)
     tables=[t[0] for t in con.execute("SHOW TABLES").fetchall()]
     results=[]
     def add(table,issue,count,total,impact):
@@ -81,13 +78,18 @@ if checks:
     c3.metric("Total Affected",f"{df['count'].sum():,}"); worst=df.sort_values('share_pct',ascending=False).iloc[0]; c4.metric("Highest Share",f"{worst['share_pct']}% in {worst['table']}")
     st.divider()
     st.subheader("Validation Checks")
-    st.dataframe(df[["table","issue","count","total_rows","share_pct","impact"]].rename(columns={"share_pct":"share_%_of_table","impact":"which_conclusions_it_might_affect"}), use_container_width=True)
+    st.dataframe(df[["table","issue","count","total_rows","share_pct","impact"]].rename(columns={"share_pct":"share_%_of_table","impact":"which_conclusions_it_might_affect"}), width="stretch")
     for _,row in df.iterrows():
         with st.expander(f"{row['table']} — {row['issue']} — {row['count']} rows ({row['share_pct']}%)"):
             col1,col2=st.columns([1,2])
             with col1: st.metric("Count",row['count']); st.metric("Share",f"{row['share_pct']}%"); st.metric("Total Rows",row['total_rows'])
             with col2: st.warning(f"**Impact:** {row['impact']}"); st.progress(min(row['share_pct']/100,1.0), text=f"{row['share_pct']}% affected")
-    st.download_button("📥 Download CSV", df.to_csv(index=False).encode(), "data_quality_report.csv", "text/csv", use_container_width=True)
+    st.download_button("📥 Download CSV", df.to_csv(index=False).encode(), "data_quality_report.csv", "text/csv", width="stretch")
+    st.download_button(
+        "Download PDF", dataframe_to_pdf("VersalMotors data quality report", df),
+        "data_quality_report.pdf", "application/pdf", width="stretch",
+        icon=":material/picture_as_pdf:",
+    )
 else:
     st.success("No issues - all checks passed!")
 

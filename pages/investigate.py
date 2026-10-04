@@ -4,6 +4,7 @@ from pathlib import Path
 
 import duckdb
 import pandas as pd
+from src.database.connection import get_connection
 import streamlit as st
 
 from src.analytics.drilldown import warranty_by_branch, warranty_by_model, warranty_claim_records
@@ -23,8 +24,8 @@ BRANCH_KEY = "warranty_drilldown_branch"
 @st.cache_data(show_spinner="Loading warranty evidence…")
 def load_analytics_data(database_path: str, modified_at: float) -> AnalyticsData:
     del modified_at
-    with duckdb.connect(database_path, read_only=True) as connection:
-        frames = {table: connection.execute(f'SELECT * FROM "{table}"').fetchdf() for table in TABLES}
+    connection = get_connection(read_only=True)
+    frames = {table: connection.execute(f'SELECT * FROM "{table}"').fetchdf() for table in TABLES}
     return AnalyticsData(**frames)
 
 
@@ -143,4 +144,15 @@ st.download_button(
     "Download these claims as CSV", records.to_csv(index=False).encode("utf-8"),
     file_name=f"warranty_claims_{selected_model}_{selected_branch}.csv".replace(" ", "_"),
     mime="text/csv", icon=":material/download:",
+)
+from src.ui.pdf_exports import dataframe_to_pdf
+
+st.download_button(
+    "Download these claims as PDF",
+    dataframe_to_pdf(
+        f"Warranty claims: {selected_model} at {selected_branch}", records
+    ),
+    file_name=f"warranty_claims_{selected_model}_{selected_branch}.pdf".replace(" ", "_"),
+    mime="application/pdf",
+    icon=":material/picture_as_pdf:",
 )

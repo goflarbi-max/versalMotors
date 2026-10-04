@@ -4,6 +4,7 @@ from pathlib import Path
 
 import duckdb
 import pandas as pd
+from src.database.connection import get_connection
 import streamlit as st
 
 from src.analytics.metrics import (
@@ -23,8 +24,8 @@ TABLES = (
 def load_analytics_data(database_path: str, modified_at: float) -> AnalyticsData:
     """Load cleaned tables; the modification time invalidates stale cache data."""
     del modified_at
-    with duckdb.connect(database_path, read_only=True) as connection:
-        frames = {table: connection.execute(f'SELECT * FROM "{table}"').fetchdf() for table in TABLES}
+    connection = get_connection(read_only=True)
+    frames = {table: connection.execute(f'SELECT * FROM "{table}"').fetchdf() for table in TABLES}
     return AnalyticsData(**frames)
 
 

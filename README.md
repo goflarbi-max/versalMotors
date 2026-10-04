@@ -8,7 +8,7 @@ versalMotors has sales, inventory, service, warranty, complaint, and customer-sa
 
 ## Solution
 
-This project provides a multipage business-intelligence application that turns the operational records into auditable management metrics. The current implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, a filterable management Overview, and warranty-cost drill-down from model to branch to individual claims.
+This project provides a multipage business-intelligence application that turns operational records into auditable management metrics. The implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, a filterable management Overview, warranty-cost drill-down, data-quality monitoring, evidence-backed business questions, and downloadable management briefs.
 
 ## Dataset
 
@@ -21,16 +21,17 @@ The repository contains nine synthetic raw CSV tables covering branches, models,
 3. `src/data/cleaning.py` standardises reviewed values, safely parses fields, flags questionable records, removes only exact duplicates, and writes an audit log.
 4. `scripts/build_database.py` rebuilds the cleaned CSVs and local DuckDB database.
 5. `src/analytics/metrics.py` calculates tested business metrics without UI or database side effects.
-6. Streamlit presents persistent filters, management KPIs, period comparisons, charts, and warranty drill-down evidence. Ask the Business, Management Brief, and Data Quality remain placeholders.
+6. Streamlit presents persistent filters, management KPIs, period comparisons, charts, warranty drill-down evidence, data-quality checks, and PDF exports.
+7. The optional Gemini layer turns reviewed evidence into narrative answers; deterministic queries and brief templates remain available when Gemini is missing or unavailable.
 
 ## Architecture
 
 ```text
-Business Data -> Data Processing -> Database -> Analysis -> AI Layer -> Dashboard -> Management
-Raw CSVs      -> Audited Cleaning -> DuckDB   -> Metrics  -> Planned  -> Streamlit -> Decisions
+Business Data -> Data Processing -> Database -> Analysis -> AI Layer        -> Dashboard -> Management
+Raw CSVs      -> Audited Cleaning -> DuckDB   -> Metrics  -> Optional Gemini -> Streamlit -> Decisions
 ```
 
-The implemented path currently runs through the dashboard. The runtime AI layer is still planned.
+The AI layer is optional: reviewed database queries and deterministic summaries keep the dashboard operational during missing credentials, timeouts, rate limits, and Gemini service failures.
 
 ## Technologies (What + Why)
 
@@ -39,11 +40,13 @@ The implemented path currently runs through the dashboard. The runtime AI layer 
 - **CSV:** keeps raw and cleaned pipeline stages portable and auditable.
 - **DuckDB:** stores the local analytical model and supports independent SQL verification of important calculations.
 - **pytest:** checks cleaning contracts, formulas, filter safety, SQL parity, and drill-down reconciliation.
+- **Google Gen AI SDK:** provides optional evidence-grounded questions and management narratives using the configurable `gemini-3.8-flash` model.
+- **fpdf2:** creates genuine downloadable PDF management briefs and operational reports.
 - **Git and GitHub:** provide version control, traceability, and project history.
 
 ## AI Usage
 
-AI has assisted development by drafting code, documentation, dataset patterns, tests, and quality checks. Its output is reviewed against source data, cleaning logs, SQL totals, and hand-built fixtures. The planned runtime AI layer may help users ask business questions and prepare management summaries, but no runtime AI feature exists yet. AI does not make business decisions, silently repair ambiguous records, or replace evidence from the database.
+AI has assisted development by drafting code, documentation, dataset patterns, tests, and quality checks. At runtime, Gemini can translate supported business questions into read-only queries and turn returned evidence into concise narratives. Every generated query passes through table and operation allowlists, and response numbers are checked against request evidence. If Gemini has no key or returns a transient error such as `503`, the app retries and then uses reviewed deterministic queries and brief templates. AI does not calculate source metrics, make business decisions, silently repair ambiguous records, or replace database evidence.
 
 ## Data Quality
 
@@ -58,6 +61,11 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Preventing invalid dimension relationships from appearing as legitimate `Unmapped` categories without discarding otherwise valid records.
 - Keeping KPI totals consistent between pandas calculations and independent DuckDB SQL checks.
 - Tracing recurring `Unmapped` chart values back through sales, inventory, and model joins, then enforcing orphan exclusion at the shared enrichment boundary instead of applying a cosmetic chart-only fix.
+- Preventing generated SQL from accessing files or unapproved tables while still supporting legitimate CTE-based analytical queries.
+- Keeping business-question and management-brief workflows useful when Gemini credentials are absent or the API returns `503`, rate-limit, or timeout failures.
+- Verifying every AI-reported number against request evidence and suppressing narratives that cannot be grounded.
+- Producing genuine PDF downloads instead of renaming plain text with a `.pdf` extension.
+- Keeping implementation-level SQL hidden from the user interface while retaining evidence tables and internal auditability.
 
 ## AI Mistakes
 
@@ -76,16 +84,25 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Build navigation and data foundations before investing in presentation details.
 - A renamed error is still an error; data-quality problems should remain auditable and must not be promoted into management categories.
 - Period comparisons and drill-down totals need independent tests so charts reconcile to their underlying records.
+- External AI services must be optional enhancements; deterministic business logic is the reliable product foundation.
+- Read-only database mode alone is insufficient for generated SQL because analytical engines may still expose filesystem functions.
 
 ## Future Improvements
 
-- Complete the Data Quality page with visible counts and affected-record evidence.
 - Expand drill-down beyond warranty costs to sales, inventory, service, and complaints.
-- Add a validated business-question interface and clearly governed AI summaries.
-- Generate an evidence-backed Management Brief from tested analytical results.
+- Route all remaining AI-page KPI definitions through the shared analytics metrics layer.
+- Expand the deterministic question registry beyond the four reviewed offline questions.
+- Complete the evidence-object schema and strengthen prompt-injection testing.
 - Add browser-level mobile testing and deployment checks.
 
 ## Daily Progress Log
+
+### Day 3 - 2026-10-03 - Governed AI, Data Quality & Management Reporting
+
+- Done: Completed the Data Quality and Management Brief pages; secured Ask the Business with read-only SQL allowlists and numerical evidence checks; upgraded the configurable model to Gemini 3.8 Flash; added retries for transient API failures and deterministic no-Gemini fallbacks; removed SQL code from the user-facing evidence view; and added genuine PDF downloads for briefs, claims, and quality reports.
+- Files: `pages/ask_the_business.py`, `pages/management_brief.py`, `pages/data_quality.py`, `src/ai/guardrails.py`, `src/ai/gemini_client.py`, `src/ai/fallback.py`, `src/ai/brief.py`, `src/database/connection.py`, `src/ui/pdf_exports.py`, `tests/test_ai_fallback.py`, `docs/day3_audit.md`, `docs/test_log.md`, `requirements.txt`, `.env.example`.
+- Commits: `e2d7589 fix guardrails integration - complete Step 3`; `b689bfb Add management brief`; `1b5e938 Add data quality page`; current Day 3 resilience and reporting update.
+- Next: Consolidate remaining AI-page metrics in `src/analytics/metrics.py`, complete the deterministic insights registry, and broaden drill-down coverage.
 
 ### Day 2 - 2026-10-02 - README, Analytics, Overview & Drill-Down
 

@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import date, timedelta
 from src.ai.brief import get_kpis_for_period, build_evidence, generate_brief_sections
+from src.ui.pdf_exports import text_to_pdf
 
 st.set_page_config(layout="wide")
 st.title("📋 Management Brief")
@@ -13,7 +14,7 @@ with col1:
 with col2:
     end_date = st.date_input("End Date", value=date(2024,12,31))
 
-if st.button("🚀 Generate Brief", type="primary", use_container_width=True):
+if st.button("🚀 Generate Brief", type="primary", width="stretch"):
     with st.spinner("Building brief with evidence..."):
         kpis = get_kpis_for_period(str(start_date), str(end_date))
         evidence = build_evidence(kpis, str(start_date), str(end_date))
@@ -51,12 +52,12 @@ if st.button("🚀 Generate Brief", type="primary", use_container_width=True):
         st.divider()
         st.subheader("Supporting Evidence")
         ev_df = pd.DataFrame([{"Evidence ID": e["id"], "Description": e["label"], "Value": e["value"]} for e in evidence])
-        st.dataframe(ev_df, use_container_width=True)
+        st.dataframe(ev_df, width="stretch")
 
         # Detail expanders to trace claim -> source data -> number (For Check)
         for e in evidence:
             with st.expander(f"{e['id']}: {e['label']} = {e['value']}"):
-                st.dataframe(e["df"], use_container_width=True)
+                st.dataframe(e["df"], width="stretch")
                 st.caption(f"Number {e['number']} traced and verified against source data")
 
         # --- EXPORT MARKDOWN AND PDF (Required) ---
@@ -83,20 +84,13 @@ if st.button("🚀 Generate Brief", type="primary", use_container_width=True):
 ## Questions Requiring Further Investigation
 {brief.get('questions','')}
 """
-        st.download_button("📥 Export Markdown", md_content.encode(), f"brief_{start_date}_{end_date}.md", "text/markdown", use_container_width=True)
+        st.download_button("📥 Export Markdown", md_content.encode(), f"brief_{start_date}_{end_date}.md", "text/markdown", width="stretch")
 
-        # Simple PDF export via markdown as txt - works without extra libs
-        try:
-            from fpdf import FPDF
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_font("Arial", size=11)
-            for line in md_content.split("\n"):
-                pdf.multi_cell(0, 8, line.encode('latin-1','ignore').decode('latin-1'))
-            pdf_bytes = pdf.output(dest='S').encode('latin-1')
-            st.download_button("📄 Export PDF", pdf_bytes, f"brief_{start_date}_{end_date}.pdf", "application/pdf", use_container_width=True)
-        except:
-            st.download_button("📄 Export PDF (as TXT)", md_content.encode(), f"brief_{start_date}_{end_date}.pdf", "application/pdf", use_container_width=True)
+        pdf_bytes = text_to_pdf(
+            f"VersalMotors management brief: {start_date} to {end_date}",
+            md_content,
+        )
+        st.download_button("📄 Export PDF", pdf_bytes, f"brief_{start_date}_{end_date}.pdf", "application/pdf", width="stretch")
 
 
 else:

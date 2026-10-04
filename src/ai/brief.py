@@ -3,51 +3,37 @@ Step 5: Management Brief - src/ai/brief.py
 Pull top insights and KPIs for selected period, generate brief with evidence ids.
 Every finding must cite evidence ids.
 """
-import duckdb
+from src.database.connection import get_connection
 import pandas as pd
 from datetime import date
 from typing import Dict, List, Tuple
 import os, glob
-
-def find_db():
-    for p in ["data/business.duckdb", "business.duckdb"] + glob.glob("**/*.duckdb", recursive=True):
-        if os.path.exists(p): return p
-    return "data/business.duckdb"
-
-DB_PATH = find_db()
+from src.ai.gemini_client import generate_text
 
 def get_kpis_for_period(start_date: str, end_date: str) -> Dict:
-    con = duckdb.connect(DB_PATH, read_only=True)
+    con = get_connection(read_only=True)
     try:
-        # auto-detect revenue col
-        cols = con.execute("DESCRIBE sales").fetchall()
-        col_names = [c[0].lower() for c in cols]
-        col_real = [c[0] for c in cols]
+        # Hardcode correct names instead of guessing to support parameterization
         rev_col = "total_sale_price"
-        for cand in ['total_sale_price','sale_price','total_amount','amount']:
-            if cand in col_names:
-                rev_col = col_real[col_names.index(cand)]
-                break
+        date_col = "sale_date"
 
-        date_col = "sale_date" if "sale_date" in col_names else col_real[0]
-
-        revenue = con.execute(f"SELECT SUM({rev_col}) FROM sales WHERE {date_col} BETWEEN '{start_date}' AND '{end_date}'").fetchone()[0] or 0
-        sales = con.execute(f"SELECT COUNT(*) FROM sales WHERE {date_col} BETWEEN '{start_date}' AND '{end_date}'").fetchone()[0] or 0
+        revenue = con.execute("SELECT SUM(total_sale_price) FROM sales WHERE sale_date BETWEEN ? AND ?", [start_date, end_date]).fetchone()[0] or 0
+        sales = con.execute("SELECT COUNT(*) FROM sales WHERE sale_date BETWEEN ? AND ?", [start_date, end_date]).fetchone()[0] or 0
         avg_ticket = revenue / sales if sales else 0
 
         # branch performance
-        branch_df = con.execute(f"""
-            SELECT branch_id, SUM({rev_col}) as rev, COUNT(*) as cnt
-            FROM sales WHERE {date_col} BETWEEN '{start_date}' AND '{end_date}'
+        branch_df = con.execute("""
+            SELECT branch_id, SUM(total_sale_price) as rev, COUNT(*) as cnt
+            FROM sales WHERE sale_date BETWEEN ? AND ?
             GROUP BY branch_id ORDER BY rev DESC
-        """).fetchdf()
+        """, [start_date, end_date]).fetchdf()
 
         # monthly trend
-        monthly_df = con.execute(f"""
-            SELECT DATE_TRUNC('month', {date_col})::DATE as month, SUM({rev_col}) as rev
-            FROM sales WHERE {date_col} BETWEEN '{start_date}' AND '{end_date}'
+        monthly_df = con.execute("""
+            SELECT DATE_TRUNC('month', sale_date)::DATE as month, SUM(total_sale_price) as rev
+            FROM sales WHERE sale_date BETWEEN ? AND ?
             GROUP BY 1 ORDER BY 1
-        """).fetchdf()
+        """, [start_date, end_date]).fetchdf()
 
         # inventory low
         try:
@@ -92,7 +78,7 @@ def build_evidence(kpis: Dict, start_date: str, end_date: str) -> List[Dict]:
         "label": "Average Ticket Size",
         "value": f"GHS {kpis['avg_ticket']:,.2f}",
         "number": kpis['avg_ticket'],
-        "sql": f"SELECT SUM(rev_col)/COUNT(*) FROM sales WHERE date BETWEEN range",
+        "sql": f"SELECT SUM(total_sale_price)/COUNT(*) FROM sales WHERE sale_date BETWEEN '{start_date}' AND '{end_date}'",
         "df": pd.DataFrame([{"metric":"Avg Ticket","value":kpis['avg_ticket']}])
     })
     if not kpis['branch_df'].empty:
@@ -129,15 +115,13 @@ def build_evidence(kpis: Dict, start_date: str, end_date: str) -> List[Dict]:
 def generate_brief_sections(kpis: Dict, evidence: List[Dict], start_date: str, end_date: str) -> Dict[str, str]:
     """Generate brief - tries AI, falls back to deterministic with evidence ids"""
     try:
-        import google.generativeai as genai
         key = os.getenv("GEMINI_API_KEY","")
         try:
             import streamlit as st
             key = st.secrets.get("GEMINI_API_KEY", key)
         except: pass
         if key:
-            genai.configure(api_key=key)
-            model = genai.GenerativeModel("gemini-2.5-flash")
+            model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
             ev_text = "\n".join([f"{e['id']}: {e['label']} = {e['value']} | SQL: {e['sql']}" for e in evidence])
             prompt = f"""
             Period: {start_date} to {end_date}
@@ -154,9 +138,9 @@ def generate_brief_sections(kpis: Dict, evidence: List[Dict], start_date: str, e
             RECOMMENDED ACTIONS:
             QUESTIONS REQUIRING FURTHER INVESTIGATION:
             """
-            ai_text = model.generate_content(prompt).text
-            # Simple parse - return as is plus we will still build structured dict
-            return {"raw": ai_text, "evidence": evidence}
+            result = generate_text(prompt, api_key=key, model=model)
+            if result["ok"]:
+                return {"raw": result["text"], "evidence": evidence}
     except Exception as e:
         pass
 
