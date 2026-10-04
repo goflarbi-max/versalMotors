@@ -57,13 +57,12 @@ def test_all_quick_questions_and_typed_follow_ups_work_in_one_session(monkeypatc
     app = AppTest.from_file(app_path, default_timeout=30).run()
     app.switch_page("pages/ask_the_business.py").run()
 
-    app.pills[0].set_value("Revenue trend").run()
-    app.pills[0].set_value("Best branch").run()
+    app.button(key="quick_revenue_trend").click().run()
+    app.button(key="quick_best_branch").click().run()
+    app.button(key="quick_aged_inventory").click().run()
+    app.button(key="quick_complaints").click().run()
     app.chat_input[0].set_value(
-        "Aged inventory: oldest available VIN and inventory age."
-    ).run()
-    app.chat_input[0].set_value(
-        "Complaints: branch name and valid complaint count."
+        "How did completed-sale revenue change by month?"
     ).run()
 
     assistant_answers = [
@@ -72,9 +71,11 @@ def test_all_quick_questions_and_typed_follow_ups_work_in_one_session(monkeypatc
         if message["role"] == "assistant"
     ]
     assert not app.exception
-    assert len(assistant_answers) == 4
+    assert len(assistant_answers) == 5
     assert "Completed-sale revenue in" in assistant_answers[0]
     assert "highest completed-sale revenue" in assistant_answers[1]
     assert "oldest available vehicle" in assistant_answers[2]
     assert "most valid complaints" in assistant_answers[3]
-    assert len(calls) == 4
+    assert "Completed-sale revenue in" in assistant_answers[4]
+    # The four buttons bypass Gemini; only the typed question calls the client.
+    assert len(calls) == 1

@@ -22,14 +22,6 @@ SUGGESTIONS = {
 }
 
 
-def queue_business_suggestion() -> None:
-    """Consume a pill selection once so it cannot override later questions."""
-    selected = st.session_state.get("business_suggestion")
-    if selected in SUGGESTIONS:
-        st.session_state["pending_business_question"] = SUGGESTIONS[selected]
-    st.session_state["business_suggestion"] = None
-
-
 @st.cache_data(show_spinner="Loading business context…")
 def load_context() -> tuple[str, dict[str, float]]:
     connection = get_connection(read_only=True)
@@ -58,8 +50,6 @@ st.session_state.setdefault("business_messages", [])
 with st.sidebar:
     if st.button("Clear chat", icon=":material/delete:", width="stretch"):
         st.session_state.business_messages = []
-        st.session_state.pop("pending_business_question", None)
-        st.session_state["business_suggestion"] = None
         st.rerun()
 
 st.title("Ask the Business")
@@ -73,20 +63,19 @@ with st.container(horizontal=True):
 
 ask_tab, history_tab = st.tabs(["Ask", "History"])
 with ask_tab:
-    pending_question = st.session_state.pop("pending_business_question", None)
-    st.pills(
-        "Quick questions",
-        list(SUGGESTIONS),
-        key="business_suggestion",
-        on_change=queue_business_suggestion,
-    )
+    st.caption("Quick questions")
+    quick_question = None
+    with st.container(horizontal=True):
+        for label, prompt in SUGGESTIONS.items():
+            if st.button(label, key=f"quick_{label.lower().replace(' ', '_')}"):
+                quick_question = prompt
     for message in st.session_state.business_messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     submitted = st.chat_input("Ask about the business", submit_mode="disable")
-    # Typed input always wins. Quick-question state must never override a later
-    # question on Streamlit's next top-to-bottom rerun.
-    question = submitted or pending_question
+    # Buttons are transient per rerun, so they cannot override later questions.
+    question = submitted or quick_question
+    use_reviewed_query = quick_question is not None and submitted is None
     if question:
         valid, error = validate_question(question)
         out_of_scope = handle_unanswerable(question)
@@ -102,7 +91,11 @@ with ask_tab:
                 try:
                     model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
                     prompt = f"Schema:\n{schema}\nQuestion: {question}\nReturn one DuckDB SELECT only. Use net_sale_price for revenue, exclude ERROR rows, and limit detail to 100 rows."
-                    sql_result = generate_text(prompt, api_key=key(), model=model)
+                    sql_result = (
+                        {"ok": False, "text": "", "reason": "reviewed_quick_question"}
+                        if use_reviewed_query
+                        else generate_text(prompt, api_key=key(), model=model)
+                    )
                     if sql_result["ok"]:
                         sql = sql_result["text"].replace("```sql", "").replace("```", "").strip()
                     else:

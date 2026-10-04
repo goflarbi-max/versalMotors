@@ -100,7 +100,7 @@ The raw data intentionally includes missing values, duplicates, name and categor
 
 ### Day 4 - 2026-10-04 - Resilient AI Model Failover
 
-- Done: Added bounded retry and lighter-model failover for Gemini `429`, `5xx`, and timeout failures; routed missing credentials, exhausted models, and rejected generated SQL through reviewed offline queries; generated concrete grounded answers for revenue trend, best branch, aged inventory, and complaints; prevented raw provider errors and `FACTS` labels from reaching users; repaired quick-question and typed-follow-up session state; and documented the complete architecture.
+- Done: Added bounded retry and lighter-model failover for Gemini `429`, `5xx`, and timeout failures; routed missing credentials, exhausted models, and rejected generated SQL through reviewed offline queries; generated concrete grounded answers for revenue trend, best branch, aged inventory, and complaints; replaced stateful suggestion controls with reliable buttons that run reviewed queries without waiting for Gemini; prevented raw provider errors and `FACTS` labels from reaching users; preserved typed-question AI handling; and documented the complete architecture.
 - Files: `src/ai/gemini_client.py`, `src/ai/fallback.py`, `src/ai/guardrails.py`, `pages/ask_the_business.py`, `tests/test_ai_fallback.py`, `tests/test_ask_business_resilience.py`, `.env.example`, `docs/architecture.md`, `README.md`.
 - Commit: Current Day 4 AI resilience and question-flow commit.
 - Next: Expand the reviewed offline question registry and consolidate remaining AI-page KPIs through `src/analytics/metrics.py`.
