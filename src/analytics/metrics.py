@@ -17,6 +17,11 @@ import pandas as pd
 Period = Literal["D", "W", "M", "Q", "Y"]
 
 
+def _missing_columns(frame: pd.DataFrame, required: Iterable[str]) -> bool:
+    """Return True when a degraded source cannot support a metric formula."""
+    return not set(required).issubset(frame.columns)
+
+
 @dataclass(frozen=True)
 class Filters:
     """Immutable dashboard-independent filter specification.
@@ -220,7 +225,10 @@ def revenue(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
     ``_row_quality_status == 'ERROR'`` and rows with null date or selling price are
     excluded; WARNING rows are included. Null prices are never treated as zero.
     """
-    frame = _sales_for_metric(data, filters).dropna(subset=["sale_date", "net_sale_price"])
+    frame = _sales_for_metric(data, filters)
+    if _missing_columns(frame, ["sale_date", "net_sale_price", "sale_id"]):
+        return pd.DataFrame(columns=["period", "revenue", "transaction_count"])
+    frame = frame.dropna(subset=["sale_date", "net_sale_price"])
     if frame.empty:
         return pd.DataFrame(columns=["period", "revenue", "transaction_count"])
     frame["period"] = _period(frame["sale_date"], filters.period)
@@ -241,7 +249,10 @@ def gross_margin(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
     excluded. WARNING rows remain included. Flagged/null acquisition costs are not
     imputed and do not contribute to either margin or its denominator.
     """
-    frame = _sales_for_metric(data, filters).dropna(subset=["sale_date", "net_sale_price", "acquisition_cost"])
+    frame = _sales_for_metric(data, filters)
+    if _missing_columns(frame, ["sale_date", "net_sale_price", "acquisition_cost"]):
+        return pd.DataFrame(columns=["period", "selling_price", "acquisition_cost", "gross_margin", "gross_margin_rate"])
+    frame = frame.dropna(subset=["sale_date", "net_sale_price", "acquisition_cost"])
     if frame.empty:
         return pd.DataFrame(columns=["period", "selling_price", "acquisition_cost", "gross_margin", "gross_margin_rate"])
     frame["gross_margin"] = frame["net_sale_price"] - frame["acquisition_cost"]
@@ -493,7 +504,10 @@ def revenue_by_branch(data: AnalyticsData, filters: Filters) -> pd.DataFrame:
     completed-sale default, exact filters, null handling, and ERROR-row exclusion
     match :func:`revenue`. Rows without a valid canonical branch are excluded.
     """
-    frame = _sales_for_metric(data, filters).dropna(subset=["sale_date", "net_sale_price", "inventory_id"])
+    frame = _sales_for_metric(data, filters)
+    if _missing_columns(frame, ["sale_date", "net_sale_price", "inventory_id"]):
+        return pd.DataFrame(columns=["branch", "revenue", "units_sold"])
+    frame = frame.dropna(subset=["sale_date", "net_sale_price", "inventory_id"])
     if frame.empty:
         return pd.DataFrame(columns=["branch", "revenue", "units_sold"])
     frame["branch"] = frame.get("branch_display", pd.Series(pd.NA, index=frame.index))
@@ -512,7 +526,10 @@ def gross_margin_by_model(data: AnalyticsData, filters: Filters) -> pd.DataFrame
     by model revenue. Sales status, quality, and null rules match
     :func:`gross_margin`; rows without a valid canonical model are excluded.
     """
-    frame = _sales_for_metric(data, filters).dropna(subset=["sale_date", "net_sale_price", "acquisition_cost"])
+    frame = _sales_for_metric(data, filters)
+    if _missing_columns(frame, ["sale_date", "net_sale_price", "acquisition_cost"]):
+        return pd.DataFrame(columns=["model", "revenue", "gross_margin", "gross_margin_rate"])
+    frame = frame.dropna(subset=["sale_date", "net_sale_price", "acquisition_cost"])
     if "model_id_orphan_flag" in frame.columns:
         frame = frame[~frame["model_id_orphan_flag"].fillna(False).astype(bool)]
     if frame.empty:

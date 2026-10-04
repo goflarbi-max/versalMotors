@@ -10,8 +10,8 @@ import pandas as pd
 import pytest
 
 from src.analytics.metrics import (
-    AnalyticsData, Filters, gross_margin, gross_margin_by_model, revenue,
-    revenue_by_branch, warranty_claims,
+    AnalyticsData, Filters, gross_margin, gross_margin_by_model, overview_kpis,
+    revenue, revenue_by_branch, warranty_claims,
 )
 
 
@@ -123,6 +123,30 @@ def test_filters_are_exact_and_do_not_mutate_inputs(small_frames: AnalyticsData)
     assert result["transaction_count"].sum() == 2
     pd.testing.assert_frame_equal(small_frames.sales, original_sales)
     pd.testing.assert_frame_equal(small_frames.inventory, original_inventory)
+
+
+def test_missing_and_heavily_null_prices_do_not_crash_metrics(small_frames: AnalyticsData) -> None:
+    """A 30% null shock or missing price column must degrade safely."""
+    null_prices = small_frames.sales.copy(deep=True)
+    null_prices.loc[null_prices.index[:1], "net_sale_price"] = pd.NA
+    null_data = AnalyticsData(**{
+        **small_frames.__dict__,
+        "sales": null_prices,
+    })
+    assert revenue(null_data, Filters())["revenue"].sum() == 35_000.0
+
+    missing_price_data = AnalyticsData(**{
+        **small_frames.__dict__,
+        "sales": small_frames.sales.drop(columns=["net_sale_price"]),
+    })
+    assert revenue(missing_price_data, Filters()).empty
+    assert gross_margin(missing_price_data, Filters()).empty
+    assert revenue_by_branch(missing_price_data, Filters()).empty
+    assert gross_margin_by_model(missing_price_data, Filters()).empty
+    degraded_kpis = overview_kpis(missing_price_data, Filters())
+    assert set(degraded_kpis["metric"]) == {
+        "Revenue", "Gross margin", "Units sold", "Discount rate"
+    }
 
 
 def test_all_metrics_return_expected_columns_and_rows() -> None:
