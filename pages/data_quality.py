@@ -86,7 +86,7 @@ if checks:
     df=pd.DataFrame(checks)
     c1,c2,c3,c4=st.columns(4)
     c1.metric("Issues Found",len(df)); c2.metric("Tables Affected",df['table'].nunique())
-    c3.metric("Total Affected",f"{df['count'].sum():,}"); worst=df.sort_values('share_pct',ascending=False).iloc[0]; c4.metric("Highest Share",f"{worst['share_pct']}% in {worst['table']}")
+    c3.metric("Total Affected",f"{df['count'].sum():,}"); worst=df.sort_values('share_pct',ascending=False).iloc[0]; c4.metric("Highest Share",f"{worst['share_pct']}%",help=f"Highest affected table: {worst['table']}")
     st.divider()
     st.subheader("Validation Checks")
     st.dataframe(df[["table","issue","count","total_rows","share_pct","impact"]].rename(columns={"share_pct":"share_%_of_table","impact":"which_conclusions_it_might_affect"}), width="stretch")

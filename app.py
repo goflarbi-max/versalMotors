@@ -48,6 +48,17 @@ st.markdown(
         overflow: visible !important;
     }
 
+    /* Auto-height overview cards stay large without Streamlit scroll regions. */
+    [class*="st-key-overview_kpi_"] {
+        min-height: 200px !important;
+        overflow: visible !important;
+    }
+
+    [class*="st-key-overview_kpi_"] [data-testid="stVerticalBlockBorderWrapper"] {
+        min-height: 200px !important;
+        overflow: visible !important;
+    }
+
     div[data-testid="stMetricValue"],
     div[data-testid="stMetricValue"] * {
         font-size: 32px !important;

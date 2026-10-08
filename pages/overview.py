@@ -72,7 +72,8 @@ for card_pair in (metric_cards[:2], metric_cards[2:]):
     for column, (label, formatter, question) in zip(columns, card_pair, strict=True):
         row = kpis.loc[label]
         with column:
-            with st.container(border=True, height=200):
+            card_key = f"overview_kpi_{label.lower().replace(' ', '_')}"
+            with st.container(border=True, key=card_key):
                 st.metric(label, formatter(row["value"]), metric_delta(row))
                 st.caption(question)
 
