@@ -20,54 +20,168 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* Scoped, Streamlit-safe card styling. No global text color overrides. */
+    /* VersalMotors enterprise color system: light defaults. */
+    :root {
+        color-scheme: light;
+        --vm-page: #F8FAFC;
+        --vm-page-depth: #F1F5F9;
+        --vm-card: #FFFFFF;
+        --vm-text: #0F172A;
+        --vm-text-secondary: #64748B;
+        --vm-border: #E2E8F0;
+        --vm-accent: #4F46E5;
+        --vm-accent-soft: rgba(79, 70, 229, 0.08);
+        --vm-success: #10B981;
+        --vm-warning: #F59E0B;
+        --vm-danger: #EF4444;
+        --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* System fallback when Streamlit has no explicit theme attribute. */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            color-scheme: dark;
+            --vm-page: #020617;
+            --vm-page-depth: #060B19;
+            --vm-card: #0F172A;
+            --vm-text: #F1F5F9;
+            --vm-text-secondary: #94A3B8;
+            --vm-border: #1E293B;
+            --vm-accent: #6366F1;
+            --vm-accent-soft: rgba(99, 102, 241, 0.12);
+            --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+        }
+    }
+
+    /* Explicit Streamlit menu selection takes precedence over the OS. */
+    [data-theme="light"] {
+        color-scheme: light;
+        --vm-page: #F8FAFC;
+        --vm-page-depth: #F1F5F9;
+        --vm-card: #FFFFFF;
+        --vm-text: #0F172A;
+        --vm-text-secondary: #64748B;
+        --vm-border: #E2E8F0;
+        --vm-accent: #4F46E5;
+        --vm-accent-soft: rgba(79, 70, 229, 0.08);
+        --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] {
+        color-scheme: dark;
+        --vm-page: #020617;
+        --vm-page-depth: #060B19;
+        --vm-card: #0F172A;
+        --vm-text: #F1F5F9;
+        --vm-text-secondary: #94A3B8;
+        --vm-border: #1E293B;
+        --vm-accent: #6366F1;
+        --vm-accent-soft: rgba(99, 102, 241, 0.12);
+        --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+    }
+
+    * {
+        transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    }
+
     .stApp {
-        background-color: #F8FAFC;
+        background:
+            radial-gradient(circle at 88% -10%, var(--vm-accent-soft), transparent 28rem),
+            linear-gradient(180deg, var(--vm-page), var(--vm-page-depth)) !important;
     }
 
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: #FFFFFF;
-        border-color: #E2E8F0 !important;
-        border-radius: 16px !important;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    .stApp::before {
+        content: "";
+        position: fixed;
+        inset: 0 0 auto 0;
+        height: 4px;
+        background: linear-gradient(90deg, #4F46E5, #7C3AED);
+        z-index: 999999;
+        pointer-events: none;
     }
 
-    [data-testid="stMetric"] {
-        background-color: #FFFFFF;
-        border: 1px solid #E2E8F0;
-        border-radius: 16px;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-        padding: 18px;
+    section[data-testid="stSidebar"] {
+        background-color: var(--vm-card) !important;
+        border-right: 1px solid var(--vm-border) !important;
     }
 
-    [data-testid="stMetricValue"],
-    [data-testid="stMetricValue"] * {
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
+    /* Bordered Streamlit containers become restrained enterprise cards. */
+    [data-testid="stVerticalBlockBorderWrapper"],
+    div[data-testid="stContainer"] {
+        background-color: var(--vm-card) !important;
+        border-color: var(--vm-border) !important;
+        border-radius: 14px !important;
+        box-shadow: var(--vm-shadow) !important;
+    }
+
+    div[data-testid="stMetric"] {
+        background-color: var(--vm-card) !important;
+        border: 1px solid var(--vm-border) !important;
+        border-radius: 14px !important;
+        box-shadow: var(--vm-shadow) !important;
+        padding: 18px !important;
+    }
+
+    /* Explicit metric contrast prevents invisible values in light mode. */
+    div[data-testid="stMetricValue"],
+    div[data-testid="stMetricValue"] * {
+        color: var(--vm-text) !important;
+        -webkit-text-fill-color: var(--vm-text) !important;
+        font-weight: 700 !important;
         opacity: 1 !important;
     }
 
-    @media (prefers-color-scheme: dark) {
-        .stApp {
-            background-color: #020617;
-        }
+    div[data-testid="stMetricLabel"],
+    div[data-testid="stMetricLabel"] * {
+        color: var(--vm-text-secondary) !important;
+        -webkit-text-fill-color: var(--vm-text-secondary) !important;
+        opacity: 1 !important;
+    }
 
-        [data-testid="stVerticalBlockBorderWrapper"] {
-            background-color: #0F172A;
-            border-color: #1E293B !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
-        }
+    div[data-testid="stMetricDelta"],
+    div[data-testid="stMetricDelta"] * {
+        opacity: 1 !important;
+    }
 
-        [data-testid="stMetric"] {
-            background-color: #0F172A;
-            border-color: #1E293B;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
-        }
+    h1, h2, h3 {
+        color: var(--vm-text) !important;
+        -webkit-text-fill-color: var(--vm-text) !important;
+    }
 
-        [data-testid="stMetricValue"],
-        [data-testid="stMetricValue"] * {
-            color: #F1F5F9 !important;
-            -webkit-text-fill-color: #F1F5F9 !important;
+    [data-testid="stCaptionContainer"] {
+        color: var(--vm-text-secondary) !important;
+    }
+
+    [data-testid="stDataFrame"] {
+        background-color: var(--vm-card) !important;
+        border: 1px solid var(--vm-border) !important;
+        border-radius: 12px !important;
+        box-shadow: var(--vm-shadow) !important;
+        overflow: hidden;
+    }
+
+    [data-testid="stDataFrame"] *,
+    [data-testid="stTable"] * {
+        border-color: var(--vm-border) !important;
+    }
+
+    [data-testid="stVegaLiteChart"],
+    [data-testid="stArrowVegaLiteChart"] {
+        background-color: transparent !important;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    [data-testid="stVegaLiteChart"] canvas,
+    [data-testid="stArrowVegaLiteChart"] canvas,
+    [data-testid="stVegaLiteChart"] svg,
+    [data-testid="stArrowVegaLiteChart"] svg {
+        background-color: transparent !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            transition-duration: 0.01ms !important;
         }
     }
     </style>
