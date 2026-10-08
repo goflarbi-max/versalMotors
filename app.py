@@ -1,7 +1,6 @@
 """versalMotors Business Intelligence application shell."""
 
 import logging
-from pathlib import Path
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -19,7 +18,60 @@ st.set_page_config(
 )
 
 st.markdown(
-    f"<style>{Path(__file__).with_name('style.css').read_text(encoding='utf-8')}</style>",
+    """
+    <style>
+    /* Scoped, Streamlit-safe card styling. No global text color overrides. */
+    .stApp {
+        background-color: #F8FAFC;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #FFFFFF;
+        border-color: #E2E8F0 !important;
+        border-radius: 16px !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+
+    [data-testid="stMetric"] {
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+        padding: 18px;
+    }
+
+    [data-testid="stMetricValue"],
+    [data-testid="stMetricValue"] * {
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+        opacity: 1 !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .stApp {
+            background-color: #020617;
+        }
+
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            background-color: #0F172A;
+            border-color: #1E293B !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+        }
+
+        [data-testid="stMetric"] {
+            background-color: #0F172A;
+            border-color: #1E293B;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+        }
+
+        [data-testid="stMetricValue"],
+        [data-testid="stMetricValue"] * {
+            color: #F1F5F9 !important;
+            -webkit-text-fill-color: #F1F5F9 !important;
+        }
+    }
+    </style>
+    """,
     unsafe_allow_html=True,
 )
 
