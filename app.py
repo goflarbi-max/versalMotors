@@ -119,10 +119,7 @@ st.markdown(
         border: 1px solid var(--vm-border) !important;
         border-radius: 14px !important;
         box-shadow: var(--vm-shadow) !important;
-        min-width: 100% !important;
-        min-height: 140px !important;
-        padding: 24px !important;
-        overflow: visible !important;
+        padding: 18px !important;
     }
 
     /* Explicit metric contrast prevents invisible values in light mode. */
@@ -130,13 +127,8 @@ st.markdown(
     div[data-testid="stMetricValue"] * {
         color: var(--vm-text) !important;
         -webkit-text-fill-color: var(--vm-text) !important;
-        font-size: 32px !important;
         font-weight: 700 !important;
         opacity: 1 !important;
-        max-width: none !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        white-space: nowrap !important;
     }
 
     div[data-testid="stMetricLabel"],

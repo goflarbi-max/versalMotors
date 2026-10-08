@@ -60,21 +60,17 @@ if kpis.empty or kpis["value"].fillna(0).eq(0).all():
     st.info("No qualifying records match these filters. Broaden the date range or remove one or more filters.")
     st.stop()
 
-metric_cards = (
-    ("Revenue", money, "How much sales value did the selected period generate?"),
-    ("Gross margin", money, "How much value remained after vehicle acquisition cost?"),
-    ("Units sold", lambda value: f"{value:,.0f}", "How many distinct vehicles were sold?"),
-    ("Discount rate", percentage, "How much of gross price was given up through discounts?"),
-)
-
-for card_pair in (metric_cards[:2], metric_cards[2:]):
-    columns = st.columns(2, gap="large")
-    for column, (label, formatter, question) in zip(columns, card_pair, strict=True):
+with st.container(horizontal=True):
+    for label, formatter, question in (
+        ("Revenue", money, "How much sales value did the selected period generate?"),
+        ("Gross margin", money, "How much value remained after vehicle acquisition cost?"),
+        ("Units sold", lambda value: f"{value:,.0f}", "How many distinct vehicles were sold?"),
+        ("Discount rate", percentage, "How much of gross price was given up through discounts?"),
+    ):
         row = kpis.loc[label]
-        with column:
-            with st.container(border=True, height=200):
-                st.metric(label, formatter(row["value"]), metric_delta(row))
-                st.caption(question)
+        with st.container(border=True, width=260):
+            st.metric(label, formatter(row["value"]), metric_delta(row))
+            st.caption(question)
 
 trend = revenue(data, filters)
 branches = revenue_by_branch(data, filters)
