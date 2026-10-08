@@ -17,11 +17,24 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.markdown(
+if st.context.theme.type == "dark":
+    theme_tokens = """
+        color-scheme: dark;
+        --vm-page: #020617;
+        --vm-page-depth: #060B19;
+        --vm-card: #0F172A;
+        --vm-text: #F1F5F9;
+        --vm-text-secondary: #94A3B8;
+        --vm-border: #1E293B;
+        --vm-accent: #6366F1;
+        --vm-accent-soft: rgba(99, 102, 241, 0.12);
+        --vm-success: #10B981;
+        --vm-warning: #F59E0B;
+        --vm-danger: #EF4444;
+        --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
     """
-    <style>
-    /* VersalMotors enterprise color system: light defaults. */
-    :root {
+else:
+    theme_tokens = """
         color-scheme: light;
         --vm-page: #F8FAFC;
         --vm-page-depth: #F1F5F9;
@@ -35,49 +48,14 @@ st.markdown(
         --vm-warning: #F59E0B;
         --vm-danger: #EF4444;
         --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
+    """
 
-    /* System fallback when Streamlit has no explicit theme attribute. */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            color-scheme: dark;
-            --vm-page: #020617;
-            --vm-page-depth: #060B19;
-            --vm-card: #0F172A;
-            --vm-text: #F1F5F9;
-            --vm-text-secondary: #94A3B8;
-            --vm-border: #1E293B;
-            --vm-accent: #6366F1;
-            --vm-accent-soft: rgba(99, 102, 241, 0.12);
-            --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
-        }
-    }
-
-    /* Explicit Streamlit menu selection takes precedence over the OS. */
-    [data-theme="light"] {
-        color-scheme: light;
-        --vm-page: #F8FAFC;
-        --vm-page-depth: #F1F5F9;
-        --vm-card: #FFFFFF;
-        --vm-text: #0F172A;
-        --vm-text-secondary: #64748B;
-        --vm-border: #E2E8F0;
-        --vm-accent: #4F46E5;
-        --vm-accent-soft: rgba(79, 70, 229, 0.08);
-        --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-
-    [data-theme="dark"] {
-        color-scheme: dark;
-        --vm-page: #020617;
-        --vm-page-depth: #060B19;
-        --vm-card: #0F172A;
-        --vm-text: #F1F5F9;
-        --vm-text-secondary: #94A3B8;
-        --vm-border: #1E293B;
-        --vm-accent: #6366F1;
-        --vm-accent-soft: rgba(99, 102, 241, 0.12);
-        --vm-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+st.markdown(
+    """
+    <style>
+    /* Streamlit's active menu theme supplies these semantic tokens. */
+    :root {
+        __VM_THEME_TOKENS__
     }
 
     * {
@@ -193,7 +171,7 @@ st.markdown(
         }
     }
     </style>
-    """,
+    """.replace("__VM_THEME_TOKENS__", theme_tokens),
     unsafe_allow_html=True,
 )
 
