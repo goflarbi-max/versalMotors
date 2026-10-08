@@ -1,0 +1,62 @@
+/* SAFE PROFESSIONAL THEME - No invisible text */
+
+/* Page blend only - no text color override */
+.stApp {
+  background: #F8FAFC !important;
+}
+@media (prefers-color-scheme: dark) {
+  .stApp { background: #020617 !important; }
+}
+
+/* KPI Cards - only background and border, NOT global text */
+div[data-testid="stMetric"],
+div[data-testid="stContainer"] {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+}
+@media (prefers-color-scheme: dark) {
+  div[data-testid="stMetric"],
+  div[data-testid="stContainer"] {
+    background: #0F172A !important;
+    border: 1px solid #1E293B !important;
+  }
+}
+
+/* FORCE METRIC VALUES TO BE VISIBLE */
+div[data-testid="stMetricValue"] {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+div[data-testid="stMetricLabel"] {
+  color: #64748B !important;
+}
+@media (prefers-color-scheme: dark) {
+  div[data-testid="stMetricValue"] { color: #F1F5F9 !important; }
+  div[data-testid="stMetricLabel"] { color: #94A3B8 !important; }
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+  background: #FFFFFF !important;
+  border-right: 1px solid #E2E8F0 !important;
+}
+@media (prefers-color-scheme: dark) {
+  section[data-testid="stSidebar"] {
+    background: #020617 !important;
+    border-right: 1px solid #1E293B !important;
+  }
+}
+
+/* Keep all normal text default - DO NOT override p, span globally */
+
+/* Top premium line */
+.stApp::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4F46E5, #8B5CF6, #06B6D4);
+  z-index: 9999;
+}
