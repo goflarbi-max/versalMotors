@@ -1,7 +1,6 @@
 """versalMotors Business Intelligence application shell."""
 
 import logging
-from pathlib import Path
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -10,7 +9,6 @@ import streamlit as st
 
 from src.database.bootstrap import database_is_ready, ensure_database
 
-
 st.set_page_config(
     page_title="versalMotors BI",
     page_icon="🚗",
@@ -18,12 +16,44 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Global presentation layer. Keeping the visual system in one stylesheet lets
-# every page rendered through ``st.navigation`` share the same UI treatment.
-st.markdown(
-    f"<style>{Path(__file__).with_name('style.css').read_text(encoding='utf-8')}</style>",
-    unsafe_allow_html=True,
-)
+st.markdown("""
+<style>
+/* LIGHT MODE ONLY - Professional */
+.stApp {
+  background-color: #F8FAFC!important;
+}
+
+div[data-testid="stMetric"] {
+  background: #FFFFFF!important;
+  border: 1px solid #E2E8F0!important;
+  border-radius: 16px!important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04)!important;
+  padding: 18px!important;
+}
+
+/* FORCE VISIBILITY - Light mode */
+div[data-testid="stMetricValue"] div {
+  color: #0F172A!important;
+  -webkit-text-fill-color: #0F172A!important;
+  opacity: 1!important;
+}
+
+div[data-testid="stMetricLabel"] div {
+  color: #64748B!important;
+  -webkit-text-fill-color: #64748B!important;
+  opacity: 1!important;
+}
+
+div[data-testid="stMetricDelta"] div {
+  opacity: 1!important;
+}
+
+h1, h2, h3 {
+  color: #0F172A!important;
+  -webkit-text-fill-color: #0F172A!important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 try:
     if not database_is_ready():
