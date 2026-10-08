@@ -1,6 +1,7 @@
 """versalMotors Business Intelligence application shell."""
 
 import logging
+from pathlib import Path
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,6 +16,13 @@ st.set_page_config(
     page_icon="🚗",
     layout="wide",
     initial_sidebar_state="expanded",
+)
+
+# Global presentation layer. Keeping the visual system in one stylesheet lets
+# every page rendered through ``st.navigation`` share the same UI treatment.
+st.markdown(
+    f"<style>{Path(__file__).with_name('style.css').read_text(encoding='utf-8')}</style>",
+    unsafe_allow_html=True,
 )
 
 try:
