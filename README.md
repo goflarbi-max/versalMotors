@@ -8,7 +8,7 @@ versalMotors has sales, inventory, service, warranty, complaint, and customer-sa
 
 ## Solution
 
-This project provides a multipage business-intelligence application that turns operational records into auditable management metrics. The implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, a filterable management Overview, warranty-cost drill-down, data-quality monitoring, evidence-backed business questions, and downloadable management briefs.
+This project provides a multipage business-intelligence application that turns operational records into auditable management metrics. A responsive, theme-aware landing page provides direct access to the management Overview and Ask the Business workflows. The implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, warranty-cost drill-down, data-quality monitoring, evidence-backed business questions, and downloadable management briefs.
 
 ### Run locally
 
@@ -39,7 +39,7 @@ The repository contains nine synthetic raw CSV tables covering branches, models,
 3. `src/data/cleaning.py` standardises reviewed values, safely parses fields, flags questionable records, removes only exact duplicates, and writes an audit log.
 4. `scripts/build_database.py` rebuilds the cleaned CSVs and local DuckDB database.
 5. `src/analytics/metrics.py` calculates tested business metrics without UI or database side effects.
-6. Streamlit presents persistent filters, management KPIs, period comparisons, charts, warranty drill-down evidence, data-quality checks, and PDF exports.
+6. Streamlit opens with a lightweight landing page, then presents persistent filters, management KPIs, period comparisons, charts, warranty drill-down evidence, data-quality checks, and PDF exports. Theme-aware logo assets are stored in `assets/`.
 7. The optional Gemini layer tries a primary model and lighter fallback model with bounded transient-error retries. Reviewed queries and deterministic evidence summaries remain available when every model is unavailable.
 
 ## Architecture
@@ -90,6 +90,7 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Implementing the approved DD/MM-first date rule while retaining ambiguous inputs and invalid-date flags rather than silently choosing a convenient interpretation.
 - Keeping missing totals null while exposing calculated companion values, so management metrics never confuse reconstruction with a source-recorded amount.
 - Enforcing the approved one-completed-sale-per-VIN and near-duplicate rules without automatically deleting legitimate transactions that merely look similar.
+- Keeping transparent brand artwork readable across Streamlit light and dark modes, including first renders where server-side theme context is unavailable.
 
 ## AI Mistakes
 
@@ -146,6 +147,13 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - Add normalized service-volume and model-population denominators to strengthen the management investigations in `docs/management_brief.md`.
 
 ## Daily Progress Log
+
+### Day 6 - 2026-10-14 - Landing Page & Theme-Aware Branding
+
+- Done: Added a responsive, database-independent landing page; created transparent dark and light logo assets; made logo rendering adapt reliably to Streamlit light and dark modes; added Home navigation back to the landing page while keeping its sidebar hidden; retained the full sidebar and shared filters on business pages; and removed landing-page footer clutter and heading permalink icons across the application. The automated suite passes 38 tests and 24 subtests.
+- Files: `app.py`, `pages/landing.py`, `src/ui/components.py`, `src/ui/theme.py`, `assets/logo_original.jpg`, `assets/logo_dark.png`, `assets/logo_light.png`, `README.md`.
+- Commit: `Add responsive landing page and theme-aware branding`.
+- Next: Capture final hosted screenshots in both themes and confirm the production deployment reflects the new landing experience.
 
 ### Day 5 - 2026-10-05 - Final Verification & Deployment Readiness
 
