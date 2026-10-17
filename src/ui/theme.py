@@ -428,16 +428,16 @@ def apply_theme() -> None:
 
         [class*="st-key-landing_actions"] > [data-testid="stElementContainer"] {
             flex: 0 0 auto;
-            width: fit-content !important;
+            width: 15rem !important;
             max-width: none;
         }
 
         [class*="st-key-landing_actions"] [data-testid="stPageLink"] {
-            width: fit-content !important;
+            width: 100% !important;
         }
 
         [class*="st-key-landing_actions"] [data-testid="stPageLink"] a {
-            width: max-content !important;
+            width: 100% !important;
             min-height: 3rem;
             justify-content: center;
             align-items: center;
