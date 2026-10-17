@@ -12,6 +12,40 @@ def _show_password_help() -> None:
     st.info("Please contact the system administrator to reset your password.")
 
 
+def _enable_login_enter_key() -> None:
+    """Submit the existing login button when Enter is pressed in either field."""
+    st.html(
+        """
+        <script>
+        (() => {
+            const handlerKey = "__versalMotorsLoginEnterHandler";
+            if (window[handlerKey]) return;
+
+            const handler = (event) => {
+                if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+                if (!(event.target instanceof HTMLInputElement)) return;
+                if (!["email", "password"].includes(event.target.type)) return;
+
+                const signInButton = document.querySelector(
+                    '[class*="st-key-sign_in"] button'
+                );
+                if (!signInButton || signInButton.disabled) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+                window.__versalMotorsLoginEnterTriggered = true;
+                signInButton.click();
+            };
+
+            document.addEventListener("keyup", handler);
+            window[handlerKey] = handler;
+        })();
+        </script>
+        """,
+        unsafe_allow_javascript=True,
+    )
+
+
 def render_login() -> None:
     """Render the responsive login card and authenticate submitted credentials."""
     apply_login_theme()
@@ -68,3 +102,5 @@ def render_login() -> None:
                 else:
                     login(user)
                     st.rerun()
+
+            _enable_login_enter_key()
