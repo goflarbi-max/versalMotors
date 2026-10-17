@@ -3,6 +3,191 @@
 import streamlit as st
 
 
+def apply_login_theme() -> None:
+    """Apply login-only chrome hiding and responsive card styling."""
+    st.html(
+        """
+        <span id="versal-theme-bootstrap" hidden></span>
+        <script>
+        (() => {
+            const sessionMarker = "versalMotorsLightThemeInitialized";
+            if (sessionStorage.getItem(sessionMarker) !== "true") {
+                const themeKeys = Object.keys(localStorage).filter((key) =>
+                    key.startsWith("stActiveTheme-")
+                );
+                let changed = false;
+
+                for (const key of themeKeys) {
+                    const stored = localStorage.getItem(key);
+                    let selected = stored;
+                    try {
+                        selected = JSON.parse(stored);
+                    } catch (_) {
+                        // Older Streamlit versions may store the value without JSON encoding.
+                    }
+                    if (selected !== "Light") {
+                        localStorage.setItem(key, JSON.stringify("Light"));
+                        changed = true;
+                    }
+                }
+
+                sessionStorage.setItem(sessionMarker, "true");
+                if (changed) {
+                    window.location.reload();
+                    return;
+                }
+            }
+
+        })();
+        </script>
+        """,
+        unsafe_allow_javascript=True,
+    )
+    try:
+        dark_mode = st.context.theme.type == "dark"
+    except (AttributeError, RuntimeError):
+        dark_mode = False
+
+    card_background = "#0F172A" if dark_mode else "#FFFFFF"
+    card_text = "#F8FAFC" if dark_mode else "#0F172A"
+    muted_text = "#CBD5E1" if dark_mode else "#64748B"
+    field_background = "#111827" if dark_mode else "#F8FAFC"
+    field_border = "#334155" if dark_mode else "#CBD5E1"
+    page_background = "#020617" if dark_mode else "#F8FAFC"
+
+    st.html(
+        f"""
+        <style>
+        [data-testid="stSidebar"],
+        [data-testid="stSidebarCollapsedControl"],
+        [data-testid="stHeader"],
+        [data-testid="stToolbar"],
+        footer {{
+            display: none !important;
+        }}
+
+        .stApp,
+        [data-testid="stAppViewContainer"] {{
+            background: {page_background};
+        }}
+
+        .block-container {{
+            width: 100%;
+            max-width: 100% !important;
+            padding: 1rem !important;
+        }}
+
+        [class*="st-key-login_shell"] {{
+            width: 100%;
+            min-height: calc(100dvh - 2rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+
+        [class*="st-key-login_shell"] > div {{
+            width: 100%;
+        }}
+
+        [class*="st-key-login_card"] {{
+            width: min(100%, 420px);
+            margin-inline: auto;
+            padding: 2rem;
+            border: 1px solid {field_border};
+            border-radius: 16px !important;
+            background: {card_background};
+            color: {card_text};
+            box-shadow: 0 24px 65px rgba(2, 6, 23, 0.34);
+        }}
+
+        [class*="st-key-login_card"] h1 {{
+            color: {card_text};
+            font-size: clamp(1.45rem, 4vw, 1.9rem);
+            line-height: 1.2;
+            margin-bottom: 0;
+        }}
+
+        [class*="st-key-login_card"] label,
+        [class*="st-key-login_card"] p {{
+            color: {card_text};
+        }}
+
+        [class*="st-key-login_card"] [data-baseweb="input"] {{
+            min-height: 3rem;
+            border-color: {field_border};
+            background: {field_background};
+        }}
+
+        [class*="st-key-login_card"] [data-baseweb="input"] input {{
+            color: {card_text};
+        }}
+
+        [class*="st-key-login_card"] [data-baseweb="input"] input::placeholder {{
+            color: {muted_text};
+            opacity: 0.82;
+        }}
+
+        [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"] {{
+            min-height: 3.25rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+        }}
+
+        [class*="st-key-forgot_password_row"] button {{
+            min-height: auto;
+            padding: 0.15rem 0 !important;
+            color: #6366F1 !important;
+            font-weight: 650;
+        }}
+
+        .versal-login-subtitle {{
+            margin: -0.15rem 0 0.75rem;
+            color: {muted_text} !important;
+            text-align: center;
+            font-size: 0.98rem;
+        }}
+
+        .versal-demo-access {{
+            margin-top: 0.5rem;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            background: color-mix(in srgb, {card_text} 6%, transparent);
+            color: {muted_text};
+            text-align: center;
+            font-size: 0.82rem;
+            line-height: 1.55;
+        }}
+
+        .versal-demo-access strong {{
+            color: {card_text};
+        }}
+
+        .versal-demo-access code {{
+            color: {card_text};
+            background: transparent;
+            font-size: 0.8rem;
+        }}
+
+        @media (max-width: 480px) {{
+            .block-container {{
+                padding: 0.75rem !important;
+            }}
+
+            [class*="st-key-login_shell"] {{
+                min-height: calc(100dvh - 1.5rem);
+            }}
+
+            [class*="st-key-login_card"] {{
+                padding: 1.35rem 1.1rem;
+                border-radius: 14px !important;
+            }}
+        }}
+        </style>
+        """
+    )
+
+
 def hide_landing_navigation() -> None:
     """Hide sidebar navigation and its reveal control on the landing route only."""
     st.html(
@@ -94,6 +279,36 @@ def apply_theme() -> None:
         [class*="st-key-sidebar_brand"] img {
             max-width: 100%;
             height: auto;
+        }
+
+        [class*="st-key-landing_account"] {
+            position: fixed;
+            /* Sit below Streamlit's deployment toolbar instead of behind it. */
+            top: 3.5rem;
+            right: 1rem;
+            z-index: 1000001;
+            width: auto;
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            gap: 0.55rem !important;
+            padding: 0.25rem 0.45rem 0.25rem 0.75rem;
+            border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--background-color, #FFFFFF) 92%, transparent);
+            backdrop-filter: blur(10px);
+        }
+
+        [class*="st-key-landing_account"] p {
+            max-width: 14rem;
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        [class*="st-key-landing_account"] button {
+            min-height: 2.25rem;
         }
 
         [class*="st-key-landing_shell"] {
@@ -190,6 +405,16 @@ def apply_theme() -> None:
 
             .versal-landing-description {
                 font-size: 0.98rem;
+            }
+
+            [class*="st-key-landing_account"] {
+                top: 3.25rem;
+                right: 0.65rem;
+                max-width: calc(100vw - 1.3rem);
+            }
+
+            [class*="st-key-landing_account"] p {
+                max-width: 9rem;
             }
         }
 

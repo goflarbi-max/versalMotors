@@ -4,6 +4,10 @@
 
 ```mermaid
 flowchart LR
+    USER[Application user] --> AUTH{App-level authentication<br/>bcrypt verification, session lockout}
+    AUTH -- Not authenticated --> LOGIN[Login page only]
+    AUTH -- Authenticated --> UI
+
     RAW[Raw CSV data<br/>9 operational tables] --> CLEAN[Audited cleaning<br/>explicit mappings, safe parsing,<br/>quality flags and cleaning log]
     CLEAN --> FILES[Cleaned CSVs]
     FILES --> DB[(DuckDB<br/>business.duckdb)]
@@ -35,6 +39,7 @@ flowchart LR
 | Evidence | Dictionaries and DataFrames returned by analytics/AI tools | Carries the fact, value, filters, and source context used to support an answer. |
 | AI tools | `src/ai/gemini_client.py`, `src/database/connection.py` | Optionally interprets questions and executes only approved read-only business queries. |
 | Guardrails | `src/ai/guardrails.py`, retry/fallback logic | Rejects unsafe input and SQL, verifies narrative numbers, retries transient failures, and falls back without exposing provider errors. |
+| Authentication | `src/auth/auth.py`, `src/ui/auth_ui.py` | Loads bcrypt hashes from Secrets or local environment, validates credentials, applies per-session lockout, and conditionally registers protected pages. |
 | User interface | `app.py`, `pages/`, `src/ui/` | Presents persistent filters, KPIs, charts, drill-downs, evidence, quality results, and PDF downloads. |
 | Management | Application users | Use evidence to choose investigations and actions; AI does not make decisions for them. |
 
@@ -44,7 +49,8 @@ flowchart LR
 2. `scripts/build_database.py` calls the cleaning pipeline, writes cleaned CSVs, verifies table row counts, and loads DuckDB.
 3. Pure pandas functions calculate metrics from cleaned tables. Question and drill-down tools query the same governed data.
 4. Evidence objects are passed to optional AI narration and to deterministic fallback summaries.
-5. Streamlit renders the result and lets management inspect supporting records.
+5. The access gate exposes only the login page until successful bcrypt verification.
+6. Streamlit then renders the landing and business pages and lets management inspect supporting records.
 
 ## Resilient Ask the Business flow
 
@@ -81,9 +87,29 @@ flowchart TD
 | Question is unsupported by available data | The limitation is explained without guessing. |
 | Filters return no rows | A no-data message is shown without a page crash. |
 
+## Authentication boundary
+
+```mermaid
+flowchart TD
+    VISIT[Browser session] --> STATE{Authenticated session?}
+    STATE -- No --> LOGIN[Login page only]
+    LOGIN --> VALIDATE[Validate required fields and email format]
+    VALIDATE --> BCRYPT[Bcrypt check<br/>real or dummy hash]
+    BCRYPT -- Invalid --> ATTEMPTS{Five failures?}
+    ATTEMPTS -- No --> LOGIN
+    ATTEMPTS -- Yes --> LOCK[Lock session for 60 seconds]
+    LOCK --> LOGIN
+    BCRYPT -- Valid --> SESSION[Store authenticated flag and email]
+    SESSION --> PAGES[Register landing and business pages]
+    PAGES --> SIGNOUT[Sign out clears session state]
+    SIGNOUT --> LOGIN
+```
+
+The demo access layer is intentionally small and session-scoped. Credential hashes come from Streamlit Secrets or `VERSALMOTORS_AUTH_USERS_JSON` in local `.env`; plaintext passwords are never used for verification or stored in session state. An unknown email is checked against a fixed dummy bcrypt hash and receives the same response as an incorrect password. This is suitable for controlled project demonstration access; a production deployment should use a managed identity provider and Streamlit's OIDC support.
+
 ## Security and configuration
 
-Secrets are loaded from `.env` or Streamlit secrets and are excluded from Git. Model name, fallback models, and retry limits are configurable through `.env.example`. The database and cleaned CSVs are generated artifacts. `app.py` calls `src/database/bootstrap.py` before page navigation. If DuckDB is missing or incomplete, a process lock permits one first-start build from the committed raw CSVs and the result is accepted only after all nine managed tables are present. This makes Streamlit Cloud self-starting without committing a large database. Developers can also rebuild explicitly with:
+Secrets are loaded from `.env` or Streamlit secrets and are excluded from Git. Authentication runs before database bootstrap, so unauthenticated sessions cannot trigger business-page rendering. Model name, fallback models, and retry limits are configurable through `.env.example`. The database and cleaned CSVs are generated artifacts. After authentication, `app.py` calls `src/database/bootstrap.py` before protected page navigation. If DuckDB is missing or incomplete, a process lock permits one first-start build from the committed raw CSVs and the result is accepted only after all nine managed tables are present. This makes Streamlit Cloud self-starting without committing a large database. Developers can also rebuild explicitly with:
 
 ```powershell
 python scripts/build_database.py

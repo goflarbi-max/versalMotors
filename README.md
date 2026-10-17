@@ -20,13 +20,43 @@ python -m venv .venv
 
 The database and cleaned CSVs are generated artifacts. On a fresh clone or Streamlit Cloud deployment, `app.py` automatically builds and validates them from the committed raw CSVs before opening the pages. You can still run `.\.venv\Scripts\python.exe scripts\build_database.py` explicitly when rebuilding data during development. Google Gemini is optional; copy `.env.example` to `.env` only when AI narration is wanted.
 
+### Authentication
+
+VersalMotors uses a small app-level login for this project demo. It is an access gate for the demonstration, not a replacement for production identity management or single sign-on. Unauthenticated sessions register only the login screen; protected page URLs are not registered until sign-in succeeds. Password verification uses bcrypt hashes, unknown accounts follow the same bcrypt check path, and five failed attempts lock that browser session for 60 seconds.
+
+Public demo access:
+
+- Email: `demo@versalmotors.com`
+- Password: `VersalDemo2026!`
+
+Generate the corresponding hash locally without placing the password in shell history:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\create_user.py
+```
+
+For local development, place the generated hash in `.env` as a JSON email-to-hash mapping:
+
+```dotenv
+VERSALMOTORS_AUTH_USERS_JSON='{"demo@versalmotors.com":"<bcrypt-hash>"}'
+```
+
+For Streamlit Community Cloud, use this format in the app's Secrets settings:
+
+```toml
+[auth.users]
+"demo@versalmotors.com" = "<bcrypt-hash>"
+```
+
+Only hashes are used for authentication. The displayed demo password is intentionally public for this demonstration account. `.env` and `.streamlit/secrets.toml` are excluded from Git.
+
 ### Testing
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-The Day 4 stress suite records 35 passing tests and 24 passing subtests across calculations, degraded schemas, bad chronology, filters, AI failures, unsupported questions, large data, and all five Streamlit pages. Full results and limitations are in `docs/test_log.md`.
+The full suite records 48 passing tests and 24 passing subtests across authentication, calculations, degraded schemas, bad chronology, filters, AI failures, unsupported questions, large data, and all five Streamlit pages. Full stress-test results and limitations are in `docs/test_log.md`.
 
 ## Dataset
 
@@ -39,8 +69,9 @@ The repository contains nine synthetic raw CSV tables covering branches, models,
 3. `src/data/cleaning.py` standardises reviewed values, safely parses fields, flags questionable records, removes only exact duplicates, and writes an audit log.
 4. `scripts/build_database.py` rebuilds the cleaned CSVs and local DuckDB database.
 5. `src/analytics/metrics.py` calculates tested business metrics without UI or database side effects.
-6. Streamlit opens with a lightweight landing page, then presents persistent filters, management KPIs, period comparisons, charts, warranty drill-down evidence, data-quality checks, and PDF exports. Theme-aware logo assets are stored in `assets/`.
-7. The optional Gemini layer tries a primary model and lighter fallback model with bounded transient-error retries. Reviewed queries and deterministic evidence summaries remain available when every model is unavailable.
+6. The bcrypt access layer registers only the login screen until a session is authenticated, then opens the landing page without disturbing shared filter state.
+7. Streamlit presents persistent filters, management KPIs, period comparisons, charts, warranty drill-down evidence, data-quality checks, and PDF exports. Theme-aware logo assets are stored in `assets/`.
+8. The optional Gemini layer tries a primary model and lighter fallback model with bounded transient-error retries. Reviewed queries and deterministic evidence summaries remain available when every model is unavailable.
 
 ## Architecture
 
@@ -55,6 +86,7 @@ The AI layer is optional: reviewed database queries and deterministic summaries 
 
 - **Python and pandas:** generate, clean, test, and analyse the dataset reproducibly.
 - **Streamlit:** provides responsive multipage navigation, persistent filters, KPI cards, charts, and drill-down evidence.
+- **bcrypt:** verifies demo-account passwords using salted adaptive hashes instead of stored plaintext credentials.
 - **CSV:** keeps raw and cleaned pipeline stages portable and auditable.
 - **DuckDB:** stores the local analytical model and supports independent SQL verification of important calculations.
 - **pytest:** checks cleaning contracts, formulas, filter safety, SQL parity, and drill-down reconciliation.
@@ -91,6 +123,7 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Keeping missing totals null while exposing calculated companion values, so management metrics never confuse reconstruction with a source-recorded amount.
 - Enforcing the approved one-completed-sale-per-VIN and near-duplicate rules without automatically deleting legitimate transactions that merely look similar.
 - Keeping transparent brand artwork readable across Streamlit light and dark modes, including first renders where server-side theme context is unavailable.
+- Protecting direct multipage URLs without adding authentication code to every business page, while preserving existing headless page tests and shared filter state.
 
 ## AI Mistakes
 
@@ -147,6 +180,12 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - Add normalized service-volume and model-population denominators to strengthen the management investigations in `docs/management_brief.md`.
 
 ## Daily Progress Log
+
+### Day 7 - 2026-10-15 - Demo Authentication & Access Control
+
+- Done: Added a responsive bcrypt-backed login screen, conditional page registration that protects direct URLs, consistent credential errors, five-attempt session lockout, a safe password-hash generator, landing-page account controls, business-page sidebar sign-out, local and Streamlit Secrets documentation, and authentication architecture. The full suite passes 48 tests and 24 subtests.
+- Files: `app.py`, `src/auth/auth.py`, `src/auth/__init__.py`, `src/ui/auth_ui.py`, `src/ui/theme.py`, `scripts/create_user.py`, `tests/test_auth.py`, `requirements.txt`, `.env.example`, `README.md`, `docs/architecture.md`.
+- Next: Add the generated demo bcrypt hash to Streamlit Secrets and verify sign-in and lockout on the hosted application.
 
 ### Day 6 - 2026-10-14 - Landing Page & Theme-Aware Branding
 

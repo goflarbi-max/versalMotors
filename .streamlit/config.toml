@@ -1,4 +1,5 @@
 [theme]
+base = "light"
 primaryColor = "#4F46E5"
 baseRadius = "large"
 showWidgetBorder = true
