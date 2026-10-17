@@ -69,17 +69,28 @@ def apply_login_theme() -> None:
         .stApp,
         [data-testid="stAppViewContainer"] {{
             background: {page_background};
+            height: 100dvh;
+            overflow: hidden !important;
+        }}
+
+        html,
+        body,
+        [data-testid="stAppViewContainer"] > .main {{
+            height: 100dvh;
+            overflow: hidden !important;
         }}
 
         .block-container {{
             width: 100%;
             max-width: 100% !important;
             padding: 1rem !important;
+            height: 100dvh;
+            overflow: hidden !important;
         }}
 
         [class*="st-key-login_shell"] {{
             width: 100%;
-            min-height: calc(100dvh - 2rem);
+            height: calc(100dvh - 2rem);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -92,7 +103,7 @@ def apply_login_theme() -> None:
         [class*="st-key-login_card"] {{
             width: min(100%, 420px);
             margin-inline: auto;
-            padding: 2rem;
+            padding: 1.5rem 2rem;
             border: 1px solid {field_border};
             border-radius: 16px !important;
             background: {card_background};
@@ -142,31 +153,10 @@ def apply_login_theme() -> None:
         }}
 
         .versal-login-subtitle {{
-            margin: -0.15rem 0 0.75rem;
+            margin: -0.15rem 0 0.4rem;
             color: {muted_text} !important;
             text-align: center;
             font-size: 0.98rem;
-        }}
-
-        .versal-demo-access {{
-            margin-top: 0.5rem;
-            padding: 0.8rem 1rem;
-            border-radius: 10px;
-            background: color-mix(in srgb, {card_text} 6%, transparent);
-            color: {muted_text};
-            text-align: center;
-            font-size: 0.82rem;
-            line-height: 1.55;
-        }}
-
-        .versal-demo-access strong {{
-            color: {card_text};
-        }}
-
-        .versal-demo-access code {{
-            color: {card_text};
-            background: transparent;
-            font-size: 0.8rem;
         }}
 
         @media (max-width: 480px) {{
@@ -175,11 +165,11 @@ def apply_login_theme() -> None:
             }}
 
             [class*="st-key-login_shell"] {{
-                min-height: calc(100dvh - 1.5rem);
+                height: calc(100dvh - 1.5rem);
             }}
 
             [class*="st-key-login_card"] {{
-                padding: 1.35rem 1.1rem;
+                padding: 1.1rem;
                 border-radius: 14px !important;
             }}
         }}

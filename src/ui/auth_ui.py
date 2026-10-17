@@ -7,10 +7,6 @@ from src.ui.components import render_logo
 from src.ui.theme import apply_login_theme
 
 
-DEMO_EMAIL = "demo@versalmotors.com"
-DEMO_PASSWORD = "VersalDemo2026!"
-
-
 @st.dialog("Forgot Password?", icon=":material/help:")
 def _show_password_help() -> None:
     st.info("Please contact the system administrator to reset your password.")
@@ -23,7 +19,7 @@ def render_login() -> None:
     with st.container(key="login_shell"):
         with st.container(key="login_card"):
             with st.container(horizontal_alignment="center", gap="small"):
-                render_logo(190)
+                render_logo(165)
                 st.title(
                     "VersalMotors Business Intelligence",
                     text_alignment="center",
@@ -68,13 +64,3 @@ def render_login() -> None:
                 else:
                     login(user)
                     st.rerun()
-
-            st.html(
-                f"""
-                <div class="versal-demo-access">
-                  <strong>Demo access</strong><br>
-                  Email: <code>{DEMO_EMAIL}</code><br>
-                  Password: <code>{DEMO_PASSWORD}</code>
-                </div>
-                """
-            )
