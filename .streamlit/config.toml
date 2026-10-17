@@ -36,3 +36,6 @@ backgroundColor = "#020617"
 secondaryBackgroundColor = "#0F172A"
 textColor = "#F1F5F9"
 borderColor = "#1E293B"
+
+[server]
+enableStaticServing = true

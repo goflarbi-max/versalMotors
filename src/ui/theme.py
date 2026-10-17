@@ -1,41 +1,30 @@
 """Shared visual styling for the Streamlit shell and landing page."""
 
-import base64
-from pathlib import Path
-
 import streamlit as st
 
 
 LANDING_SURFACE_THEME = {
     "light": {
-        "overlay": "rgba(255, 255, 255, 0.84)",
-        "vignette": "rgba(255, 255, 255, 0.24)",
-        "panel": "rgba(255, 255, 255, 0.64)",
-        "panel_fallback": "rgba(255, 255, 255, 0.96)",
+        "overlay": "rgba(255, 255, 255, 0.76)",
+        "vignette": "rgba(255, 255, 255, 0.18)",
+        "panel": "rgba(255, 255, 255, 0.42)",
+        "panel_fallback": "rgba(255, 255, 255, 0.88)",
         "border": "rgba(255, 255, 255, 0.82)",
         "shadow": "0 24px 70px rgba(15, 23, 42, 0.18)",
         "title": "#111827",
         "description": "#374151",
     },
     "dark": {
-        "overlay": "rgba(15, 18, 28, 0.91)",
-        "vignette": "rgba(2, 6, 23, 0.28)",
-        "panel": "rgba(20, 24, 35, 0.55)",
-        "panel_fallback": "rgba(20, 24, 35, 0.96)",
+        "overlay": "rgba(15, 18, 28, 0.84)",
+        "vignette": "rgba(2, 6, 23, 0.20)",
+        "panel": "rgba(20, 24, 35, 0.42)",
+        "panel_fallback": "rgba(20, 24, 35, 0.88)",
         "border": "rgba(255, 255, 255, 0.17)",
         "shadow": "0 24px 70px rgba(0, 0, 0, 0.38)",
         "title": "#F8FAFC",
         "description": "#CBD5E1",
     },
 }
-
-
-@st.cache_data(show_spinner=False)
-def _landing_background_data_uri() -> str:
-    """Return the optimized landing background once per Streamlit cache cycle."""
-    image_path = Path(__file__).resolve().parents[2] / "assets" / "landing_bg.webp"
-    encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
-    return f"data:image/webp;base64,{encoded}"
 
 
 def apply_login_theme() -> None:
@@ -283,7 +272,9 @@ def _apply_landing_surface_theme() -> None:
         dark_mode = False
 
     surface = LANDING_SURFACE_THEME["dark" if dark_mode else "light"]
-    background_uri = _landing_background_data_uri()
+    # Streamlit serves files in ./static at /app/static when static serving is
+    # enabled. The browser caches this URL, avoiding a large base64 CSS payload.
+    background_uri = "/app/static/landing_bg.webp"
     st.markdown(
         f"""
         <style id="versal-landing-surface">
@@ -295,30 +286,41 @@ def _apply_landing_surface_theme() -> None:
                 url("{background_uri}") !important;
             background-position: center center !important;
             background-size: cover !important;
-            background-attachment: fixed !important;
+            background-attachment: scroll !important;
             background-repeat: no-repeat !important;
+            overflow: hidden !important;
+            transition: none !important;
+            animation: none !important;
         }}
 
-        /* Direct fallback that does not depend on :has() support or page-shell timing. */
+        [data-testid="stAppViewContainer"]:has([class*="st-key-landing_shell"])
+        .block-container {{
+            width: 100% !important;
+            max-width: none !important;
+            height: 100dvh !important;
+            padding: 4px 0 0 !important;
+            overflow: hidden !important;
+        }}
+
         [class*="st-key-landing_shell"] {{
-            position: relative;
+            position: relative !important;
+            width: 100% !important;
+            max-width: none !important;
+            height: calc(100dvh - 4px) !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: clamp(0.75rem, 2vw, 1.5rem) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
             isolation: isolate;
+            transition: none !important;
+            animation: none !important;
         }}
 
-        [class*="st-key-landing_shell"]::before {{
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-            background-image:
-                radial-gradient(ellipse at center, transparent 36%, {surface["vignette"]} 100%),
-                linear-gradient({surface["overlay"]}, {surface["overlay"]}),
-                url("{background_uri}");
-            background-position: center center;
-            background-size: cover;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
+        [class*="st-key-landing_shell"] > div {{
+            width: 100%;
         }}
 
         [class*="st-key-landing_content"] {{
@@ -330,8 +332,10 @@ def _apply_landing_surface_theme() -> None:
             border-radius: 24px !important;
             background: {surface["panel"]} !important;
             box-shadow: {surface["shadow"]} !important;
-            -webkit-backdrop-filter: blur(18px) saturate(140%);
-            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+            transition: none !important;
+            animation: none !important;
         }}
 
         [class*="st-key-landing_content"] h1 {{
@@ -343,16 +347,9 @@ def _apply_landing_surface_theme() -> None:
             opacity: 1;
         }}
 
-        @supports not ((-webkit-backdrop-filter: blur(1px)) or
-                       (backdrop-filter: blur(1px))) {{
-            [class*="st-key-landing_content"] {{
-                background: {surface["panel_fallback"]};
-            }}
-        }}
-
         @media (max-width: 480px) {{
             [class*="st-key-landing_shell"] {{
-                padding: 0.65rem 0 !important;
+                padding: 0.65rem !important;
             }}
 
             [class*="st-key-landing_content"] {{
