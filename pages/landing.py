@@ -21,11 +21,29 @@ with st.container(key="landing_shell"):
                 "pages/overview.py",
                 label="Open Business Overview",
                 icon=":material/monitoring:",
-                width="stretch",
+                width="content",
             )
             st.page_link(
                 "pages/ask_the_business.py",
                 label="Ask the Business",
                 icon=":material/forum:",
-                width="stretch",
+                width="content",
             )
+
+# Keep this page-local override after the links so no earlier cached theme rule can
+# recreate the retired right-side pseudo-element.
+st.html(
+    """
+    <style id="versal-remove-landing-button-after">
+    [class*="st-key-landing_actions"] [data-testid="stPageLink"] a::after,
+    [class*="st-key-landing_actions"] [data-testid="stPageLink"] a:after {
+        content: none !important;
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        border: 0 !important;
+        margin: 0 !important;
+    }
+    </style>
+    """
+)

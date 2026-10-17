@@ -256,6 +256,42 @@ def hide_landing_navigation() -> None:
 
 def apply_theme() -> None:
     """Apply existing shell polish plus responsive landing-page styles."""
+    try:
+        dark_mode = st.context.theme.type == "dark"
+    except (AttributeError, RuntimeError):
+        dark_mode = False
+
+    landing_button_theme = {
+        "button_primary_bg": "#0F0F3D",
+        "button_primary_hover": "#1A1A5E",
+        "button_secondary_bg": "#D92D20",
+        "button_secondary_hover": "#B42318",
+        "button_text": "#FFFFFF",
+        "button_focus_ring": "#6366F1",
+        "button_primary_shadow": (
+            "0 10px 24px rgba(15, 15, 61, 0.30), "
+            "0 0 0 1px rgba(255, 255, 255, 0.24)"
+            if dark_mode
+            else "0 10px 24px rgba(15, 15, 61, 0.24)"
+        ),
+        "button_secondary_shadow": "0 10px 24px rgba(180, 35, 24, 0.24)",
+    }
+    st.html(
+        f"""
+        <style>
+        :root {{
+            --landing-button-primary-bg: {landing_button_theme["button_primary_bg"]};
+            --landing-button-primary-hover: {landing_button_theme["button_primary_hover"]};
+            --landing-button-secondary-bg: {landing_button_theme["button_secondary_bg"]};
+            --landing-button-secondary-hover: {landing_button_theme["button_secondary_hover"]};
+            --landing-button-text: {landing_button_theme["button_text"]};
+            --landing-button-focus-ring: {landing_button_theme["button_focus_ring"]};
+            --landing-button-primary-shadow: {landing_button_theme["button_primary_shadow"]};
+            --landing-button-secondary-shadow: {landing_button_theme["button_secondary_shadow"]};
+        }}
+        </style>
+        """
+    )
     st.html(
         """
         <style>
@@ -387,24 +423,96 @@ def apply_theme() -> None:
         [class*="st-key-landing_actions"] {
             width: 100%;
             justify-content: center;
-            gap: 1rem !important;
+            gap: 0.8rem !important;
         }
 
         [class*="st-key-landing_actions"] > [data-testid="stElementContainer"] {
-            flex: 1 1 280px;
-            max-width: 320px;
+            flex: 0 0 auto;
+            width: fit-content !important;
+            max-width: none;
+        }
+
+        [class*="st-key-landing_actions"] [data-testid="stPageLink"] {
+            width: fit-content !important;
         }
 
         [class*="st-key-landing_actions"] [data-testid="stPageLink"] a {
-            width: 100%;
-            min-height: 3.5rem;
+            width: max-content !important;
+            min-height: 3rem;
             justify-content: center;
-            font-size: 1rem;
-            font-weight: 650;
-            padding: 0.8rem 1.1rem;
-            border: 1px solid color-mix(in srgb, currentColor 42%, transparent);
-            border-radius: 0.75rem;
-            background: color-mix(in srgb, currentColor 5%, transparent);
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            border: 0 !important;
+            border-radius: 999px;
+            color: var(--landing-button-text) !important;
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: left;
+            text-decoration: none;
+            box-shadow: none;
+            transform: translateY(0);
+            transition: background-color 180ms ease, box-shadow 180ms ease,
+                        transform 180ms ease;
+        }
+
+        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a * {
+            color: var(--landing-button-text) !important;
+        }
+
+        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a p {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        [class*="st-key-landing_actions"] [data-testid="stPageLink"]
+        a [data-testid="stIconMaterial"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            font-size: 1.2rem !important;
+            line-height: 1;
+        }
+
+        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a::after {
+            content: none !important;
+            display: none !important;
+        }
+
+        [class*="st-key-landing_actions"] > [data-testid="stElementContainer"]:nth-child(1)
+        [data-testid="stPageLink"] a {
+            background: var(--landing-button-primary-bg);
+            box-shadow: var(--landing-button-primary-shadow);
+        }
+
+        [class*="st-key-landing_actions"] > [data-testid="stElementContainer"]:nth-child(2)
+        [data-testid="stPageLink"] a {
+            background: var(--landing-button-secondary-bg);
+            box-shadow: var(--landing-button-secondary-shadow);
+        }
+
+        [class*="st-key-landing_actions"] > [data-testid="stElementContainer"]:nth-child(1)
+        [data-testid="stPageLink"] a:hover {
+            background: var(--landing-button-primary-hover);
+            box-shadow: 0 13px 28px rgba(15, 15, 61, 0.32);
+            transform: translateY(-2px);
+        }
+
+        [class*="st-key-landing_actions"] > [data-testid="stElementContainer"]:nth-child(2)
+        [data-testid="stPageLink"] a:hover {
+            background: var(--landing-button-secondary-hover);
+            box-shadow: 0 13px 28px rgba(180, 35, 24, 0.30);
+            transform: translateY(-2px);
+        }
+
+        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a:active {
+            transform: translateY(0) scale(0.99);
+        }
+
+        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a:focus-visible {
+            outline: 3px solid var(--landing-button-text);
+            outline-offset: 3px;
+            box-shadow: 0 0 0 6px var(--landing-button-focus-ring);
         }
 
         .versal-landing-description {
@@ -450,9 +558,13 @@ def apply_theme() -> None:
                 width: 100%;
             }
 
+            [class*="st-key-landing_actions"] [data-testid="stPageLink"] {
+                width: 100% !important;
+            }
+
             [class*="st-key-landing_actions"] [data-testid="stPageLink"] a {
-                width: 100%;
-                min-height: 3.75rem;
+                width: 100% !important;
+                min-height: 3rem;
             }
 
             .versal-landing-description {
