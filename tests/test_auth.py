@@ -89,6 +89,22 @@ def test_password_is_never_stored_in_session_state(auth_state):
     assert not any("password" in str(key).lower() for key in auth_state)
 
 
+def test_demo_credentials_work_when_deployment_has_no_auth_config(monkeypatch):
+    state = {}
+    monkeypatch.delenv("VERSALMOTORS_AUTH_USERS_JSON", raising=False)
+    monkeypatch.setattr(auth.st, "secrets", {})
+    monkeypatch.setattr(auth, "_get_session_state", lambda: state)
+
+    users = auth._load_users()
+    user = auth.verify_credentials(DEMO_EMAIL, DEMO_PASSWORD)
+
+    assert set(users) == {DEMO_EMAIL}
+    assert bcrypt.checkpw(
+        DEMO_PASSWORD.encode("utf-8"), users[DEMO_EMAIL].encode("utf-8")
+    )
+    assert user == {"email": DEMO_EMAIL}
+
+
 def test_unauthenticated_navigation_does_not_register_protected_pages(monkeypatch):
     monkeypatch.setattr(auth, "_is_streamlit_test_session", lambda: False)
     app = AppTest.from_file(APP, default_timeout=30).run()

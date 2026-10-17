@@ -60,7 +60,11 @@ def render_login() -> None:
                 try:
                     user = verify_credentials(email, password)
                 except AuthenticationError as error:
-                    st.error(str(error))
+                    st.toast(
+                        str(error),
+                        icon=":material/error:",
+                        duration="long",
+                    )
                 else:
                     login(user)
                     st.rerun()

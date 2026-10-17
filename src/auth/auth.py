@@ -23,6 +23,11 @@ MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
 INVALID_CREDENTIALS_MESSAGE = "Invalid email or password"
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+DEFAULT_DEMO_USERS = {
+    "demo@versalmotors.com": (
+        "$2b$12$Hcb3wXrzER0BeTWmDilcQeWNL8oJMEPLYFJq1StHS7ESHlzkSDzQa"
+    )
+}
 
 # A valid, fixed bcrypt hash used for unknown accounts. It ensures unknown emails
 # still perform the same expensive password check as configured accounts.
@@ -50,7 +55,7 @@ def _normalise_users(users: Mapping[str, Any]) -> dict[str, str]:
 
 
 def _load_users() -> dict[str, str]:
-    """Load email-to-bcrypt-hash mappings from Secrets, then local environment."""
+    """Load users from Secrets or environment, with a deploy-safe demo fallback."""
     try:
         auth_config = st.secrets.get("auth", {})
         secret_users = auth_config.get("users", {}) if auth_config else {}
@@ -61,12 +66,13 @@ def _load_users() -> dict[str, str]:
 
     raw_users = os.getenv("VERSALMOTORS_AUTH_USERS_JSON", "").strip()
     if not raw_users:
-        return {}
+        return DEFAULT_DEMO_USERS.copy()
     try:
         parsed = json.loads(raw_users)
     except json.JSONDecodeError:
-        return {}
-    return _normalise_users(parsed) if isinstance(parsed, dict) else {}
+        return DEFAULT_DEMO_USERS.copy()
+    configured_users = _normalise_users(parsed) if isinstance(parsed, dict) else {}
+    return configured_users or DEFAULT_DEMO_USERS.copy()
 
 
 def _is_streamlit_test_session() -> bool:
