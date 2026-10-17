@@ -48,7 +48,25 @@ def apply_login_theme() -> None:
     except (AttributeError, RuntimeError):
         dark_mode = False
 
-    card_background = "#0F172A" if dark_mode else "#FFFFFF"
+    login_glass = {
+        "light": {
+            "card_background": "rgba(255, 255, 255, 0.64)",
+            "fallback_background": "rgba(255, 255, 255, 0.96)",
+            "card_border": "rgba(255, 255, 255, 0.78)",
+            "card_shadow": "0 24px 65px rgba(15, 23, 42, 0.18)",
+            "shape_one": "rgba(99, 102, 241, 0.20)",
+            "shape_two": "rgba(56, 189, 248, 0.17)",
+        },
+        "dark": {
+            "card_background": "rgba(20, 24, 35, 0.56)",
+            "fallback_background": "rgba(15, 23, 42, 0.96)",
+            "card_border": "rgba(255, 255, 255, 0.18)",
+            "card_shadow": "0 24px 65px rgba(0, 0, 0, 0.38)",
+            "shape_one": "rgba(99, 102, 241, 0.16)",
+            "shape_two": "rgba(14, 165, 233, 0.12)",
+        },
+    }
+    glass = login_glass["dark" if dark_mode else "light"]
     card_text = "#F8FAFC" if dark_mode else "#0F172A"
     muted_text = "#CBD5E1" if dark_mode else "#64748B"
     field_background = "#111827" if dark_mode else "#F8FAFC"
@@ -94,21 +112,59 @@ def apply_login_theme() -> None:
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            isolation: isolate;
         }}
 
         [class*="st-key-login_shell"] > div {{
             width: 100%;
+            position: relative;
+            z-index: 1;
+        }}
+
+        [class*="st-key-login_shell"]::before,
+        [class*="st-key-login_shell"]::after {{
+            content: "";
+            position: absolute;
+            z-index: 0;
+            width: min(46vw, 520px);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            filter: blur(42px);
+            opacity: 0.9;
+            pointer-events: none;
+        }}
+
+        [class*="st-key-login_shell"]::before {{
+            top: -18%;
+            left: 8%;
+            background: {glass["shape_one"]};
+        }}
+
+        [class*="st-key-login_shell"]::after {{
+            right: 7%;
+            bottom: -22%;
+            background: {glass["shape_two"]};
         }}
 
         [class*="st-key-login_card"] {{
             width: min(100%, 420px);
             margin-inline: auto;
             padding: 1.5rem 2rem;
-            border: 1px solid {field_border};
+            border: 1px solid {glass["card_border"]};
             border-radius: 16px !important;
-            background: {card_background};
+            background: {glass["card_background"]};
             color: {card_text};
-            box-shadow: 0 24px 65px rgba(2, 6, 23, 0.34);
+            box-shadow: {glass["card_shadow"]};
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            backdrop-filter: blur(18px) saturate(140%);
+        }}
+
+        @supports not ((-webkit-backdrop-filter: blur(1px)) or
+                       (backdrop-filter: blur(1px))) {{
+            [class*="st-key-login_card"] {{
+                background: {glass["fallback_background"]};
+            }}
         }}
 
         [class*="st-key-login_card"] h1 {{
@@ -171,6 +227,12 @@ def apply_login_theme() -> None:
             [class*="st-key-login_card"] {{
                 padding: 1.1rem;
                 border-radius: 14px !important;
+            }}
+
+            [class*="st-key-login_shell"]::before,
+            [class*="st-key-login_shell"]::after {{
+                width: 72vw;
+                filter: blur(32px);
             }}
         }}
         </style>
