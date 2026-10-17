@@ -62,6 +62,10 @@ The full suite records 48 passing tests and 24 passing subtests across authentic
 
 The repository contains nine synthetic raw CSV tables covering branches, models, salespeople, inventory, sales, service records, warranty claims, complaints, and satisfaction. The data spans approximately 2.5 years, uses Ghanaian cedi (`GHS`), and deliberately contains realistic quality problems for testing. Raw CSVs are committed so a fresh clone can rebuild the application without access to private files. Cleaned outputs are generated locally in `data/cleaned/` and loaded into `data/business.duckdb`; both are excluded from Git. `docs/data_dictionary.md` records the observed schema and profile.
 
+### Assets
+
+The `assets/` folder contains the theme-aware VersalMotors logos and an optimized, landing-page-only business background derived from the preserved original image.
+
 ## How the System Works
 
 1. `scripts/generate_dataset.py` creates deterministic synthetic raw CSVs.

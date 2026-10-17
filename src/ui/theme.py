@@ -1,6 +1,41 @@
 """Shared visual styling for the Streamlit shell and landing page."""
 
+import base64
+from pathlib import Path
+
 import streamlit as st
+
+
+LANDING_SURFACE_THEME = {
+    "light": {
+        "overlay": "rgba(255, 255, 255, 0.84)",
+        "vignette": "rgba(255, 255, 255, 0.24)",
+        "panel": "rgba(255, 255, 255, 0.64)",
+        "panel_fallback": "rgba(255, 255, 255, 0.96)",
+        "border": "rgba(255, 255, 255, 0.82)",
+        "shadow": "0 24px 70px rgba(15, 23, 42, 0.18)",
+        "title": "#111827",
+        "description": "#374151",
+    },
+    "dark": {
+        "overlay": "rgba(15, 18, 28, 0.91)",
+        "vignette": "rgba(2, 6, 23, 0.28)",
+        "panel": "rgba(20, 24, 35, 0.55)",
+        "panel_fallback": "rgba(20, 24, 35, 0.96)",
+        "border": "rgba(255, 255, 255, 0.17)",
+        "shadow": "0 24px 70px rgba(0, 0, 0, 0.38)",
+        "title": "#F8FAFC",
+        "description": "#CBD5E1",
+    },
+}
+
+
+@st.cache_data(show_spinner=False)
+def _landing_background_data_uri() -> str:
+    """Return the optimized landing background once per Streamlit cache cycle."""
+    image_path = Path(__file__).resolve().parents[2] / "assets" / "landing_bg.webp"
+    encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
+    return f"data:image/webp;base64,{encoded}"
 
 
 def apply_login_theme() -> None:
@@ -240,6 +275,98 @@ def apply_login_theme() -> None:
     )
 
 
+def _apply_landing_surface_theme() -> None:
+    """Register landing-only image and glass styles in the global theme layer."""
+    try:
+        dark_mode = st.context.theme.type == "dark"
+    except (AttributeError, RuntimeError):
+        dark_mode = False
+
+    surface = LANDING_SURFACE_THEME["dark" if dark_mode else "light"]
+    background_uri = _landing_background_data_uri()
+    st.markdown(
+        f"""
+        <style id="versal-landing-surface">
+        .stApp:has([class*="st-key-landing_shell"]),
+        [data-testid="stAppViewContainer"]:has([class*="st-key-landing_shell"]) {{
+            background-image:
+                radial-gradient(ellipse at center, transparent 36%, {surface["vignette"]} 100%),
+                linear-gradient({surface["overlay"]}, {surface["overlay"]}),
+                url("{background_uri}") !important;
+            background-position: center center !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+        }}
+
+        /* Direct fallback that does not depend on :has() support or page-shell timing. */
+        [class*="st-key-landing_shell"] {{
+            position: relative;
+            isolation: isolate;
+        }}
+
+        [class*="st-key-landing_shell"]::before {{
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-image:
+                radial-gradient(ellipse at center, transparent 36%, {surface["vignette"]} 100%),
+                linear-gradient({surface["overlay"]}, {surface["overlay"]}),
+                url("{background_uri}");
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }}
+
+        [class*="st-key-landing_content"] {{
+            width: min(100%, 760px);
+            margin-inline: auto;
+            padding: clamp(1.35rem, 3.2vw, 2.25rem);
+            box-sizing: border-box;
+            border: 1px solid {surface["border"]} !important;
+            border-radius: 24px !important;
+            background: {surface["panel"]} !important;
+            box-shadow: {surface["shadow"]} !important;
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            backdrop-filter: blur(18px) saturate(140%);
+        }}
+
+        [class*="st-key-landing_content"] h1 {{
+            color: {surface["title"]} !important;
+        }}
+
+        [class*="st-key-landing_content"] .versal-landing-description {{
+            color: {surface["description"]} !important;
+            opacity: 1;
+        }}
+
+        @supports not ((-webkit-backdrop-filter: blur(1px)) or
+                       (backdrop-filter: blur(1px))) {{
+            [class*="st-key-landing_content"] {{
+                background: {surface["panel_fallback"]};
+            }}
+        }}
+
+        @media (max-width: 480px) {{
+            [class*="st-key-landing_shell"] {{
+                padding: 0.65rem 0 !important;
+            }}
+
+            [class*="st-key-landing_content"] {{
+                width: calc(100% - 0.5rem);
+                padding: 1.1rem 0.9rem;
+                border-radius: 18px !important;
+            }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def hide_landing_navigation() -> None:
     """Hide sidebar navigation and its reveal control on the landing route only."""
     st.html(
@@ -260,6 +387,8 @@ def apply_theme() -> None:
         dark_mode = st.context.theme.type == "dark"
     except (AttributeError, RuntimeError):
         dark_mode = False
+
+    _apply_landing_surface_theme()
 
     landing_button_theme = {
         "button_primary_bg": "#0F0F3D",

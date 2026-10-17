@@ -5,9 +5,6 @@ import streamlit as st
 from src.ui.components import render_logo
 from src.ui.theme import hide_landing_navigation
 
-
-hide_landing_navigation()
-
 with st.container(key="landing_shell"):
     with st.container(horizontal_alignment="center", gap="small", key="landing_content"):
         render_logo(480)
@@ -47,3 +44,7 @@ st.html(
     </style>
     """
 )
+
+# Inject route-specific chrome after the page tree exists so Streamlit navigation
+# cannot discard the background or glass styles during the page transition.
+hide_landing_navigation()
