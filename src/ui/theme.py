@@ -76,6 +76,281 @@ RUNTIME_THEME = {
 }
 
 
+OVERVIEW_THEME = {
+    "light": {
+        "card_outer_bg": "#F8FAFC",
+        "card_bg": "#FFFFFF",
+        "card_outer_border": "#E2E8F0",
+        "card_shadow": "0 8px 24px rgba(15, 23, 42, 0.06)",
+        "card_shadow_hover": "0 14px 30px rgba(15, 23, 42, 0.10)",
+        "text": "#0F172A",
+        "label_muted": "#64748B",
+        "badge_up_bg": "#DCFCE7",
+        "badge_up_text": "#15803D",
+        "badge_down_bg": "#FEE2E2",
+        "badge_down_text": "#B91C1C",
+        "badge_neutral_bg": "#F1F5F9",
+        "badge_neutral_text": "#475569",
+        "icon_tile_bg": "#DCFCE7",
+        "icon_tile_fg": "#15803D",
+        "chart_palette": ("#16C060", "#3DB2A0", "#94A3B8", "#CBD5E1"),
+        "chart_grid": "#E2E8F0",
+        "chart_grid_subtle": "rgba(226, 232, 240, 0.58)",
+        "chart_tooltip_bg": "#FFFFFF",
+        "chart_tooltip_text": "#0F172A",
+    },
+    "dark": {
+        "card_outer_bg": "#0B1220",
+        "card_bg": "#0F172A",
+        "card_outer_border": "#334155",
+        "card_shadow": "0 8px 24px rgba(0, 0, 0, 0.24)",
+        "card_shadow_hover": "0 14px 32px rgba(0, 0, 0, 0.36)",
+        "text": "#F1F5F9",
+        "label_muted": "#CBD5E1",
+        "badge_up_bg": "rgba(22, 192, 96, 0.18)",
+        "badge_up_text": "#6EE7A2",
+        "badge_down_bg": "rgba(239, 68, 68, 0.18)",
+        "badge_down_text": "#FCA5A5",
+        "badge_neutral_bg": "#1E293B",
+        "badge_neutral_text": "#CBD5E1",
+        "icon_tile_bg": "rgba(22, 192, 96, 0.16)",
+        "icon_tile_fg": "#6EE7A2",
+        "chart_palette": ("#16C060", "#3DB2A0", "#94A3B8", "#64748B"),
+        "chart_grid": "#334155",
+        "chart_grid_subtle": "rgba(51, 65, 85, 0.56)",
+        "chart_tooltip_bg": "#111827",
+        "chart_tooltip_text": "#F1F5F9",
+    },
+}
+
+
+def active_overview_theme() -> dict[str, object]:
+    """Return Overview colours matching the app's current runtime selection."""
+    selected = st.session_state.get("sidebar_dark_mode")
+    if isinstance(selected, bool):
+        return OVERVIEW_THEME["dark" if selected else "light"]
+    try:
+        dark_mode = st.context.theme.type == "dark"
+    except (AttributeError, RuntimeError):
+        dark_mode = False
+    return OVERVIEW_THEME["dark" if dark_mode else "light"]
+
+
+def apply_overview_theme() -> None:
+    """Apply styling scoped exclusively to the Business Overview page."""
+    palette = active_overview_theme()
+    st.html(
+        f"""
+        <style>
+        [class*="st-key-overview_kpi_"] .versal-overview-kpi-outer {{
+            padding: 0.42rem;
+            border: 1px solid {palette["card_outer_border"]};
+            border-radius: 20px;
+            background: {palette["card_outer_bg"]};
+            box-shadow: {palette["card_shadow"]};
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }}
+
+        [class*="st-key-overview_kpi_"] .versal-overview-kpi-outer:hover {{
+            transform: translateY(-2px);
+            box-shadow: {palette["card_shadow_hover"]};
+        }}
+
+        [class*="st-key-overview_kpi_"] .versal-overview-kpi-inner {{
+            min-height: 188px;
+            padding: 1.15rem 1.2rem 1rem;
+            border-radius: 15px;
+            background: {palette["card_bg"]};
+            color: {palette["text"]};
+        }}
+
+        .versal-overview-kpi-head,
+        .versal-overview-kpi-value-row,
+        .versal-overview-kpi-footer,
+        .versal-overview-chart-head {{
+            display: flex;
+            align-items: center;
+        }}
+
+        .versal-overview-kpi-head,
+        .versal-overview-kpi-footer,
+        .versal-overview-chart-head {{
+            justify-content: space-between;
+        }}
+
+        .versal-overview-kpi-label,
+        .versal-overview-chart-eyebrow {{
+            margin: 0;
+            color: {palette["label_muted"]} !important;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }}
+
+        .versal-overview-icon-tile {{
+            width: 2rem;
+            height: 2rem;
+            flex: 0 0 2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid color-mix(in srgb, {palette["icon_tile_fg"]} 28%, transparent);
+            border-radius: 0.58rem;
+            background: {palette["icon_tile_bg"]};
+            color: {palette["icon_tile_fg"]};
+        }}
+
+        .versal-overview-icon-tile .material-symbols-rounded {{
+            color: inherit !important;
+            direction: ltr;
+            display: inline-block;
+            font-family: "Material Symbols Rounded" !important;
+            font-size: 1.15rem;
+            font-style: normal;
+            font-variation-settings: "FILL" 0, "wght" 450, "GRAD" 0, "opsz" 20;
+            font-weight: normal;
+            letter-spacing: normal;
+            line-height: 1;
+            text-transform: none;
+            white-space: nowrap;
+            word-wrap: normal;
+            -webkit-font-feature-settings: "liga";
+            font-feature-settings: "liga";
+            -webkit-font-smoothing: antialiased;
+        }}
+
+        .versal-overview-kpi-value-row {{
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            margin-top: 0.55rem;
+        }}
+
+        .versal-overview-kpi-value {{
+            color: {palette["text"]};
+            font-size: clamp(1.55rem, 2.5vw, 1.85rem);
+            font-weight: 750;
+            letter-spacing: -0.025em;
+            line-height: 1.15;
+        }}
+
+        .versal-overview-change {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.22rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }}
+
+        .versal-overview-change--up {{
+            background: {palette["badge_up_bg"]};
+            color: {palette["badge_up_text"]};
+        }}
+
+        .versal-overview-change--down {{
+            background: {palette["badge_down_bg"]};
+            color: {palette["badge_down_text"]};
+        }}
+
+        .versal-overview-change--neutral {{
+            background: {palette["badge_neutral_bg"]};
+            color: {palette["badge_neutral_text"]};
+        }}
+
+        .versal-overview-kpi-question {{
+            min-height: 2.5rem;
+            margin: 0.75rem 0 0;
+            color: {palette["label_muted"]} !important;
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }}
+
+        .versal-overview-kpi-divider {{
+            height: 1px;
+            margin: 0.75rem 0 0.65rem;
+            background: {palette["card_outer_border"]};
+        }}
+
+        .versal-overview-kpi-footer {{
+            gap: 0.55rem;
+            color: {palette["label_muted"]};
+            font-size: 0.76rem;
+        }}
+
+        .versal-overview-kpi-footer-copy {{
+            min-width: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }}
+
+        .versal-overview-kpi-footer strong {{
+            color: {palette["text"]};
+        }}
+
+        [class*="st-key-overview_chart_outer_"] {{
+            margin-top: 1rem;
+            padding: 0.42rem;
+            border: 1px solid {palette["card_outer_border"]};
+            border-radius: 20px !important;
+            background: {palette["card_outer_bg"]};
+            box-shadow: {palette["card_shadow"]};
+        }}
+
+        [class*="st-key-overview_chart_inner_"] {{
+            padding: 1rem 1rem 0.35rem;
+            border-radius: 15px !important;
+            background: {palette["card_bg"]};
+        }}
+
+        .versal-overview-chart-copy {{
+            min-width: 0;
+        }}
+
+        .versal-overview-chart-title {{
+            margin: 0.22rem 0 0;
+            color: {palette["text"]};
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }}
+
+        .versal-overview-chart-caption {{
+            margin: 0.3rem 0 0;
+            color: {palette["label_muted"]} !important;
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }}
+
+        [class*="st-key-overview_chart_inner_"] [data-testid="stPlotlyChart"] {{
+            border: 0 !important;
+            border-radius: 0 !important;
+            overflow: hidden;
+        }}
+
+        @media (max-width: 480px) {{
+            [class*="st-key-overview_kpi_"] .versal-overview-kpi-inner {{
+                min-height: 176px;
+                padding: 1rem;
+            }}
+
+            [class*="st-key-overview_chart_inner_"] {{
+                padding-inline: 0.7rem;
+            }}
+
+            .versal-overview-kpi-value {{
+                font-size: 1.5rem;
+            }}
+        }}
+        </style>
+        """
+    )
+
+
 @st.cache_data(show_spinner=False)
 def _landing_background_data_uri() -> str:
     """Embed the optimized background so hosted routes need no static-file URL."""

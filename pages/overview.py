@@ -10,7 +10,10 @@ import streamlit as st
 from src.analytics.metrics import (
     AnalyticsData, gross_margin_by_model, overview_kpis, revenue, revenue_by_branch,
 )
+from src.ui.charts import overview_chart
+from src.ui.components import kpi_card, overview_chart_header
 from src.ui.filters import render_sidebar_filters
+from src.ui.theme import apply_overview_theme
 
 
 DATABASE_PATH = Path("data/business.duckdb")
@@ -43,6 +46,7 @@ def percentage(value: float) -> str:
 
 st.title("Business overview")
 st.caption("A management view of sales scale, profitability, discounting, and where performance comes from.")
+apply_overview_theme()
 
 if not DATABASE_PATH.exists():
     st.error("The analytical database is unavailable. Run `python scripts/build_database.py` and refresh this page.")
@@ -61,49 +65,108 @@ if kpis.empty or kpis["value"].fillna(0).eq(0).all():
     st.stop()
 
 metric_cards = (
-    ("Revenue", money, "How much sales value did the selected period generate?"),
-    ("Gross margin", money, "How much value remained after vehicle acquisition cost?"),
-    ("Units sold", lambda value: f"{value:,.0f}", "How many distinct vehicles were sold?"),
-    ("Discount rate", percentage, "How much of gross price was given up through discounts?"),
+    ("Revenue", money, "How much sales value did the selected period generate?", "payments"),
+    ("Gross margin", money, "How much value remained after vehicle acquisition cost?", "account_balance_wallet"),
+    ("Units sold", lambda value: f"{value:,.0f}", "How many distinct vehicles were sold?", "directions_car"),
+    ("Discount rate", percentage, "How much of gross price was given up through discounts?", "percent"),
 )
 
 for card_pair in (metric_cards[:2], metric_cards[2:]):
     columns = st.columns(2, gap="large")
-    for column, (label, formatter, question) in zip(columns, card_pair, strict=True):
+    for column, (label, formatter, question, icon) in zip(columns, card_pair, strict=True):
         row = kpis.loc[label]
         with column:
             card_key = f"overview_kpi_{label.lower().replace(' ', '_')}"
-            with st.container(border=True, key=card_key):
-                st.metric(label, formatter(row["value"]), metric_delta(row))
-                st.caption(question)
+            with st.container(key=card_key):
+                kpi_card(
+                    label,
+                    formatter(row["value"]),
+                    metric_delta(row),
+                    question,
+                    icon,
+                )
 
 trend = revenue(data, filters)
 branches = revenue_by_branch(data, filters)
 models = gross_margin_by_model(data, filters)
 
-with st.container(border=True):
-    st.subheader("Revenue trend")
-    st.caption("Is sales revenue rising, falling, or showing seasonal movement over time?")
-    if trend.empty:
-        st.info("No revenue trend is available for the selected filters.")
-    else:
-        st.line_chart(trend, x="period", y="revenue", y_label="Revenue (GHS)", x_label="Month")
+with st.container(key="overview_chart_outer_revenue_trend"):
+    with st.container(key="overview_chart_inner_revenue_trend"):
+        overview_chart_header(
+            "Performance trend",
+            "Revenue trend",
+            "Is sales revenue rising, falling, or showing seasonal movement over time?",
+            "show_chart",
+        )
+        if trend.empty:
+            st.info("No revenue trend is available for the selected filters.")
+        else:
+            st.plotly_chart(
+                overview_chart(
+                    trend,
+                    chart_type="line",
+                    x="period",
+                    y="revenue",
+                    y_label="Revenue (GHS)",
+                    x_label="Month",
+                    series_name="Revenue",
+                ),
+                use_container_width=True,
+                theme=None,
+                config={"displayModeBar": False, "responsive": True},
+            )
 
-with st.container(border=True):
-    st.subheader("Revenue by branch")
-    st.caption("Which locations contribute most to sales revenue?")
-    if branches.empty:
-        st.info("No branch revenue is available for the selected filters.")
-    else:
-        st.bar_chart(branches, x="branch", y="revenue", y_label="Revenue (GHS)", x_label="Branch", horizontal=True)
+with st.container(key="overview_chart_outer_revenue_branch"):
+    with st.container(key="overview_chart_inner_revenue_branch"):
+        overview_chart_header(
+            "Branch performance",
+            "Revenue by branch",
+            "Which locations contribute most to sales revenue?",
+            "location_on",
+        )
+        if branches.empty:
+            st.info("No branch revenue is available for the selected filters.")
+        else:
+            st.plotly_chart(
+                overview_chart(
+                    branches,
+                    chart_type="horizontal_bar",
+                    x="branch",
+                    y="revenue",
+                    y_label="Revenue (GHS)",
+                    x_label="Branch",
+                    series_name="Revenue",
+                ),
+                use_container_width=True,
+                theme=None,
+                config={"displayModeBar": False, "responsive": True},
+            )
 
-with st.container(border=True):
-    st.subheader("Gross margin by model")
-    st.caption("Which vehicle models contribute the most gross margin after acquisition cost?")
-    if models.empty:
-        st.info("No model margin is available for the selected filters.")
-    else:
-        st.bar_chart(models, x="model", y="gross_margin", y_label="Gross margin (GHS)", x_label="Model", horizontal=True)
+with st.container(key="overview_chart_outer_margin_model"):
+    with st.container(key="overview_chart_inner_margin_model"):
+        overview_chart_header(
+            "Model performance",
+            "Gross margin by model",
+            "Which vehicle models contribute the most gross margin after acquisition cost?",
+            "directions_car",
+        )
+        if models.empty:
+            st.info("No model margin is available for the selected filters.")
+        else:
+            st.plotly_chart(
+                overview_chart(
+                    models,
+                    chart_type="horizontal_bar",
+                    x="model",
+                    y="gross_margin",
+                    y_label="Gross margin (GHS)",
+                    x_label="Model",
+                    series_name="Gross margin",
+                ),
+                use_container_width=True,
+                theme=None,
+                config={"displayModeBar": False, "responsive": True},
+            )
 
 with st.container(border=True):
     st.subheader("Investigate the evidence")
