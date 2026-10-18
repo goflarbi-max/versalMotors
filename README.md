@@ -8,7 +8,7 @@ versalMotors has sales, inventory, service, warranty, complaint, and customer-sa
 
 ## Solution
 
-This project provides a multipage business-intelligence application that turns operational records into auditable management metrics. A responsive, theme-aware landing page provides direct access to the management Overview and Ask the Business workflows. The implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, warranty-cost drill-down, data-quality monitoring, evidence-backed business questions, and downloadable management briefs.
+This project provides a multipage business-intelligence application that turns operational records into auditable management metrics. A responsive, theme-aware landing page provides direct access to the management Overview and Ask the Business workflows. The implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, warranty-cost drill-down, responsive sortable and paginated evidence tables, data-quality monitoring, evidence-backed business questions, and downloadable management briefs.
 
 ### Run locally
 
@@ -56,7 +56,7 @@ Only hashes are used for authentication. The displayed demo password is intentio
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-The full suite records 48 passing tests and 24 passing subtests across authentication, calculations, degraded schemas, bad chronology, filters, AI failures, unsupported questions, large data, and all five Streamlit pages. Full stress-test results and limitations are in `docs/test_log.md`.
+The full suite records 55 passing tests and 24 passing subtests across authentication, calculations, degraded schemas, bad chronology, filters, AI failures, unsupported questions, large data, all five Streamlit pages, and the shared table renderer. Full stress-test results and limitations are in `docs/test_log.md`.
 
 ## Dataset
 
@@ -74,7 +74,7 @@ The `assets/` folder contains the theme-aware VersalMotors logos and the preserv
 4. `scripts/build_database.py` rebuilds the cleaned CSVs and local DuckDB database.
 5. `src/analytics/metrics.py` calculates tested business metrics without UI or database side effects.
 6. The bcrypt access layer registers only the login screen until a session is authenticated, then opens the landing page without disturbing shared filter state.
-7. Streamlit presents persistent filters, management KPIs, period comparisons, charts, warranty drill-down evidence, data-quality checks, and PDF exports. Theme-aware logo assets are stored in `assets/`.
+7. Streamlit presents persistent filters, management KPIs, period comparisons, charts, responsive sortable and paginated tables, warranty drill-down evidence, data-quality checks, and PDF exports. Theme-aware logo assets are stored in `assets/`.
 8. The optional Gemini layer tries a primary model and lighter fallback model with bounded transient-error retries. Reviewed queries and deterministic evidence summaries remain available when every model is unavailable.
 
 ## Architecture
@@ -128,6 +128,7 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Enforcing the approved one-completed-sale-per-VIN and near-duplicate rules without automatically deleting legitimate transactions that merely look similar.
 - Keeping transparent brand artwork readable across Streamlit light and dark modes, including first renders where server-side theme context is unavailable.
 - Protecting direct multipage URLs without adding authentication code to every business page, while preserving existing headless page tests and shared filter state.
+- Replacing inconsistent native data grids with one safe table renderer while preserving DataFrame values, download payloads, stable numeric/date/text sorting, null ordering, pagination state, and mobile overflow behaviour.
 
 ## AI Mistakes
 
@@ -184,6 +185,12 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - Add normalized service-volume and model-population denominators to strengthen the management investigations in `docs/management_brief.md`.
 
 ## Daily Progress Log
+
+### Day 8 - 2026-10-18 - Responsive Application Tables
+
+- Done: Replaced application data grids with one reusable, theme-aware table renderer across Investigate, Ask the Business, Management Brief, and Data Quality. Added stable three-state sorting, nulls-last ordering, 10/25/50-row pagination, responsive internal scrolling, safe HTML escaping, empty-result handling, and per-table session state without mutating source DataFrames or download data. Resolved a stale local Streamlit process that initially continued serving the pre-change module. The full suite passes 55 tests and 24 subtests.
+- Files: `src/ui/components.py`, `src/ui/theme.py`, `pages/investigate.py`, `pages/ask_the_business.py`, `pages/management_brief.py`, `pages/data_quality.py`, `tests/test_table_ui.py`, `README.md`.
+- Next: Verify the table experience on the hosted deployment at desktop and mobile widths.
 
 ### Day 7 - 2026-10-15 - Demo Authentication & Access Control
 

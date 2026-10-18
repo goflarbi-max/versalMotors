@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import date, timedelta
 from src.ai.brief import get_kpis_for_period, build_evidence, generate_brief_sections
+from src.ui.components import render_table
 from src.ui.pdf_exports import text_to_pdf
 
 st.set_page_config(layout="wide")
@@ -52,12 +53,15 @@ if st.button("🚀 Generate Brief", type="primary", width="stretch"):
         st.divider()
         st.subheader("Supporting Evidence")
         ev_df = pd.DataFrame([{"Evidence ID": e["id"], "Description": e["label"], "Value": e["value"]} for e in evidence])
-        st.dataframe(ev_df, width="stretch")
+        render_table(ev_df, key="management_brief_supporting_evidence")
 
         # Detail expanders to trace claim -> source data -> number (For Check)
-        for e in evidence:
+        for evidence_position, e in enumerate(evidence):
             with st.expander(f"{e['id']}: {e['label']} = {e['value']}"):
-                st.dataframe(e["df"], width="stretch")
+                render_table(
+                    e["df"],
+                    key=f"management_brief_evidence_{evidence_position}_{e['id']}",
+                )
                 st.caption(f"Number {e['number']} traced and verified against source data")
 
         # --- EXPORT MARKDOWN AND PDF (Required) ---

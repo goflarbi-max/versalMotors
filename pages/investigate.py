@@ -9,6 +9,7 @@ import streamlit as st
 
 from src.analytics.drilldown import warranty_by_branch, warranty_by_model, warranty_claim_records
 from src.analytics.metrics import AnalyticsData
+from src.ui.components import render_table
 from src.ui.filters import render_sidebar_filters
 
 
@@ -80,13 +81,14 @@ if not selected_model or selected_model not in models["model"].tolist():
         "previous_claim_cost": "Prior cost", "cost_change": "Cost change",
         "cost_change_rate": "Change %",
     })
-    st.dataframe(
-        display_models, hide_index=True, width="stretch",
+    render_table(
+        display_models,
+        key="investigate_warranty_models",
         column_config={
-            "Claim cost": st.column_config.NumberColumn(format="GHS %.2f"),
-            "Prior cost": st.column_config.NumberColumn(format="GHS %.2f"),
-            "Cost change": st.column_config.NumberColumn(format="GHS %.2f"),
-            "Change %": st.column_config.NumberColumn(format="percent"),
+            "Claim cost": {"format": "GHS %.2f"},
+            "Prior cost": {"format": "GHS %.2f"},
+            "Cost change": {"format": "GHS %.2f"},
+            "Change %": {"format": "percent"},
         },
     )
     model_choice = st.selectbox("Choose a model to investigate", models["model"].tolist(), key="model_choice")
@@ -110,11 +112,12 @@ if not selected_branch or selected_branch not in branches["branch"].tolist():
         "branch": "Branch", "claim_count": "Claims", "claim_cost": "Claim cost",
         "share_of_model_cost": "Share of model cost",
     })
-    st.dataframe(
-        display_branches, hide_index=True, width="stretch",
+    render_table(
+        display_branches,
+        key="investigate_warranty_branches",
         column_config={
-            "Claim cost": st.column_config.NumberColumn(format="GHS %.2f"),
-            "Share of model cost": st.column_config.NumberColumn(format="percent"),
+            "Claim cost": {"format": "GHS %.2f"},
+            "Share of model cost": {"format": "percent"},
         },
     )
     branch_choice = st.selectbox("Choose a branch to inspect", branches["branch"].tolist(), key="branch_choice")
@@ -131,13 +134,14 @@ if records.empty:
     st.stop()
 
 st.metric("Claims shown", f"{len(records):,}")
-st.dataframe(
-    records, hide_index=True, width="stretch",
+render_table(
+    records,
+    key="investigate_warranty_claim_records",
     column_config={
-        "claim_date": st.column_config.DateColumn("Claim date", format="DD MMM YYYY"),
-        "claim_amount": st.column_config.NumberColumn("Claim amount", format="GHS %.2f"),
-        "approved_amount": st.column_config.NumberColumn("Approved amount", format="GHS %.2f"),
-        "manufacturer_recovery_amount": st.column_config.NumberColumn("Recovery amount", format="GHS %.2f"),
+        "claim_date": {"label": "Claim date", "format": "DD MMM YYYY"},
+        "claim_amount": {"label": "Claim amount", "format": "GHS %.2f"},
+        "approved_amount": {"label": "Approved amount", "format": "GHS %.2f"},
+        "manufacturer_recovery_amount": {"label": "Recovery amount", "format": "GHS %.2f"},
     },
 )
 st.download_button(

@@ -12,6 +12,7 @@ from src.ai.fallback import (
 from src.ai.gemini_client import generate_text
 from src.ai.guardrails import build_grounded_response, handle_unanswerable, validate_question
 from src.database.connection import get_connection, run_readonly_sql
+from src.ui.components import render_table
 
 
 SUGGESTIONS = {
@@ -107,7 +108,7 @@ with ask_tab:
                         st.info(mode_message)
                         st.session_state.business_messages.append({"role": "assistant", "content": mode_message})
                         st.stop()
-                    st.dataframe(result, hide_index=True, width="stretch")
+                    render_table(result, key="ask_business_evidence")
                     evidence = build_fallback_evidence(question, result)
                     answer_prompt = f"Question: {question}\nEvidence: {result.to_json(orient='records', date_format='iso')[:12000]}\nAnswer directly and concisely. Use only numbers in evidence; do not add a FACTS heading."
                     answer_result = (

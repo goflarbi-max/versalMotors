@@ -124,6 +124,289 @@ OVERVIEW_THEME = {
 }
 
 
+TABLE_THEME = {
+    "light": {
+        "card_bg": "#FFFFFF",
+        "card_shadow": "0 10px 28px rgba(15, 23, 42, 0.08)",
+        "table_header_bg": "#46515F",
+        "table_header_text": "#FFFFFF",
+        "table_row_bg": "#FFFFFF",
+        "table_row_alt_bg": "#F8FAFC",
+        "table_row_hover": "#F1F5F9",
+        "table_border": "#D9DEE5",
+        "table_text": "#475569",
+        "table_muted_text": "#64748B",
+        "table_selected_bg": "#E8F5D8",
+        "table_selected_check": "#2F855A",
+        "table_footer_bg": "#FFFFFF",
+        "table_page_bg": "#FFFFFF",
+        "table_page_text": "#475569",
+        "table_page_hover": "#EAF7FB",
+        "table_page_active_bg": "#5BC0DE",
+        "table_page_active_text": "#FFFFFF",
+        "table_focus": "#2563EB",
+    },
+    "dark": {
+        "card_bg": "#1B1F27",
+        "card_shadow": "0 12px 30px rgba(0, 0, 0, 0.30)",
+        "table_header_bg": "#E6EAF0",
+        "table_header_text": "#20242D",
+        "table_row_bg": "#1B1F27",
+        "table_row_alt_bg": "#20242D",
+        "table_row_hover": "#292F3A",
+        "table_border": "#343B47",
+        "table_text": "#F1F5F9",
+        "table_muted_text": "#B8C0CC",
+        "table_selected_bg": "#1F3A2A",
+        "table_selected_check": "#6EE7A2",
+        "table_footer_bg": "#1B1F27",
+        "table_page_bg": "#20242D",
+        "table_page_text": "#E6EAF0",
+        "table_page_hover": "#2D3541",
+        "table_page_active_bg": "#5BC0DE",
+        "table_page_active_text": "#FFFFFF",
+        "table_focus": "#93C5FD",
+    },
+}
+
+
+TABLE_COMPONENT_CSS = """
+.versal-table-root {
+    width: 100%;
+    min-width: 0;
+    color: var(--table-text);
+    font-family: var(--st-font, sans-serif);
+}
+
+.versal-table-card {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--table-border);
+    border-radius: 14px;
+    background: var(--table-card-bg);
+    box-shadow: var(--table-card-shadow);
+}
+
+.versal-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.versal-table {
+    width: 100%;
+    min-width: max-content;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+}
+
+.versal-table th,
+.versal-table td {
+    min-width: 8rem;
+    padding: 12px 16px;
+    border-right: 1px solid var(--table-border);
+    border-bottom: 1px solid var(--table-border);
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.versal-table th:last-child,
+.versal-table td:last-child {
+    border-right: 0;
+}
+
+.versal-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.versal-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 0;
+    background: var(--table-header-bg);
+    color: var(--table-header-text);
+}
+
+.versal-table th:first-child,
+.versal-table td:first-child {
+    position: sticky;
+    left: 0;
+}
+
+.versal-table thead th:first-child {
+    z-index: 3;
+    background: var(--table-header-bg);
+}
+
+.versal-table tbody td:first-child {
+    z-index: 1;
+    background: inherit;
+}
+
+.versal-table-sort {
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.versal-table-sort:hover {
+    background: color-mix(in srgb, var(--table-header-text) 10%, transparent);
+}
+
+.versal-table-sort:focus-visible,
+.versal-table-page:focus-visible,
+.versal-table-size:focus-visible {
+    outline: 3px solid var(--table-focus);
+    outline-offset: -3px;
+}
+
+.versal-table-sort-indicator {
+    flex: 0 0 auto;
+    font-size: 14px;
+    opacity: 0.86;
+}
+
+.versal-table tbody tr {
+    background: var(--table-row-bg);
+    color: var(--table-text);
+}
+
+.versal-table tbody tr:nth-child(even) {
+    background: var(--table-row-alt-bg);
+}
+
+.versal-table tbody tr:hover {
+    background: var(--table-row-hover);
+}
+
+.versal-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: 56px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--table-border);
+    background: var(--table-footer-bg);
+    color: var(--table-muted-text);
+    font-size: 12px;
+}
+
+.versal-table-controls,
+.versal-table-pagination {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.versal-table-size {
+    min-height: 40px;
+    padding: 7px 30px 7px 10px;
+    border: 1px solid var(--table-border);
+    border-radius: 8px;
+    background: var(--table-page-bg);
+    color: var(--table-page-text);
+    font: inherit;
+}
+
+.versal-table-page {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 7px 10px;
+    border: 1px solid var(--table-border);
+    border-radius: 999px;
+    background: var(--table-page-bg);
+    color: var(--table-page-text);
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.versal-table-page:hover:not(:disabled) {
+    background: var(--table-page-hover);
+}
+
+.versal-table-page.is-active {
+    border-color: var(--table-page-active-bg);
+    background: var(--table-page-active-bg);
+    color: var(--table-page-active-text);
+}
+
+.versal-table-page:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.versal-table-ellipsis {
+    min-width: 28px;
+    text-align: center;
+}
+
+.versal-table-empty {
+    padding: 28px 18px;
+    border: 1px solid var(--table-border);
+    border-radius: 14px;
+    background: var(--table-card-bg);
+    box-shadow: var(--table-card-shadow);
+    color: var(--table-muted-text);
+    text-align: center;
+    font-size: 13px;
+}
+
+@media (max-width: 480px) {
+    .versal-table th,
+    .versal-table td,
+    .versal-table-sort {
+        padding: 11px 12px;
+    }
+
+    .versal-table-footer {
+        align-items: flex-start;
+    }
+
+    .versal-table-controls,
+    .versal-table-pagination {
+        width: 100%;
+    }
+
+    .versal-table-pagination {
+        justify-content: flex-start;
+    }
+}
+"""
+
+
+def active_table_theme() -> dict[str, str]:
+    """Return table colours for the app's active runtime theme."""
+    selected = st.session_state.get("sidebar_dark_mode")
+    if isinstance(selected, bool):
+        return TABLE_THEME["dark" if selected else "light"]
+    try:
+        dark_mode = st.context.theme.type == "dark"
+    except (AttributeError, RuntimeError):
+        dark_mode = False
+    return TABLE_THEME["dark" if dark_mode else "light"]
+
+
 def active_overview_theme() -> dict[str, object]:
     """Return Overview colours matching the app's current runtime selection."""
     selected = st.session_state.get("sidebar_dark_mode")
