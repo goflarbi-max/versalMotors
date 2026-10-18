@@ -567,11 +567,11 @@ def apply_theme() -> None:
             max-width: none;
         }
 
-        [class*="st-key-landing_actions"] [data-testid="stPageLink"] {
+        [class*="st-key-landing_actions"] [data-testid="stButton"] {
             width: 100% !important;
         }
 
-        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a {
+        [class*="st-key-landing_actions"] [data-testid="stButton"] button {
             width: 100% !important;
             min-height: 3rem;
             justify-content: center;
@@ -585,66 +585,60 @@ def apply_theme() -> None:
             font-weight: 700;
             line-height: 1.2;
             text-align: left;
-            text-decoration: none;
             box-shadow: none;
             transform: translateY(0);
             transition: background-color 180ms ease, box-shadow 180ms ease,
                         transform 180ms ease;
         }
 
-        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a * {
+        [class*="st-key-landing_actions"] [data-testid="stButton"] button * {
             color: var(--landing-button-text) !important;
         }
 
-        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a p {
+        [class*="st-key-landing_actions"] [data-testid="stButton"] button p {
             margin: 0;
             font-size: 1.1rem;
         }
 
-        [class*="st-key-landing_actions"] [data-testid="stPageLink"]
-        a [data-testid="stIconMaterial"] {
+        [class*="st-key-landing_actions"] [data-testid="stButton"]
+        button [data-testid="stIconMaterial"] {
             width: 1.2rem;
             height: 1.2rem;
             font-size: 1.2rem !important;
             line-height: 1;
         }
 
-        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a::after {
-            content: none !important;
-            display: none !important;
-        }
-
         [class*="st-key-landing_actions"] > [data-testid="stElementContainer"]:nth-child(1)
-        [data-testid="stPageLink"] a {
+        [data-testid="stButton"] button {
             background: var(--landing-button-primary-bg);
             box-shadow: var(--landing-button-primary-shadow);
         }
 
         [class*="st-key-landing_actions"] > [data-testid="stElementContainer"]:nth-child(2)
-        [data-testid="stPageLink"] a {
+        [data-testid="stButton"] button {
             background: var(--landing-button-secondary-bg);
             box-shadow: var(--landing-button-secondary-shadow);
         }
 
         [class*="st-key-landing_actions"] > [data-testid="stElementContainer"]:nth-child(1)
-        [data-testid="stPageLink"] a:hover {
+        [data-testid="stButton"] button:hover {
             background: var(--landing-button-primary-hover);
             box-shadow: 0 13px 28px rgba(15, 15, 61, 0.32);
             transform: translateY(-2px);
         }
 
         [class*="st-key-landing_actions"] > [data-testid="stElementContainer"]:nth-child(2)
-        [data-testid="stPageLink"] a:hover {
+        [data-testid="stButton"] button:hover {
             background: var(--landing-button-secondary-hover);
             box-shadow: 0 13px 28px rgba(180, 35, 24, 0.30);
             transform: translateY(-2px);
         }
 
-        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a:active {
+        [class*="st-key-landing_actions"] [data-testid="stButton"] button:active {
             transform: translateY(0) scale(0.99);
         }
 
-        [class*="st-key-landing_actions"] [data-testid="stPageLink"] a:focus-visible {
+        [class*="st-key-landing_actions"] [data-testid="stButton"] button:focus-visible {
             outline: 3px solid var(--landing-button-text);
             outline-offset: 3px;
             box-shadow: 0 0 0 6px var(--landing-button-focus-ring);
@@ -693,11 +687,11 @@ def apply_theme() -> None:
                 width: 100%;
             }
 
-            [class*="st-key-landing_actions"] [data-testid="stPageLink"] {
+            [class*="st-key-landing_actions"] [data-testid="stButton"] {
                 width: 100% !important;
             }
 
-            [class*="st-key-landing_actions"] [data-testid="stPageLink"] a {
+            [class*="st-key-landing_actions"] [data-testid="stButton"] button {
                 width: 100% !important;
                 min-height: 3rem;
             }

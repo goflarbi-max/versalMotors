@@ -14,36 +14,20 @@ with st.container(key="landing_shell"):
         )
         st.space("small")
         with st.container(horizontal=True, wrap=True, key="landing_actions"):
-            st.page_link(
-                "pages/overview.py",
-                label="Open Business Overview",
+            if st.button(
+                "Open Business Overview",
                 icon=":material/monitoring:",
+                key="landing_open_overview",
                 width="content",
-            )
-            st.page_link(
-                "pages/ask_the_business.py",
-                label="Ask the Business",
+            ):
+                st.switch_page("pages/overview.py")
+            if st.button(
+                "Ask the Business",
                 icon=":material/forum:",
+                key="landing_ask_business",
                 width="content",
-            )
-
-# Keep this page-local override after the links so no earlier cached theme rule can
-# recreate the retired right-side pseudo-element.
-st.html(
-    """
-    <style id="versal-remove-landing-button-after">
-    [class*="st-key-landing_actions"] [data-testid="stPageLink"] a::after,
-    [class*="st-key-landing_actions"] [data-testid="stPageLink"] a:after {
-        content: none !important;
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        border: 0 !important;
-        margin: 0 !important;
-    }
-    </style>
-    """
-)
+            ):
+                st.switch_page("pages/ask_the_business.py")
 
 # Inject route-specific chrome after the page tree exists so Streamlit navigation
 # cannot discard the background or glass styles during the page transition.
