@@ -1,5 +1,8 @@
 """Shared visual styling for the Streamlit shell and landing page."""
 
+import base64
+from pathlib import Path
+
 import streamlit as st
 
 
@@ -25,6 +28,14 @@ LANDING_SURFACE_THEME = {
         "description": "#CBD5E1",
     },
 }
+
+
+@st.cache_data(show_spinner=False)
+def _landing_background_data_uri() -> str:
+    """Embed the optimized background so hosted routes need no static-file URL."""
+    image_path = Path(__file__).resolve().parents[2] / "assets" / "landing_bg.webp"
+    encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
+    return f"data:image/webp;base64,{encoded}"
 
 
 def apply_login_theme() -> None:
@@ -272,9 +283,7 @@ def _apply_landing_surface_theme() -> None:
         dark_mode = False
 
     surface = LANDING_SURFACE_THEME["dark" if dark_mode else "light"]
-    # Streamlit serves files in ./static at /app/static when static serving is
-    # enabled. The browser caches this URL, avoiding a large base64 CSS payload.
-    background_uri = "/app/static/landing_bg.webp"
+    background_uri = _landing_background_data_uri()
     st.markdown(
         f"""
         <style id="versal-landing-surface">

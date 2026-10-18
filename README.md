@@ -64,7 +64,7 @@ The repository contains nine synthetic raw CSV tables covering branches, models,
 
 ### Assets
 
-The `assets/` folder contains the theme-aware VersalMotors logos and the preserved landing background; an optimized copy is served from `static/` for reliable browser caching locally and on Streamlit Community Cloud.
+The `assets/` folder contains the theme-aware VersalMotors logos and the preserved landing background. The optimized WebP is embedded through a cached data URI so it renders consistently on localhost, Streamlit Community Cloud, and custom-domain routes; `static/` retains a deployable fallback copy.
 
 ## How the System Works
 
