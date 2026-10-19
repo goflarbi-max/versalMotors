@@ -190,8 +190,8 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 
 ### Day 9 - 2026-10-19 - Light-Only Login & UI Card Polish
 
-- Done: Made the login screen permanently light regardless of native, browser, or operating-system theme; removed login theme switching; reset the UI theme to light on sign-out; preserved protected-page dark mode; and verified responsive login rendering at 375px, 768px, and 1280px. Restyled the Sign In control with a scoped charcoal gradient, accessible focus state, responsive sizing, and CSS-only icon removal without changing authentication behavior; added a login-card fallback selector so the style survives hosted Streamlit markup differences. Also completed the pending themed summary-card presentation for Ask the Business and Data Quality. The full suite passes 57 tests and 24 subtests.
-- Files: `.streamlit/config.toml`, `app.py`, `pages/ask_the_business.py`, `pages/data_quality.py`, `src/ui/components.py`, `src/ui/sidebar.py`, `src/ui/theme.py`, `tests/test_auth.py`, `README.md`.
+- Done: Made the login screen permanently light regardless of native, browser, or operating-system theme; removed login theme switching; reset the UI theme to light on sign-out; preserved protected-page dark mode; and verified responsive login rendering at 375px, 768px, and 1280px. Restyled the Sign In control with a scoped black-and-white charcoal treatment, accessible focus state, responsive sizing, and no arrow icon; reinforced the selector against hosted Streamlit markup changes so the old primary-button styling cannot return. Also completed the pending themed summary-card presentation for Ask the Business and Data Quality. The full suite passes 57 tests and 24 subtests.
+- Files: `.streamlit/config.toml`, `app.py`, `pages/ask_the_business.py`, `pages/data_quality.py`, `src/ui/auth_ui.py`, `src/ui/components.py`, `src/ui/sidebar.py`, `src/ui/theme.py`, `tests/test_auth.py`, `README.md`.
 - Next: Verify the light-only login and refreshed cards on the hosted deployment.
 
 ### Day 8 - 2026-10-18 - Responsive Application Tables

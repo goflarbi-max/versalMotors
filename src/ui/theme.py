@@ -1207,8 +1207,8 @@ def apply_login_theme() -> None:
         }}
 
         :is(
-            [class*="st-key-sign_in"] button[kind="primary"],
-            [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"]
+            [class*="st-key-sign_in"] button,
+            [class*="st-key-login_card"] [data-testid="stButton"] button[data-testid="stBaseButton-primary"]
         ) {{
             min-height: 3.375rem;
             height: 3.375rem;
@@ -1240,8 +1240,8 @@ def apply_login_theme() -> None:
         }}
 
         :is(
-            [class*="st-key-sign_in"] button[kind="primary"],
-            [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"]
+            [class*="st-key-sign_in"] button,
+            [class*="st-key-login_card"] [data-testid="stButton"] button[data-testid="stBaseButton-primary"]
         ) * {{
             color: {glass["login_button_text"]} !important;
             font: inherit;
@@ -1251,15 +1251,15 @@ def apply_login_theme() -> None:
         }}
 
         :is(
-            [class*="st-key-sign_in"] button[kind="primary"],
-            [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"]
+            [class*="st-key-sign_in"] button,
+            [class*="st-key-login_card"] [data-testid="stButton"] button[data-testid="stBaseButton-primary"]
         ) [data-testid="stIconMaterial"] {{
             display: none !important;
         }}
 
         :is(
-            [class*="st-key-sign_in"] button[kind="primary"],
-            [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"]
+            [class*="st-key-sign_in"] button,
+            [class*="st-key-login_card"] [data-testid="stButton"] button[data-testid="stBaseButton-primary"]
         ):hover:not(:disabled) {{
             background: linear-gradient(
                 180deg,
@@ -1273,8 +1273,8 @@ def apply_login_theme() -> None:
         }}
 
         :is(
-            [class*="st-key-sign_in"] button[kind="primary"],
-            [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"]
+            [class*="st-key-sign_in"] button,
+            [class*="st-key-login_card"] [data-testid="stButton"] button[data-testid="stBaseButton-primary"]
         ):active:not(:disabled) {{
             background: linear-gradient(
                 180deg,
@@ -1288,16 +1288,16 @@ def apply_login_theme() -> None:
         }}
 
         :is(
-            [class*="st-key-sign_in"] button[kind="primary"],
-            [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"]
+            [class*="st-key-sign_in"] button,
+            [class*="st-key-login_card"] [data-testid="stButton"] button[data-testid="stBaseButton-primary"]
         ):focus-visible {{
             outline: 3px solid {glass["login_button_focus"]} !important;
             outline-offset: 3px;
         }}
 
         :is(
-            [class*="st-key-sign_in"] button[kind="primary"],
-            [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"]
+            [class*="st-key-sign_in"] button,
+            [class*="st-key-login_card"] [data-testid="stButton"] button[data-testid="stBaseButton-primary"]
         ):disabled {{
             background: linear-gradient(
                 180deg,

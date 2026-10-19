@@ -86,8 +86,6 @@ def render_login() -> None:
             if st.button(
                 "Sign In",
                 type="primary",
-                icon=":material/arrow_forward:",
-                icon_position="right",
                 key="sign_in",
                 width="stretch",
             ):
