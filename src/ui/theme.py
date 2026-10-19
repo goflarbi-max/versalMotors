@@ -91,6 +91,18 @@ LOGIN_THEME = {
     "shape_one": "rgba(99, 102, 241, 0.20)",
     "shape_two": "rgba(56, 189, 248, 0.17)",
     "accent": "#6366F1",
+    "login_button_bg_top": "#2A2E37",
+    "login_button_bg_bottom": "#1C1F26",
+    "login_button_hover": "#2F343E",
+    "login_button_text": "#FFFFFF",
+    "login_button_shadow": "0 6px 16px rgba(15, 23, 42, 0.25)",
+    "login_button_hover_shadow": "0 8px 20px rgba(15, 23, 42, 0.28)",
+    "login_button_pressed_shadow": "0 3px 8px rgba(15, 23, 42, 0.20)",
+    "login_button_highlight": "inset 0 1px 0 rgba(255, 255, 255, 0.13)",
+    "login_button_focus": "#6366F1",
+    "login_button_disabled_top": "#6B7280",
+    "login_button_disabled_bottom": "#4B5563",
+    "login_button_disabled_text": "#E5E7EB",
 }
 
 
@@ -1194,11 +1206,89 @@ def apply_login_theme() -> None:
             opacity: 0.82;
         }}
 
-        [class*="st-key-login_card"] [data-testid="stButton"] button[kind="primary"] {{
-            min-height: 3.25rem;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 700;
+        [class*="st-key-sign_in"] button[kind="primary"] {{
+            min-height: 3.375rem;
+            height: 3.375rem;
+            padding: 0.75rem 1.25rem;
+            border: 0 !important;
+            border-radius: 13px !important;
+            background: linear-gradient(
+                180deg,
+                {glass["login_button_bg_top"]} 0%,
+                {glass["login_button_bg_bottom"]} 100%
+            ) !important;
+            box-shadow:
+                {glass["login_button_shadow"]},
+                {glass["login_button_highlight"]} !important;
+            color: {glass["login_button_text"]} !important;
+            font-size: 0.925rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            line-height: 1;
+            text-transform: uppercase;
+            white-space: nowrap;
+            gap: 0;
+            transform: translateY(0);
+            transition:
+                background 160ms ease,
+                box-shadow 160ms ease,
+                transform 160ms ease,
+                opacity 160ms ease;
+        }}
+
+        [class*="st-key-sign_in"] button[kind="primary"] * {{
+            color: {glass["login_button_text"]} !important;
+            font: inherit;
+            letter-spacing: inherit;
+            text-transform: inherit;
+            white-space: nowrap;
+        }}
+
+        [class*="st-key-sign_in"] button[kind="primary"]
+        [data-testid="stIconMaterial"] {{
+            display: none !important;
+        }}
+
+        [class*="st-key-sign_in"] button[kind="primary"]:hover:not(:disabled) {{
+            background: linear-gradient(
+                180deg,
+                {glass["login_button_hover"]} 0%,
+                {glass["login_button_bg_top"]} 100%
+            ) !important;
+            box-shadow:
+                {glass["login_button_hover_shadow"]},
+                {glass["login_button_highlight"]} !important;
+            transform: translateY(-2px);
+        }}
+
+        [class*="st-key-sign_in"] button[kind="primary"]:active:not(:disabled) {{
+            background: linear-gradient(
+                180deg,
+                {glass["login_button_bg_top"]} 0%,
+                {glass["login_button_bg_bottom"]} 100%
+            ) !important;
+            box-shadow:
+                {glass["login_button_pressed_shadow"]},
+                {glass["login_button_highlight"]} !important;
+            transform: translateY(0);
+        }}
+
+        [class*="st-key-sign_in"] button[kind="primary"]:focus-visible {{
+            outline: 3px solid {glass["login_button_focus"]} !important;
+            outline-offset: 3px;
+        }}
+
+        [class*="st-key-sign_in"] button[kind="primary"]:disabled {{
+            background: linear-gradient(
+                180deg,
+                {glass["login_button_disabled_top"]} 0%,
+                {glass["login_button_disabled_bottom"]} 100%
+            ) !important;
+            box-shadow: none !important;
+            color: {glass["login_button_disabled_text"]} !important;
+            cursor: not-allowed !important;
+            opacity: 0.62;
+            transform: none;
         }}
 
         [class*="st-key-forgot_password_row"] button {{
