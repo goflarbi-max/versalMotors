@@ -8,6 +8,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 import src.auth.auth as auth
+from src.ui import sidebar, theme
 
 
 DEMO_EMAIL = "demo@versalmotors.com"
@@ -137,3 +138,26 @@ def test_login_ui_never_keeps_password_in_user_session_state(monkeypatch):
     assert user_state[auth.AUTHENTICATED_KEY] is True
     assert user_state[auth.AUTH_EMAIL_KEY] == DEMO_EMAIL
     assert DEMO_PASSWORD not in user_state.values()
+
+
+def test_login_theme_is_always_light_regardless_of_session_state(monkeypatch):
+    monkeypatch.setitem(theme.st.session_state, "sidebar_dark_mode", True)
+
+    assert theme.login_theme_type() == "light"
+
+
+def test_sign_out_resets_stored_theme_to_light(monkeypatch):
+    state = {
+        sidebar._THEME_KEY: True,
+        sidebar._THEME_CONTEXT_KEY: True,
+        auth.AUTHENTICATED_KEY: True,
+    }
+    monkeypatch.setattr(sidebar.st, "session_state", state)
+    monkeypatch.setattr(sidebar, "logout", lambda: state.clear())
+
+    sidebar._logout_to_light()
+
+    assert state[sidebar._THEME_KEY] is False
+    assert state[sidebar._THEME_CONTEXT_KEY] is False
+    assert auth.AUTHENTICATED_KEY not in state
+

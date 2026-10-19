@@ -148,6 +148,12 @@ _OVERVIEW_ICONS = {
     "percent",
     "show_chart",
     "location_on",
+    "task_alt",
+    "storefront",
+    "inventory_2",
+    "report_problem",
+    "table_chart",
+    "format_list_numbered",
 }
 
 
@@ -158,6 +164,11 @@ def _overview_icon(icon: str, *, size: int = 20) -> str:
         f'<span class="material-symbols-rounded" aria-hidden="true" '
         f'style="font-size:{size}px">{icon_name}</span>'
     )
+
+
+def _summary_icon(icon: str, *, size: int = 22) -> str:
+    """Return a whitelisted Material Symbol for summary cards."""
+    return _overview_icon(icon, size=size)
 
 
 def current_theme_type() -> str | None:
@@ -257,6 +268,70 @@ def kpi_card(
             {comparison_html}
           </div>
         </div>
+        """
+    )
+
+
+def summary_card(
+    label: str,
+    value: str,
+    caption: str,
+    icon: str,
+    ring_percent: float | None = None,
+    ring_tone: str | None = None,
+    help_text: str | None = None,
+) -> None:
+    """Render an escaped, presentation-only Ask the Business summary card."""
+    safe_label = escape(str(label))
+    safe_value = escape(str(value))
+    safe_caption = escape(str(caption))
+    safe_icon = escape(str(icon))
+    safe_help = escape(str(help_text), quote=True) if help_text else ""
+
+    ring_html = ""
+    if ring_percent is not None:
+        percent = max(0.0, min(100.0, float(ring_percent)))
+        tone = ring_tone if ring_tone in {"up", "down", "neutral"} else "neutral"
+        angle = (2 * math.pi * percent / 100.0) - (math.pi / 2)
+        dot_x = 22 + (17 * math.cos(angle))
+        dot_y = 22 + (17 * math.sin(angle))
+        ring_html = f"""
+          <div class="versal-summary-ring versal-summary-ring--{tone}" aria-label="{percent:.0f} percent">
+            <svg viewBox="0 0 44 44" role="img" aria-hidden="true">
+              <circle class="versal-summary-ring-track" cx="22" cy="22" r="17"></circle>
+              <circle class="versal-summary-ring-value" cx="22" cy="22" r="17"
+                pathLength="100" stroke-dasharray="{percent:.3f} {100 - percent:.3f}"></circle>
+              <circle class="versal-summary-ring-dot" cx="{dot_x:.3f}" cy="{dot_y:.3f}" r="2.2"></circle>
+            </svg>
+            <span>{percent:.0f}%</span>
+          </div>
+        """
+
+    caption_html = (
+        f'<p class="versal-summary-caption">{safe_caption}</p>' if safe_caption else ""
+    )
+    help_html = (
+        f'<span class="versal-summary-help" title="{safe_help}" '
+        f'aria-label="{safe_help}">?</span>'
+        if safe_help
+        else ""
+    )
+    st.html(
+        f"""
+        <article class="versal-summary-card">
+          <div class="versal-summary-head">
+            <span class="versal-summary-icon" aria-hidden="true">
+              {_summary_icon(safe_icon)}
+            </span>
+            {ring_html}
+          </div>
+          <div class="versal-summary-label-row">
+            <p class="versal-summary-label">{safe_label}</p>
+            {help_html}
+          </div>
+          <p class="versal-summary-value">{safe_value}</p>
+          {caption_html}
+        </article>
         """
     )
 

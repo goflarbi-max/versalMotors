@@ -12,7 +12,8 @@ from src.ai.fallback import (
 from src.ai.gemini_client import generate_text
 from src.ai.guardrails import build_grounded_response, handle_unanswerable, validate_question
 from src.database.connection import get_connection, run_readonly_sql
-from src.ui.components import render_table
+from src.ui.components import render_table, summary_card
+from src.ui.theme import apply_ask_business_theme, apply_summary_card_theme
 
 
 SUGGESTIONS = {
@@ -49,18 +50,29 @@ def key() -> str:
 
 st.session_state.setdefault("business_messages", [])
 with st.sidebar:
-    if st.button("Clear chat", icon=":material/delete:", width="stretch"):
+    if st.button(
+        "Clear chat",
+        icon=":material/delete:",
+        key="clear_business_chat",
+        width="stretch",
+    ):
         st.session_state.business_messages = []
         st.rerun()
 
 st.title("Ask the Business")
 st.caption("Ask a question and inspect the database evidence behind the answer.")
 schema, kpis = load_context()
+apply_summary_card_theme()
+apply_ask_business_theme()
 with st.container(horizontal=True):
-    st.metric("Revenue", f'GHS {kpis["revenue"] / 1_000_000_000:.2f}B', border=True)
-    st.metric("Completed sales", f'{kpis["sales"]:,.0f}', border=True)
-    st.metric("Branches", f'{kpis["branches"]:,.0f}', border=True)
-    st.metric("Available over 90 days", f'{kpis["aged"]:,.0f}', border=True)
+    with st.container(key="ask_summary_revenue"):
+        summary_card("Revenue", f'GHS {kpis["revenue"] / 1_000_000_000:.2f}B', "", "payments")
+    with st.container(key="ask_summary_sales"):
+        summary_card("Completed sales", f'{kpis["sales"]:,.0f}', "", "task_alt")
+    with st.container(key="ask_summary_branches"):
+        summary_card("Branches", f'{kpis["branches"]:,.0f}', "", "storefront")
+    with st.container(key="ask_summary_aged"):
+        summary_card("Available over 90 days", f'{kpis["aged"]:,.0f}', "", "inventory_2")
 
 ask_tab, history_tab = st.tabs(["Ask", "History"])
 with ask_tab:

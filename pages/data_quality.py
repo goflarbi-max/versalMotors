@@ -3,7 +3,8 @@ from src.ui.pdf_exports import dataframe_to_pdf
 import os, glob, json, re
 from src.database.connection import get_connection
 import pandas as pd
-from src.ui.components import render_table
+from src.ui.components import render_table, summary_card
+from src.ui.theme import apply_summary_card_theme
 
 st.set_page_config(layout="wide")
 st.title("🛡️ Data Quality Report")
@@ -85,9 +86,23 @@ checks = run_live_checks()
 
 if checks:
     df=pd.DataFrame(checks)
-    c1,c2,c3,c4=st.columns(4)
-    c1.metric("Issues Found",len(df)); c2.metric("Tables Affected",df['table'].nunique())
-    c3.metric("Total Affected",f"{df['count'].sum():,}"); worst=df.sort_values('share_pct',ascending=False).iloc[0]; c4.metric("Highest Share",f"{worst['share_pct']}%",help=f"Highest affected table: {worst['table']}")
+    worst=df.sort_values('share_pct',ascending=False).iloc[0]
+    apply_summary_card_theme()
+    with st.container(horizontal=True):
+        with st.container(key="ask_summary_quality_issues"):
+            summary_card("Issues Found", f"{len(df):,}", "", "report_problem")
+        with st.container(key="ask_summary_quality_tables"):
+            summary_card("Tables Affected", f"{df['table'].nunique():,}", "", "table_chart")
+        with st.container(key="ask_summary_quality_affected"):
+            summary_card("Total Affected", f"{df['count'].sum():,}", "", "format_list_numbered")
+        with st.container(key="ask_summary_quality_share"):
+            summary_card(
+                "Highest Share",
+                f"{worst['share_pct']}%",
+                "",
+                "percent",
+                help_text=f"Highest affected table: {worst['table']}",
+            )
     st.divider()
     st.subheader("Validation Checks")
     quality_table = df[["table","issue","count","total_rows","share_pct","impact"]].rename(columns={"share_pct":"share_%_of_table","impact":"which_conclusions_it_might_affect"})

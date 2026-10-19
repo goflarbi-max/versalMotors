@@ -18,10 +18,10 @@ LANDING_SURFACE_THEME = {
         "description": "#374151",
     },
     "dark": {
-        "overlay": "rgba(15, 18, 28, 0.84)",
-        "vignette": "rgba(2, 6, 23, 0.20)",
-        "panel": "rgba(20, 24, 35, 0.94)",
-        "panel_fallback": "#141823",
+        "overlay": "rgba(15, 23, 42, 0.90)",
+        "vignette": "rgba(15, 23, 42, 0.22)",
+        "panel": "rgba(30, 41, 59, 0.94)",
+        "panel_fallback": "#1E293B",
         "border": "rgba(255, 255, 255, 0.17)",
         "shadow": "0 24px 70px rgba(0, 0, 0, 0.38)",
         "title": "#F8FAFC",
@@ -66,14 +66,37 @@ RUNTIME_THEME = {
         "color_scheme": "light",
     },
     "dark": {
-        "background": "#020617",
-        "secondary_background": "#0F172A",
+        "background": "#0F172A",
+        "secondary_background": "#1E293B",
         "text": "#F1F5F9",
         "muted_text": "#CBD5E1",
-        "border": "#1E293B",
+        "border": "#334155",
         "color_scheme": "dark",
     },
 }
+
+
+# Login intentionally has one visual mode. These tokens reuse the existing
+# light runtime palette so the access screen cannot drift into a second theme.
+LOGIN_THEME = {
+    "page_background": RUNTIME_THEME["light"]["background"],
+    "text": RUNTIME_THEME["light"]["text"],
+    "muted_text": RUNTIME_THEME["light"]["muted_text"],
+    "field_background": RUNTIME_THEME["light"]["secondary_background"],
+    "field_border": RUNTIME_THEME["light"]["border"],
+    "card_background": "rgba(255, 255, 255, 0.64)",
+    "fallback_background": "rgba(255, 255, 255, 0.96)",
+    "card_border": "rgba(255, 255, 255, 0.78)",
+    "card_shadow": "0 24px 65px rgba(15, 23, 42, 0.18)",
+    "shape_one": "rgba(99, 102, 241, 0.20)",
+    "shape_two": "rgba(56, 189, 248, 0.17)",
+    "accent": "#6366F1",
+}
+
+
+def login_theme_type() -> str:
+    """Return the fixed login theme, independently of runtime preferences."""
+    return "light"
 
 
 OVERVIEW_THEME = {
@@ -100,8 +123,8 @@ OVERVIEW_THEME = {
         "chart_tooltip_text": "#0F172A",
     },
     "dark": {
-        "card_outer_bg": "#0B1220",
-        "card_bg": "#0F172A",
+        "card_outer_bg": "#172033",
+        "card_bg": "#1E293B",
         "card_outer_border": "#334155",
         "card_shadow": "0 8px 24px rgba(0, 0, 0, 0.24)",
         "card_shadow_hover": "0 14px 32px rgba(0, 0, 0, 0.36)",
@@ -115,11 +138,47 @@ OVERVIEW_THEME = {
         "badge_neutral_text": "#CBD5E1",
         "icon_tile_bg": "rgba(22, 192, 96, 0.16)",
         "icon_tile_fg": "#6EE7A2",
-        "chart_palette": ("#16C060", "#3DB2A0", "#94A3B8", "#64748B"),
+        "chart_palette": ("#16C060", "#3DB2A0", "#94A3B8", "#CBD5E1"),
         "chart_grid": "#334155",
         "chart_grid_subtle": "rgba(51, 65, 85, 0.56)",
         "chart_tooltip_bg": "#111827",
         "chart_tooltip_text": "#F1F5F9",
+    },
+}
+
+
+SUMMARY_CARD_THEME = {
+    "light": {
+        "summary_card_bg": "#FDFEFE",
+        "summary_card_highlight": "rgba(255, 255, 255, 0.96)",
+        "summary_card_shadow": "0 16px 30px rgba(15, 23, 42, 0.09), 0 3px 8px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.94)",
+        "summary_card_shadow_hover": "0 21px 38px rgba(15, 23, 42, 0.13), 0 5px 12px rgba(15, 23, 42, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.98)",
+        "summary_card_text": "#111827",
+        "summary_card_label": "#374151",
+        "summary_card_caption": "#6B7280",
+        "icon_tile_bg": "rgba(255, 255, 255, 0.64)",
+        "icon_tile_border": "#CBD5E1",
+        "icon_tile_fg": "#334155",
+        "ring_track": "#E5E7EB",
+        "ring_up": "#16A34A",
+        "ring_down": "#DC2626",
+        "ring_neutral": "#64748B",
+    },
+    "dark": {
+        "summary_card_bg": "#1F232C",
+        "summary_card_highlight": "rgba(255, 255, 255, 0.055)",
+        "summary_card_shadow": "0 18px 34px rgba(0, 0, 0, 0.28), 0 4px 10px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
+        "summary_card_shadow_hover": "0 24px 42px rgba(0, 0, 0, 0.38), 0 6px 14px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.10)",
+        "summary_card_text": "#F8FAFC",
+        "summary_card_label": "#E2E8F0",
+        "summary_card_caption": "#AEB8C6",
+        "icon_tile_bg": "rgba(255, 255, 255, 0.035)",
+        "icon_tile_border": "#667085",
+        "icon_tile_fg": "#E2E8F0",
+        "ring_track": "#3B4250",
+        "ring_up": "#4ADE80",
+        "ring_down": "#F87171",
+        "ring_neutral": "#94A3B8",
     },
 }
 
@@ -419,6 +478,311 @@ def active_overview_theme() -> dict[str, object]:
     return OVERVIEW_THEME["dark" if dark_mode else "light"]
 
 
+def active_summary_card_theme() -> dict[str, str]:
+    """Return Ask the Business summary-card colours for the active theme."""
+    selected = st.session_state.get("sidebar_dark_mode")
+    if isinstance(selected, bool):
+        return SUMMARY_CARD_THEME["dark" if selected else "light"]
+    try:
+        dark_mode = st.context.theme.type == "dark"
+    except (AttributeError, RuntimeError):
+        dark_mode = False
+    return SUMMARY_CARD_THEME["dark" if dark_mode else "light"]
+
+
+def active_runtime_theme() -> dict[str, str]:
+    """Return the current main-content palette selected by the sidebar toggle."""
+    selected = st.session_state.get("sidebar_dark_mode")
+    if isinstance(selected, bool):
+        return RUNTIME_THEME["dark" if selected else "light"]
+    try:
+        dark_mode = st.context.theme.type == "dark"
+    except (AttributeError, RuntimeError):
+        dark_mode = False
+    return RUNTIME_THEME["dark" if dark_mode else "light"]
+
+
+def apply_ask_business_theme() -> None:
+    """Keep Ask the Business controls readable in both runtime themes."""
+    palette = active_runtime_theme()
+    st.html(
+        f"""
+        <style>
+        [class*="st-key-quick_"] button {{
+            min-height: 2.5rem;
+            border-color: {palette["border"]} !important;
+            background: {palette["secondary_background"]} !important;
+            color: {palette["text"]} !important;
+        }}
+
+        [class*="st-key-quick_"] button * {{
+            color: {palette["text"]} !important;
+            opacity: 1 !important;
+        }}
+
+        [class*="st-key-quick_"] button:hover {{
+            border-color: {palette["muted_text"]} !important;
+            background: color-mix(
+                in srgb,
+                {palette["secondary_background"]} 88%,
+                {palette["text"]}
+            ) !important;
+        }}
+
+        [class*="st-key-quick_"] button:focus-visible {{
+            outline: 3px solid {palette["muted_text"]};
+            outline-offset: 2px;
+        }}
+
+        [class*="st-key-clear_business_chat"] button {{
+            border-color: {palette["border"]} !important;
+            background: transparent !important;
+            color: {palette["text"]} !important;
+        }}
+
+        [class*="st-key-clear_business_chat"] button * {{
+            color: {palette["text"]} !important;
+            opacity: 1 !important;
+        }}
+
+        [class*="st-key-clear_business_chat"] button:hover {{
+            background: color-mix(
+                in srgb,
+                {palette["secondary_background"]} 82%,
+                transparent
+            ) !important;
+        }}
+
+        [class*="st-key-clear_business_chat"] button:focus-visible {{
+            outline: 3px solid {palette["muted_text"]};
+            outline-offset: 2px;
+        }}
+
+        [data-testid="stChatInput"] {{
+            border-color: {palette["border"]} !important;
+            background: {palette["secondary_background"]} !important;
+        }}
+
+        [data-testid="stChatInput"] textarea {{
+            background: transparent !important;
+            color: {palette["text"]} !important;
+            caret-color: {palette["text"]} !important;
+        }}
+
+        [data-testid="stChatInput"] textarea::placeholder {{
+            color: {palette["muted_text"]} !important;
+            opacity: 1 !important;
+        }}
+
+        [data-testid="stChatInput"] button,
+        [data-testid="stChatInput"] button * {{
+            color: {palette["text"]} !important;
+        }}
+
+        [data-baseweb="tab-list"] [data-baseweb="tab"],
+        [data-baseweb="tab-list"] [data-baseweb="tab"] * {{
+            color: {palette["text"]} !important;
+        }}
+        </style>
+        """
+    )
+
+
+def apply_summary_card_theme() -> None:
+    """Style only the four summary cards on Ask the Business."""
+    palette = active_summary_card_theme()
+    st.html(
+        f"""
+        <style>
+        [class*="st-key-ask_summary_"] {{
+            min-width: min(100%, 12rem);
+            flex: 1 1 12rem;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-card {{
+            box-sizing: border-box;
+            min-height: 178px;
+            height: 100%;
+            padding: 1.2rem 1.25rem 1.15rem;
+            overflow: hidden;
+            border: 0;
+            border-radius: 22px;
+            background:
+                linear-gradient(180deg, {palette["summary_card_highlight"]} 0%, transparent 42%),
+                {palette["summary_card_bg"]};
+            box-shadow: {palette["summary_card_shadow"]};
+            color: {palette["summary_card_text"]};
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-card:hover {{
+            transform: translateY(-3px);
+            box-shadow: {palette["summary_card_shadow_hover"]};
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-head {{
+            min-height: 46px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-icon {{
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            border: 1px solid {palette["icon_tile_border"]};
+            border-radius: 12px;
+            background: {palette["icon_tile_bg"]};
+            color: {palette["icon_tile_fg"]};
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-icon .material-symbols-rounded {{
+            color: inherit !important;
+            direction: ltr;
+            display: inline-block;
+            font-family: "Material Symbols Rounded" !important;
+            font-size: 1.25rem;
+            font-style: normal;
+            font-variation-settings: "FILL" 0, "wght" 450, "GRAD" 0, "opsz" 22;
+            font-weight: normal;
+            letter-spacing: normal;
+            line-height: 1;
+            text-transform: none;
+            white-space: nowrap;
+            word-wrap: normal;
+            -webkit-font-feature-settings: "liga";
+            font-feature-settings: "liga";
+            -webkit-font-smoothing: antialiased;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-label,
+        [class*="st-key-ask_summary_"] .versal-summary-value,
+        [class*="st-key-ask_summary_"] .versal-summary-caption {{
+            margin: 0;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-label-row {{
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-help {{
+            width: 1rem;
+            height: 1rem;
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border: 1px solid {palette["summary_card_caption"]};
+            border-radius: 50%;
+            color: {palette["summary_card_caption"]};
+            font-size: 0.65rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: help;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-label {{
+            color: {palette["summary_card_label"]};
+            font-size: 0.94rem;
+            font-weight: 600;
+            line-height: 1.35;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-value {{
+            margin-top: 0.28rem;
+            color: {palette["summary_card_text"]};
+            font-size: clamp(1.7rem, 2.2vw, 2rem);
+            font-weight: 750;
+            line-height: 1.12;
+            letter-spacing: -0.025em;
+            white-space: nowrap;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-caption {{
+            margin-top: 0.48rem;
+            color: {palette["summary_card_caption"]};
+            font-size: 0.75rem;
+            line-height: 1.45;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-ring {{
+            position: relative;
+            width: 46px;
+            height: 46px;
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            color: {palette["ring_neutral"]};
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-ring svg {{
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-ring circle {{
+            fill: none;
+            stroke-width: 3;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-ring-track {{
+            stroke: {palette["ring_track"]};
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-ring-value {{
+            stroke: currentColor;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-ring-dot {{
+            fill: currentColor;
+            stroke: none;
+        }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-ring--up {{ color: {palette["ring_up"]}; }}
+        [class*="st-key-ask_summary_"] .versal-summary-ring--down {{ color: {palette["ring_down"]}; }}
+        [class*="st-key-ask_summary_"] .versal-summary-ring--neutral {{ color: {palette["ring_neutral"]}; }}
+
+        [class*="st-key-ask_summary_"] .versal-summary-ring span {{
+            position: relative;
+            color: {palette["summary_card_text"]};
+            font-size: 0.62rem;
+            font-weight: 700;
+        }}
+
+        @media (min-width: 641px) and (max-width: 900px) {{
+            [class*="st-key-ask_summary_"] {{
+                min-width: calc(50% - 0.5rem);
+                flex-basis: calc(50% - 0.5rem);
+            }}
+        }}
+
+        @media (max-width: 640px) {{
+            [class*="st-key-ask_summary_"] {{
+                min-width: 100%;
+                flex-basis: 100%;
+            }}
+
+            [class*="st-key-ask_summary_"] .versal-summary-card {{
+                min-height: 160px;
+                padding: 1.05rem 1.1rem;
+            }}
+        }}
+        </style>
+        """
+    )
+
+
 def apply_overview_theme() -> None:
     """Apply styling scoped exclusively to the Business Overview page."""
     palette = active_overview_theme()
@@ -643,78 +1007,51 @@ def _landing_background_data_uri() -> str:
 
 
 def apply_login_theme() -> None:
-    """Apply login-only chrome hiding and responsive card styling."""
+    """Force the login route to the existing light palette only."""
+    # Keep the next authenticated render light as well. These are UI preference
+    # keys only; authentication state remains owned by ``src.auth.auth``.
+    st.session_state["sidebar_dark_mode"] = False
+    st.session_state["sidebar_theme_context"] = False
     st.html(
         """
         <span id="versal-theme-bootstrap" hidden></span>
         <script>
         (() => {
-            const sessionMarker = "versalMotorsLightThemeInitialized";
-            if (sessionStorage.getItem(sessionMarker) !== "true") {
-                const themeKeys = Object.keys(localStorage).filter((key) =>
-                    key.startsWith("stActiveTheme-")
-                );
-                let changed = false;
-
-                for (const key of themeKeys) {
-                    const stored = localStorage.getItem(key);
-                    let selected = stored;
-                    try {
-                        selected = JSON.parse(stored);
-                    } catch (_) {
-                        // Older Streamlit versions may store the value without JSON encoding.
-                    }
-                    if (selected !== "Light") {
-                        localStorage.setItem(key, JSON.stringify("Light"));
-                        changed = true;
-                    }
-                }
-
-                sessionStorage.setItem(sessionMarker, "true");
-                if (changed) {
-                    window.location.reload();
-                    return;
-                }
+            const themeKeys = Object.keys(localStorage).filter((key) =>
+                key.startsWith("stActiveTheme-")
+            );
+            for (const key of themeKeys) {
+                const oldValue = localStorage.getItem(key);
+                const newValue = JSON.stringify("Light");
+                if (oldValue === newValue) continue;
+                localStorage.setItem(key, newValue);
+                window.dispatchEvent(new StorageEvent("storage", {
+                    key,
+                    oldValue,
+                    newValue,
+                    storageArea: localStorage,
+                    url: window.location.href,
+                }));
             }
-
+            document.documentElement.style.colorScheme = "light";
+            document.documentElement.dataset.versalLoginTheme = "light";
         })();
         </script>
         """,
         unsafe_allow_javascript=True,
     )
-    try:
-        dark_mode = st.context.theme.type == "dark"
-    except (AttributeError, RuntimeError):
-        dark_mode = False
-
-    login_glass = {
-        "light": {
-            "card_background": "rgba(255, 255, 255, 0.64)",
-            "fallback_background": "rgba(255, 255, 255, 0.96)",
-            "card_border": "rgba(255, 255, 255, 0.78)",
-            "card_shadow": "0 24px 65px rgba(15, 23, 42, 0.18)",
-            "shape_one": "rgba(99, 102, 241, 0.20)",
-            "shape_two": "rgba(56, 189, 248, 0.17)",
-        },
-        "dark": {
-            "card_background": "rgba(20, 24, 35, 0.56)",
-            "fallback_background": "rgba(15, 23, 42, 0.96)",
-            "card_border": "rgba(255, 255, 255, 0.18)",
-            "card_shadow": "0 24px 65px rgba(0, 0, 0, 0.38)",
-            "shape_one": "rgba(99, 102, 241, 0.16)",
-            "shape_two": "rgba(14, 165, 233, 0.12)",
-        },
-    }
-    glass = login_glass["dark" if dark_mode else "light"]
-    card_text = "#F8FAFC" if dark_mode else "#0F172A"
-    muted_text = "#CBD5E1" if dark_mode else "#64748B"
-    field_background = "#111827" if dark_mode else "#F8FAFC"
-    field_border = "#334155" if dark_mode else "#CBD5E1"
-    page_background = "#020617" if dark_mode else "#F8FAFC"
+    glass = LOGIN_THEME
 
     st.html(
         f"""
         <style>
+        html:root {{
+            color-scheme: light !important;
+            --background-color: {glass["page_background"]} !important;
+            --secondary-background-color: {glass["field_background"]} !important;
+            --text-color: {glass["text"]} !important;
+        }}
+
         [data-testid="stSidebar"],
         [data-testid="stSidebarCollapsedControl"],
         [data-testid="stHeader"],
@@ -723,11 +1060,34 @@ def apply_login_theme() -> None:
             display: none !important;
         }}
 
-        .stApp,
-        [data-testid="stAppViewContainer"] {{
-            background: {page_background};
+        html body .stApp,
+        html body [data-testid="stAppViewContainer"],
+        html body [data-testid="stMain"] {{
+            background-color: {glass["page_background"]} !important;
+            background-image: none !important;
+            color: {glass["text"]} !important;
             height: 100dvh;
             overflow: hidden !important;
+        }}
+
+        [data-testid="stHeader"] {{
+            background: {glass["page_background"]} !important;
+        }}
+
+        body,
+        [data-testid="stToast"],
+        [data-baseweb="toast"],
+        [data-testid="stDialog"] [role="dialog"],
+        [data-baseweb="modal"] [role="dialog"] {{
+            background-color: {glass["field_background"]} !important;
+            color: {glass["text"]} !important;
+        }}
+
+        [data-testid="stToast"] *,
+        [data-baseweb="toast"] *,
+        [data-testid="stDialog"] [role="dialog"] *,
+        [data-baseweb="modal"] [role="dialog"] * {{
+            color: {glass["text"]} !important;
         }}
 
         html,
@@ -793,7 +1153,7 @@ def apply_login_theme() -> None:
             border: 1px solid {glass["card_border"]};
             border-radius: 16px !important;
             background: {glass["card_background"]};
-            color: {card_text};
+            color: {glass["text"]};
             box-shadow: {glass["card_shadow"]};
             -webkit-backdrop-filter: blur(18px) saturate(140%);
             backdrop-filter: blur(18px) saturate(140%);
@@ -807,7 +1167,7 @@ def apply_login_theme() -> None:
         }}
 
         [class*="st-key-login_card"] h1 {{
-            color: {card_text};
+            color: {glass["text"]};
             font-size: clamp(1.45rem, 4vw, 1.9rem);
             line-height: 1.2;
             margin-bottom: 0;
@@ -815,21 +1175,22 @@ def apply_login_theme() -> None:
 
         [class*="st-key-login_card"] label,
         [class*="st-key-login_card"] p {{
-            color: {card_text};
+            color: {glass["text"]};
         }}
 
         [class*="st-key-login_card"] [data-baseweb="input"] {{
             min-height: 3rem;
-            border-color: {field_border};
-            background: {field_background};
+            border-color: {glass["field_border"]};
+            background: {glass["field_background"]};
         }}
 
         [class*="st-key-login_card"] [data-baseweb="input"] input {{
-            color: {card_text};
+            color: {glass["text"]};
+            -webkit-text-fill-color: {glass["text"]};
         }}
 
         [class*="st-key-login_card"] [data-baseweb="input"] input::placeholder {{
-            color: {muted_text};
+            color: {glass["muted_text"]};
             opacity: 0.82;
         }}
 
@@ -843,13 +1204,13 @@ def apply_login_theme() -> None:
         [class*="st-key-forgot_password_row"] button {{
             min-height: auto;
             padding: 0.15rem 0 !important;
-            color: #6366F1 !important;
+            color: {glass["accent"]} !important;
             font-weight: 650;
         }}
 
         .versal-login-subtitle {{
             margin: -0.15rem 0 0.4rem;
-            color: {muted_text} !important;
+            color: {glass["muted_text"]} !important;
             text-align: center;
             font-size: 0.98rem;
         }}
@@ -881,10 +1242,14 @@ def apply_login_theme() -> None:
 
 def _apply_landing_surface_theme() -> None:
     """Register landing-only image and glass styles in the global theme layer."""
-    try:
-        dark_mode = st.context.theme.type == "dark"
-    except (AttributeError, RuntimeError):
-        dark_mode = False
+    selected = st.session_state.get("sidebar_dark_mode")
+    if isinstance(selected, bool):
+        dark_mode = selected
+    else:
+        try:
+            dark_mode = st.context.theme.type == "dark"
+        except (AttributeError, RuntimeError):
+            dark_mode = False
 
     surface = LANDING_SURFACE_THEME["dark" if dark_mode else "light"]
     background_uri = _landing_background_data_uri()
@@ -1003,10 +1368,14 @@ def hide_landing_navigation() -> None:
 
 def apply_theme() -> None:
     """Apply existing shell polish plus responsive landing-page styles."""
-    try:
-        dark_mode = st.context.theme.type == "dark"
-    except (AttributeError, RuntimeError):
-        dark_mode = False
+    selected = st.session_state.get("sidebar_dark_mode")
+    if isinstance(selected, bool):
+        dark_mode = selected
+    else:
+        try:
+            dark_mode = st.context.theme.type == "dark"
+        except (AttributeError, RuntimeError):
+            dark_mode = False
 
     _apply_landing_surface_theme()
 

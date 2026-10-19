@@ -24,6 +24,8 @@ The database and cleaned CSVs are generated artifacts. On a fresh clone or Strea
 
 VersalMotors uses a small app-level login for this project demo. It is an access gate for the demonstration, not a replacement for production identity management or single sign-on. Unauthenticated sessions register only the login screen; protected page URLs are not registered until sign-in succeeds. Password verification uses bcrypt hashes, unknown accounts follow the same bcrypt check path, and five failed attempts lock that browser session for 60 seconds.
 
+The login screen always uses the light theme; signing out resets the next login and landing page to light. After signing in, users can switch protected pages between the existing light and dark themes.
+
 Public demo access:
 
 - Email: `demo@versalmotors.com`
@@ -185,6 +187,12 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - Add normalized service-volume and model-population denominators to strengthen the management investigations in `docs/management_brief.md`.
 
 ## Daily Progress Log
+
+### Day 9 - 2026-10-19 - Light-Only Login & UI Card Polish
+
+- Done: Made the login screen permanently light regardless of native, browser, or operating-system theme; removed login theme switching; reset the UI theme to light on sign-out; preserved protected-page dark mode; and verified responsive login rendering at 375px, 768px, and 1280px. Also completed the pending themed summary-card presentation for Ask the Business and Data Quality. The full suite passes 57 tests and 24 subtests.
+- Files: `.streamlit/config.toml`, `app.py`, `pages/ask_the_business.py`, `pages/data_quality.py`, `src/ui/components.py`, `src/ui/sidebar.py`, `src/ui/theme.py`, `tests/test_auth.py`, `README.md`.
+- Next: Verify the light-only login and refreshed cards on the hosted deployment.
 
 ### Day 8 - 2026-10-18 - Responsive Application Tables
 

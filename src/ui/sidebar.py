@@ -22,6 +22,13 @@ RUNTIME_THEME = theme_module.RUNTIME_THEME
 _THEME_KEY = "sidebar_dark_mode"
 _THEME_CONTEXT_KEY = "sidebar_theme_context"
 
+
+def _logout_to_light() -> None:
+    """Sign out through the existing auth function and reset only UI theme state."""
+    logout()
+    st.session_state[_THEME_KEY] = False
+    st.session_state[_THEME_CONTEXT_KEY] = False
+
 def _is_dark_mode() -> bool:
     try:
         return st.context.theme.type == "dark"
@@ -390,5 +397,5 @@ def render_sidebar(active_page: str) -> None:
                 key="sidebar_sign_out",
                 width="stretch",
             ):
-                logout()
+                _logout_to_light()
                 st.rerun()

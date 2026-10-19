@@ -13,7 +13,7 @@ from src.database.bootstrap import database_is_ready, ensure_database
 from src.ui.components import active_logo_path
 from src.ui.auth_ui import render_login
 from src.ui.sidebar import render_sidebar
-from src.ui.theme import apply_theme, hide_landing_navigation
+from src.ui.theme import apply_login_theme, apply_theme, hide_landing_navigation
 
 
 load_dotenv()
@@ -24,9 +24,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="auto",
 )
-apply_theme()
-
 if not is_authenticated():
+    # Force the signed-out surface to light before any selectable app theme is
+    # applied. ``render_login`` repeats this idempotently as a safe fallback.
+    apply_login_theme()
     login_page = st.Page(
         render_login,
         title="Sign in",
@@ -38,6 +39,7 @@ if not is_authenticated():
     st.stop()
 
 require_login()
+apply_theme()
 
 landing_page = st.Page(
     "pages/landing.py",
