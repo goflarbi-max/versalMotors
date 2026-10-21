@@ -8,7 +8,7 @@ versalMotors has sales, inventory, service, warranty, complaint, and customer-sa
 
 ## Solution
 
-This project provides a multipage business-intelligence application that turns operational records into auditable management metrics. A responsive, theme-aware landing page provides direct access to the management Overview and Ask the Business workflows. The implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, warranty-cost drill-down, responsive sortable and paginated evidence tables, data-quality monitoring, evidence-backed business questions, and downloadable management briefs.
+This project provides a multipage business-intelligence application that turns operational records into auditable management metrics. A responsive public landing page introduces the evidence-led system before sign-in, while authenticated users enter directly through the management Overview. The implementation includes deterministic data generation, documented profiling, an explainable cleaning pipeline, a DuckDB analytical database, tested metrics, warranty-cost drill-down, responsive sortable and paginated evidence tables, data-quality monitoring, evidence-backed business questions, and downloadable management briefs.
 
 ### Run locally
 
@@ -22,9 +22,9 @@ The database and cleaned CSVs are generated artifacts. On a fresh clone or Strea
 
 ### Authentication
 
-VersalMotors uses a small app-level login for this project demo. It is an access gate for the demonstration, not a replacement for production identity management or single sign-on. Unauthenticated sessions register only the login screen; protected page URLs are not registered until sign-in succeeds. Password verification uses bcrypt hashes, unknown accounts follow the same bcrypt check path, and five failed attempts lock that browser session for 60 seconds.
+VersalMotors uses a small app-level login for this project demo. It is an access gate for the demonstration, not a replacement for production identity management or single sign-on. Unauthenticated sessions can reach only the public landing and login routes; protected URLs select the login page until sign-in succeeds. Password verification uses bcrypt hashes, unknown accounts follow the same bcrypt check path, and five failed attempts lock that browser session for 60 seconds.
 
-The login screen always uses the light theme; signing out resets the next login and landing page to light. After signing in, users can switch protected pages between the existing light and dark themes.
+The public landing page has one fixed black-and-light presentation, independent of browser theme, with accessible reduced-motion support for its subtle entrance effects. The login screen always uses the light theme; signing out resets the next login to light. After signing in, users enter Overview and can switch protected pages between the existing light and dark themes.
 
 Public demo access:
 
@@ -58,7 +58,7 @@ Only hashes are used for authentication. The displayed demo password is intentio
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-The full suite records 55 passing tests and 24 passing subtests across authentication, calculations, degraded schemas, bad chronology, filters, AI failures, unsupported questions, large data, all five Streamlit pages, and the shared table renderer. Full stress-test results and limitations are in `docs/test_log.md`.
+The full suite records 65 passing tests and 24 passing subtests across public/protected routing, authentication, calculations, degraded schemas, bad chronology, filters, AI failures, unsupported questions, large data, all five protected Streamlit pages, and the shared table renderer. Full stress-test results and limitations are in `docs/test_log.md`.
 
 ## Dataset
 
@@ -66,7 +66,7 @@ The repository contains nine synthetic raw CSV tables covering branches, models,
 
 ### Assets
 
-The `assets/` folder contains the theme-aware VersalMotors logos and the preserved landing background. The optimized WebP is embedded through a cached data URI so it renders consistently on localhost, Streamlit Community Cloud, and custom-domain routes; `static/` retains a deployable fallback copy.
+The `assets/` folder contains the theme-aware VersalMotors logos and preserved earlier landing artwork. The public landing uses the existing white logo; its lightweight dotted wave is rendered with scoped CSS, so it requires no new image asset.
 
 ## How the System Works
 
@@ -75,7 +75,7 @@ The `assets/` folder contains the theme-aware VersalMotors logos and the preserv
 3. `src/data/cleaning.py` standardises reviewed values, safely parses fields, flags questionable records, removes only exact duplicates, and writes an audit log.
 4. `scripts/build_database.py` rebuilds the cleaned CSVs and local DuckDB database.
 5. `src/analytics/metrics.py` calculates tested business metrics without UI or database side effects.
-6. The bcrypt access layer registers only the login screen until a session is authenticated, then opens the landing page without disturbing shared filter state.
+6. Signed-out sessions can view the public landing or login page; direct protected URLs choose Login. Successful authentication opens Overview without disturbing shared filter state.
 7. Streamlit presents persistent filters, management KPIs, period comparisons, charts, responsive sortable and paginated tables, warranty drill-down evidence, data-quality checks, and PDF exports. Theme-aware logo assets are stored in `assets/`.
 8. The optional Gemini layer tries a primary model and lighter fallback model with bounded transient-error retries. Reviewed queries and deterministic evidence summaries remain available when every model is unavailable.
 
@@ -187,6 +187,18 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - Add normalized service-volume and model-population denominators to strengthen the management investigations in `docs/management_brief.md`.
 
 ## Daily Progress Log
+
+### Day 11 - 2026-10-21 - Public Landing Visual Polish
+
+- Done: Refined the public landing with a black hero, five compact analytics icons, a responsive one-time staggered entrance sequence, a subtle desktop-only dot-wave drift, reduced-motion support, and clean card hover feedback. Preserved anonymous-to-login routing, protected-page redirects, the white logo, evidence cards, and all business logic. Browser checks passed at 375px, 768px, and 1280px with no horizontal overflow; the full suite passes 65 tests and 24 subtests.
+- Files: `src/ui/landing.py`, `src/ui/theme.py`, `README.md`.
+- Next: Verify the updated landing experience after the hosted Streamlit deployment refreshes.
+
+### Day 10 - 2026-10-20 - Public Landing & Protected Routing
+
+- Done: Replaced the authenticated Home screen with a database-independent public landing page featuring the white VersalMotors logo, fixed navy hero, lightweight inline-SVG dotted wave, evidence-focused feature cards, and one Sign in action. Anonymous protected URLs now select Login, successful sign-in opens Overview, and the Home item was removed from the protected sidebar without changing business-page logic. The full suite passes 65 tests and 24 subtests.
+- Files: `app.py`, `pages/landing.py`, `pages/login.py`, `src/ui/landing.py`, `src/ui/theme.py`, `tests/test_public_routing.py`, `README.md`, `docs/architecture.md`.
+- Next: Verify the public-to-login journey and responsive presentation on the hosted deployment.
 
 ### Day 9 - 2026-10-19 - Light-Only Login & UI Card Polish
 

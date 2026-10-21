@@ -1,32 +1,31 @@
 """Shared visual styling for the Streamlit shell and landing page."""
 
-import base64
-from pathlib import Path
-
 import streamlit as st
 
 
-LANDING_SURFACE_THEME = {
-    "light": {
-        "overlay": "rgba(255, 255, 255, 0.76)",
-        "vignette": "rgba(255, 255, 255, 0.18)",
-        "panel": "rgba(255, 255, 255, 0.96)",
-        "panel_fallback": "#FFFFFF",
-        "border": "rgba(255, 255, 255, 0.82)",
-        "shadow": "0 24px 70px rgba(15, 23, 42, 0.18)",
-        "title": "#111827",
-        "description": "#374151",
-    },
-    "dark": {
-        "overlay": "rgba(15, 23, 42, 0.90)",
-        "vignette": "rgba(15, 23, 42, 0.22)",
-        "panel": "rgba(30, 41, 59, 0.94)",
-        "panel_fallback": "#1E293B",
-        "border": "rgba(255, 255, 255, 0.17)",
-        "shadow": "0 24px 70px rgba(0, 0, 0, 0.38)",
-        "title": "#F8FAFC",
-        "description": "#CBD5E1",
-    },
+PUBLIC_LANDING_THEME = {
+    "landing_gradient_start": "#000000",
+    "landing_gradient_end": "#0A0A0A",
+    "landing_text": "#FFFFFF",
+    "landing_text_muted": "rgba(255, 255, 255, 0.86)",
+    "landing_band_bg": "#E8EDF4",
+    "landing_card_bg": "#FFFFFF",
+    "landing_button_border": "rgba(255, 255, 255, 0.92)",
+    "landing_card_text": "#12213F",
+    "landing_card_muted": "#5B677A",
+    "landing_icon": "#1450B8",
+    "landing_icon_bg": "#EEF4FF",
+    "landing_icon_stroke": "rgba(255, 255, 255, 0.85)",
+    "landing_icon_tile_border": "rgba(255, 255, 255, 0.25)",
+    "landing_icon_tile_bg": "rgba(255, 255, 255, 0.05)",
+    "landing_card_shadow": "0 16px 38px rgba(7, 27, 74, 0.12)",
+    "landing_focus": "#F8D14A",
+    "landing_anim_duration": "650ms",
+    "landing_anim_stagger": "110ms",
+    "landing_anim_distance": "14px",
+    "landing_icon_sweep": "70ms",
+    "landing_wave_duration": "18s",
+    "landing_hover_duration": "200ms",
 }
 
 
@@ -1010,14 +1009,6 @@ def apply_overview_theme() -> None:
     )
 
 
-@st.cache_data(show_spinner=False)
-def _landing_background_data_uri() -> str:
-    """Embed the optimized background so hosted routes need no static-file URL."""
-    image_path = Path(__file__).resolve().parents[2] / "assets" / "landing_bg.webp"
-    encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
-    return f"data:image/webp;base64,{encoded}"
-
-
 def apply_login_theme() -> None:
     """Force the login route to the existing light palette only."""
     # Keep the next authenticated render light as well. These are UI preference
@@ -1350,118 +1341,6 @@ def apply_login_theme() -> None:
     )
 
 
-def _apply_landing_surface_theme() -> None:
-    """Register landing-only image and glass styles in the global theme layer."""
-    selected = st.session_state.get("sidebar_dark_mode")
-    if isinstance(selected, bool):
-        dark_mode = selected
-    else:
-        try:
-            dark_mode = st.context.theme.type == "dark"
-        except (AttributeError, RuntimeError):
-            dark_mode = False
-
-    surface = LANDING_SURFACE_THEME["dark" if dark_mode else "light"]
-    background_uri = _landing_background_data_uri()
-    st.markdown(
-        f"""
-        <style id="versal-landing-surface">
-        .stApp:has([class*="st-key-landing_shell"]),
-        [data-testid="stAppViewContainer"]:has([class*="st-key-landing_shell"]) {{
-            background-image:
-                radial-gradient(ellipse at center, transparent 36%, {surface["vignette"]} 100%),
-                linear-gradient({surface["overlay"]}, {surface["overlay"]}),
-                url("{background_uri}") !important;
-            background-position: center center !important;
-            background-size: cover !important;
-            background-attachment: scroll !important;
-            background-repeat: no-repeat !important;
-            overflow: hidden !important;
-            transition: none !important;
-            animation: none !important;
-        }}
-
-        [data-testid="stAppViewContainer"]:has([class*="st-key-landing_shell"])
-        .block-container {{
-            width: 100% !important;
-            max-width: none !important;
-            height: 100dvh !important;
-            padding: 4px 0 0 !important;
-            overflow: hidden !important;
-        }}
-
-        [class*="st-key-landing_shell"] {{
-            position: relative !important;
-            width: 100% !important;
-            max-width: none !important;
-            height: calc(100dvh - 4px) !important;
-            min-height: 0 !important;
-            margin: 0 !important;
-            padding: clamp(0.75rem, 2vw, 1.5rem) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            overflow: hidden !important;
-            isolation: isolate;
-            transition: none !important;
-            animation: none !important;
-        }}
-
-        [class*="st-key-landing_shell"] > div {{
-            width: 100%;
-        }}
-
-        [class*="st-key-landing_content"] {{
-            width: min(100%, 760px);
-            margin-inline: auto;
-            padding: clamp(1.35rem, 3.2vw, 2.25rem);
-            box-sizing: border-box;
-            overflow: hidden !important;
-            border: 1px solid {surface["border"]} !important;
-            border-radius: 24px !important;
-            clip-path: inset(0 round 24px);
-            background: {surface["panel"]} !important;
-            box-shadow: {surface["shadow"]} !important;
-            -webkit-backdrop-filter: none !important;
-            backdrop-filter: none !important;
-            transition: none !important;
-            animation: none !important;
-        }}
-
-        [class*="st-key-landing_content"] h1 {{
-            color: {surface["title"]} !important;
-        }}
-
-        [class*="st-key-landing_content"] .versal-landing-description {{
-            color: {surface["description"]} !important;
-            opacity: 1;
-        }}
-
-        [class*="st-key-landing_content"] > div,
-        [class*="st-key-landing_content"] > div >
-        [data-testid="stVerticalBlockBorderWrapper"] {{
-            border-radius: inherit !important;
-            background: transparent !important;
-        }}
-
-        @media (max-width: 480px) {{
-            [class*="st-key-landing_shell"] {{
-                padding: 0.65rem !important;
-            }}
-
-            [class*="st-key-landing_content"] {{
-                width: calc(100% - 0.5rem);
-                padding: 1.1rem 0.9rem;
-                border-radius: 18px !important;
-                clip-path: inset(0 round 18px);
-            }}
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def hide_landing_navigation() -> None:
     """Hide sidebar navigation and its reveal control on the landing route only."""
     st.html(
@@ -1476,50 +1355,542 @@ def hide_landing_navigation() -> None:
     )
 
 
-def apply_theme() -> None:
-    """Apply existing shell polish plus responsive landing-page styles."""
-    selected = st.session_state.get("sidebar_dark_mode")
-    if isinstance(selected, bool):
-        dark_mode = selected
-    else:
-        try:
-            dark_mode = st.context.theme.type == "dark"
-        except (AttributeError, RuntimeError):
-            dark_mode = False
-
-    _apply_landing_surface_theme()
-
-    landing_button_theme = {
-        "button_primary_bg": "#0F0F3D",
-        "button_primary_hover": "#1A1A5E",
-        "button_secondary_bg": "#D92D20",
-        "button_secondary_hover": "#B42318",
-        "button_text": "#FFFFFF",
-        "button_focus_ring": "#6366F1",
-        "button_primary_shadow": (
-            "0 10px 24px rgba(15, 15, 61, 0.30), "
-            "0 0 0 1px rgba(255, 255, 255, 0.24)"
-            if dark_mode
-            else "0 10px 24px rgba(15, 15, 61, 0.24)"
-        ),
-        "button_secondary_shadow": "0 10px 24px rgba(180, 35, 24, 0.24)",
-    }
+def apply_public_landing_theme() -> None:
+    """Apply the fixed public landing design without reading runtime theme state."""
+    palette = PUBLIC_LANDING_THEME
+    hide_landing_navigation()
     st.html(
         f"""
-        <style>
-        :root {{
-            --landing-button-primary-bg: {landing_button_theme["button_primary_bg"]};
-            --landing-button-primary-hover: {landing_button_theme["button_primary_hover"]};
-            --landing-button-secondary-bg: {landing_button_theme["button_secondary_bg"]};
-            --landing-button-secondary-hover: {landing_button_theme["button_secondary_hover"]};
-            --landing-button-text: {landing_button_theme["button_text"]};
-            --landing-button-focus-ring: {landing_button_theme["button_focus_ring"]};
-            --landing-button-primary-shadow: {landing_button_theme["button_primary_shadow"]};
-            --landing-button-secondary-shadow: {landing_button_theme["button_secondary_shadow"]};
+        <style id="versal-public-landing-theme">
+        html:root {{
+            color-scheme: light !important;
+        }}
+
+        .stApp:has([class*="st-key-public_landing_shell"]),
+        [data-testid="stAppViewContainer"]:has([class*="st-key-public_landing_shell"]),
+        [data-testid="stMain"]:has([class*="st-key-public_landing_shell"]) {{
+            background: {palette["landing_band_bg"]} !important;
+            color: {palette["landing_card_text"]} !important;
+            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+                         "Segoe UI", sans-serif !important;
+        }}
+
+        [data-testid="stAppViewContainer"]:has([class*="st-key-public_landing_shell"])
+        .block-container {{
+            width: 100% !important;
+            max-width: none !important;
+            min-height: 100dvh !important;
+            padding: 0 !important;
+            overflow-x: hidden !important;
+        }}
+
+        [data-testid="stHeader"],
+        [data-testid="stToolbar"],
+        [data-testid="stDecoration"],
+        footer {{
+            display: none !important;
+        }}
+
+        [class*="st-key-public_landing_shell"] {{
+            --versal-anim-duration: {palette["landing_anim_duration"]};
+            --versal-anim-stagger: {palette["landing_anim_stagger"]};
+            --versal-anim-distance: {palette["landing_anim_distance"]};
+            --versal-icon-sweep: {palette["landing_icon_sweep"]};
+            --versal-wave-duration: {palette["landing_wave_duration"]};
+            --versal-hover-duration: {palette["landing_hover_duration"]};
+            --versal-cards-offset: -2.8rem;
+            width: 100%;
+            min-height: 100dvh;
+            margin: 0;
+            padding: 0;
+            gap: 0 !important;
+            overflow: hidden;
+            background: {palette["landing_band_bg"]};
+        }}
+
+        [class*="st-key-public_landing_hero"] {{
+            position: relative;
+            min-height: clamp(500px, 68dvh, 690px);
+            padding: clamp(1.2rem, 3vw, 2.2rem) clamp(1rem, 5vw, 2.5rem)
+                     clamp(5rem, 11vh, 7.2rem) !important;
+            box-sizing: border-box;
+            overflow: hidden;
+            isolation: isolate;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: linear-gradient(
+                118deg,
+                {palette["landing_gradient_start"]} 0%,
+                {palette["landing_gradient_end"]} 100%
+            ) !important;
+        }}
+
+        [class*="st-key-public_landing_topbar"],
+        [class*="st-key-public_landing_copy"] {{
+            position: relative;
+            z-index: 2;
+            width: min(100%, 1100px);
+            margin-inline: auto;
+        }}
+
+        [class*="st-key-public_landing_topbar"] {{
+            align-items: center;
+            gap: 1rem !important;
+        }}
+
+        [class*="st-key-public_landing_topbar"]
+        > [data-testid="stElementContainer"]:first-child {{
+            flex: 0 1 220px;
+        }}
+
+        .versal-public-logo {{
+            display: block;
+            width: clamp(140px, 18vw, 210px);
+            max-width: 100%;
+            height: auto;
+        }}
+
+        [class*="st-key-public_landing_sign_in"] button {{
+            min-width: 7.6rem;
+            min-height: 2.6rem;
+            justify-content: center;
+            padding: 0.55rem 1.35rem;
+            border: 1px solid {palette["landing_button_border"]} !important;
+            border-radius: 999px !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            color: {palette["landing_text"]} !important;
+            font-size: 0.95rem;
+            font-weight: 650;
+            transition: background-color var(--versal-hover-duration) ease,
+                        transform var(--versal-hover-duration) ease;
+        }}
+
+        [class*="st-key-public_landing_sign_in"] button * {{
+            color: {palette["landing_text"]} !important;
+        }}
+
+        [class*="st-key-public_landing_sign_in"] button:hover {{
+            background: rgba(255, 255, 255, 0.12) !important;
+            transform: translateY(-1px);
+        }}
+
+        [class*="st-key-public_landing_sign_in"] button:active {{
+            background: rgba(255, 255, 255, 0.18) !important;
+            transform: translateY(0);
+        }}
+
+        [class*="st-key-public_landing_sign_in"] button:focus-visible {{
+            outline: 3px solid {palette["landing_focus"]} !important;
+            outline-offset: 3px;
+        }}
+
+        [class*="st-key-public_landing_copy"] {{
+            margin-top: clamp(3.4rem, 8vh, 6.3rem);
+        }}
+
+        .versal-public-copy {{
+            max-width: 690px;
+        }}
+
+        .versal-public-copy h1 {{
+            max-width: 660px;
+            margin: 0;
+            color: {palette["landing_text"]} !important;
+            font-size: clamp(3.45rem, 6vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.045em;
+            line-height: 0.99;
+            text-wrap: balance;
+        }}
+
+        .versal-public-copy p {{
+            max-width: 590px;
+            margin: 1.55rem 0 0;
+            color: {palette["landing_text_muted"]} !important;
+            font-size: clamp(1rem, 1.8vw, 1.12rem);
+            line-height: 1.72;
+        }}
+
+        .versal-public-analytics-icons {{
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+        }}
+
+        .versal-public-analytics-icon {{
+            display: inline-grid;
+            flex: 0 0 44px;
+            width: 44px;
+            height: 44px;
+            box-sizing: border-box;
+            place-items: center;
+            border: 1px solid {palette["landing_icon_tile_border"]};
+            border-radius: 12px;
+            background: {palette["landing_icon_tile_bg"]};
+        }}
+
+        .versal-public-analytics-icon img {{
+            display: block;
+            width: 22px;
+            height: 22px;
+        }}
+
+        .versal-public-wave {{
+            position: absolute;
+            z-index: 0;
+            right: -3%;
+            bottom: -2%;
+            width: min(62vw, 760px);
+            aspect-ratio: 1.85 / 1;
+            opacity: 0.58;
+            pointer-events: none;
+            background-image: radial-gradient(
+                circle,
+                rgba(255, 255, 255, 0.94) 0 1.7px,
+                transparent 1.9px
+            );
+            background-size: 15px 15px;
+            clip-path: polygon(
+                0 100%, 0 82%, 14% 72%, 26% 50%, 39% 60%, 51% 31%,
+                64% 42%, 77% 15%, 88% 27%, 100% 0, 100% 100%
+            );
+            -webkit-mask-image: linear-gradient(
+                120deg,
+                transparent 2%,
+                rgba(0, 0, 0, 0.28) 35%,
+                #000 82%
+            );
+            mask-image: linear-gradient(
+                120deg,
+                transparent 2%,
+                rgba(0, 0, 0, 0.28) 35%,
+                #000 82%
+            );
+        }}
+
+        [class*="st-key-public_landing_band"] {{
+            position: relative;
+            z-index: 3;
+            min-height: 32dvh;
+            padding: 0 clamp(1rem, 5vw, 2.5rem) clamp(2.3rem, 5vw, 4rem) !important;
+            box-sizing: border-box;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: {palette["landing_band_bg"]} !important;
+        }}
+
+        .versal-public-cards {{
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: clamp(1rem, 2.2vw, 1.5rem);
+            width: min(100%, 1100px);
+            margin: 0 auto;
+            transform: translateY(var(--versal-cards-offset));
+        }}
+
+        .versal-public-card {{
+            display: grid;
+            grid-template-columns: 3.1rem minmax(0, 1fr);
+            gap: 1rem;
+            min-height: 150px;
+            padding: clamp(1.25rem, 2.5vw, 1.65rem);
+            box-sizing: border-box;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 16px;
+            background: {palette["landing_card_bg"]};
+            box-shadow: {palette["landing_card_shadow"]};
+        }}
+
+        .versal-public-card-icon {{
+            display: inline-grid;
+            width: 3rem;
+            height: 3rem;
+            place-items: center;
+            border-radius: 13px;
+            background: {palette["landing_icon_bg"]};
+            color: {palette["landing_icon"]};
+        }}
+
+        .versal-public-card-icon img {{
+            width: 1.5rem;
+            height: 1.5rem;
+            object-fit: contain;
+        }}
+
+        .versal-public-card h2 {{
+            margin: 0 0 0.5rem;
+            color: {palette["landing_card_text"]} !important;
+            font-size: 1.05rem;
+            font-weight: 750;
+            line-height: 1.3;
+        }}
+
+        .versal-public-card p {{
+            margin: 0;
+            color: {palette["landing_card_muted"]} !important;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }}
+
+        @media (max-width: 800px) {{
+            [class*="st-key-public_landing_hero"] {{
+                min-height: 620px;
+            }}
+
+            .versal-public-copy h1 {{
+                max-width: 590px;
+                font-size: clamp(2.75rem, 7.2vw, 3.55rem);
+            }}
+
+            .versal-public-wave {{
+                right: -14%;
+                width: min(78vw, 650px);
+                opacity: 0.45;
+            }}
+
+            .versal-public-cards {{
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }}
+
+            .versal-public-card {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+
+        @media (max-width: 640px) {{
+            [class*="st-key-public_landing_hero"] {{
+                min-height: 600px;
+            }}
+
+            [class*="st-key-public_landing_hero"] {{
+                padding: 1.1rem 1rem 5.2rem;
+            }}
+
+            [class*="st-key-public_landing_topbar"]
+            > [data-testid="stElementContainer"]:first-child {{
+                flex-basis: 150px;
+                min-width: 0;
+            }}
+
+            .versal-public-logo {{
+                width: clamp(130px, 38vw, 150px);
+            }}
+
+            [class*="st-key-public_landing_sign_in"] button {{
+                min-width: 6.8rem;
+                min-height: 2.75rem;
+                padding-inline: 1rem;
+            }}
+
+            [class*="st-key-public_landing_copy"] {{
+                margin-top: 4.2rem;
+            }}
+
+            .versal-public-copy h1 {{
+                max-width: 100%;
+                font-size: clamp(2.15rem, 10vw, 2.4rem);
+                line-height: 1.04;
+            }}
+
+            .versal-public-copy p {{
+                font-size: 1rem;
+                line-height: 1.62;
+            }}
+
+            .versal-public-analytics-icons {{
+                gap: 10px;
+                margin-top: 28px;
+            }}
+
+            .versal-public-analytics-icon {{
+                flex-basis: 40px;
+                width: 40px;
+                height: 40px;
+                border-radius: 11px;
+            }}
+
+            .versal-public-wave {{
+                right: -38%;
+                bottom: -1%;
+                width: 135vw;
+                opacity: 0.34;
+            }}
+
+            [class*="st-key-public_landing_band"] {{
+                padding-inline: 1rem;
+            }}
+
+            .versal-public-cards {{
+                grid-template-columns: 1fr;
+                gap: 0.9rem;
+                --versal-cards-offset: -2rem;
+            }}
+
+            .versal-public-card {{
+                grid-template-columns: 3rem minmax(0, 1fr);
+                min-height: auto;
+                padding: 1.15rem;
+            }}
+        }}
+
+        @media (prefers-reduced-motion: reduce) {{
+            [class*="st-key-public_landing_sign_in"] button {{
+                transition: none;
+            }}
+        }}
+
+        @keyframes versal-public-fade-up {{
+            from {{
+                opacity: 0;
+                transform: translate3d(0, var(--versal-anim-distance), 0);
+            }}
+            to {{
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }}
+        }}
+
+        @keyframes versal-public-cards-in {{
+            from {{
+                opacity: 0;
+                transform: translate3d(
+                    0,
+                    calc(var(--versal-cards-offset) + var(--versal-anim-distance)),
+                    0
+                );
+            }}
+            to {{
+                opacity: 1;
+                transform: translate3d(0, var(--versal-cards-offset), 0);
+            }}
+        }}
+
+        @keyframes versal-public-wave-drift {{
+            from {{ transform: translate3d(0, 0, 0); }}
+            to {{ transform: translate3d(16px, 0, 0); }}
+        }}
+
+        @media (prefers-reduced-motion: no-preference) {{
+            [class*="st-key-public_landing_topbar"],
+            .versal-public-copy h1,
+            .versal-public-copy p,
+            .versal-public-analytics-icon,
+            .versal-public-cards {{
+                animation-duration: var(--versal-anim-duration);
+                animation-timing-function: ease-out;
+                animation-fill-mode: both;
+                animation-iteration-count: 1;
+            }}
+
+            [class*="st-key-public_landing_topbar"] {{
+                animation-name: versal-public-fade-up;
+                animation-delay: 0ms;
+            }}
+
+            .versal-public-copy h1 {{
+                animation-name: versal-public-fade-up;
+                animation-delay: var(--versal-anim-stagger);
+            }}
+
+            .versal-public-copy p {{
+                animation-name: versal-public-fade-up;
+                animation-delay: calc(var(--versal-anim-stagger) + var(--versal-anim-stagger));
+            }}
+
+            .versal-public-analytics-icon {{
+                animation-name: versal-public-fade-up;
+                animation-delay: calc(
+                    var(--versal-anim-stagger) + var(--versal-anim-stagger)
+                    + var(--versal-anim-stagger)
+                );
+            }}
+
+            .versal-public-analytics-icon:nth-child(2) {{
+                animation-delay: calc(
+                    var(--versal-anim-stagger) + var(--versal-anim-stagger)
+                    + var(--versal-anim-stagger) + var(--versal-icon-sweep)
+                );
+            }}
+
+            .versal-public-analytics-icon:nth-child(3) {{
+                animation-delay: calc(
+                    var(--versal-anim-stagger) + var(--versal-anim-stagger)
+                    + var(--versal-anim-stagger) + var(--versal-icon-sweep)
+                    + var(--versal-icon-sweep)
+                );
+            }}
+
+            .versal-public-analytics-icon:nth-child(4) {{
+                animation-delay: calc(
+                    var(--versal-anim-stagger) + var(--versal-anim-stagger)
+                    + var(--versal-anim-stagger) + var(--versal-icon-sweep)
+                    + var(--versal-icon-sweep) + var(--versal-icon-sweep)
+                );
+            }}
+
+            .versal-public-analytics-icon:nth-child(5) {{
+                animation-delay: calc(
+                    var(--versal-anim-stagger) + var(--versal-anim-stagger)
+                    + var(--versal-anim-stagger) + var(--versal-icon-sweep)
+                    + var(--versal-icon-sweep) + var(--versal-icon-sweep)
+                    + var(--versal-icon-sweep)
+                );
+            }}
+
+            .versal-public-cards {{
+                animation-name: versal-public-cards-in;
+                animation-delay: calc(
+                    var(--versal-anim-stagger) + var(--versal-anim-stagger)
+                    + var(--versal-anim-stagger) + var(--versal-anim-stagger)
+                    + var(--versal-anim-stagger) + var(--versal-anim-stagger)
+                    + var(--versal-anim-stagger)
+                );
+            }}
+
+            .versal-public-wave {{
+                animation: versal-public-wave-drift var(--versal-wave-duration)
+                           ease-in-out infinite alternate;
+            }}
+
+            .versal-public-card {{
+                position: relative;
+                transition: transform var(--versal-hover-duration) ease;
+            }}
+
+            .versal-public-card::after {{
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: inherit;
+                box-shadow: 0 20px 44px rgba(7, 27, 74, 0.18);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity var(--versal-hover-duration) ease;
+            }}
+
+            .versal-public-card:hover {{
+                transform: translate3d(0, -4px, 0);
+            }}
+
+            .versal-public-card:hover::after {{
+                opacity: 1;
+            }}
+        }}
+
+        @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {{
+            .versal-public-wave {{
+                animation: none;
+            }}
         }}
         </style>
         """
     )
+
+
+def apply_theme() -> None:
+    """Apply existing visual polish to authenticated business pages."""
     st.html(
         """
         <style>
@@ -1586,6 +1957,12 @@ def apply_theme() -> None:
         [data-testid="stArrowVegaLiteChart"] {
             border-radius: 12px !important;
             overflow: hidden;
+        }
+
+        /* The public landing remains internally routable for browser Back, but
+           it is intentionally not an authenticated sidebar destination. */
+        [data-testid="stSidebarNav"] [data-testid="stSidebarNavLink"][href$="/landing"] {
+            display: none !important;
         }
 
         [class*="st-key-sidebar_brand"] {

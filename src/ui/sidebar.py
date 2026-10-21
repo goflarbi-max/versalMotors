@@ -120,6 +120,10 @@ def _apply_sidebar_css(dark_mode: bool) -> None:
             width: 100%;
         }}
 
+        [data-testid="stSidebarNav"] a[href*="landing"] {{
+            display: none !important;
+        }}
+
         [data-testid="stSidebarNav"] [data-testid="stSidebarNavLink"] {{
             box-sizing: border-box;
             width: 100%;
