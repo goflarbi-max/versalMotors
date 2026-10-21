@@ -17,6 +17,7 @@ LANDING = ROOT / "pages" / "landing.py"
 
 def test_public_root_selects_landing_while_signed_out():
     assert signed_out_default_route("http://localhost:8501/") == "landing"
+    assert signed_out_default_route(None) == "landing"
 
 
 @pytest.mark.parametrize(

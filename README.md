@@ -190,7 +190,7 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 
 ### Day 11 - 2026-10-21 - Public Landing Visual Polish
 
-- Done: Refined the public landing with a black hero, five compact analytics icons, a responsive one-time staggered entrance sequence, a subtle desktop-only dot-wave drift, reduced-motion support, and clean card hover feedback. Preserved anonymous-to-login routing, protected-page redirects, the white logo, evidence cards, and all business logic. Browser checks passed at 375px, 768px, and 1280px with no horizontal overflow; the full suite passes 65 tests and 24 subtests.
+- Done: Refined the public landing with a black hero, five compact analytics icons, a responsive one-time staggered entrance sequence, a subtle desktop-only dot-wave drift, reduced-motion support, and clean card hover feedback. Made the landing page the guaranteed custom-domain root even when a hosting proxy omits URL context, while preserving protected-page redirects, the white logo, evidence cards, and all business logic. Browser checks passed at 375px, 768px, and 1280px with no horizontal overflow; the full suite passes 65 tests and 24 subtests.
 - Files: `src/ui/landing.py`, `src/ui/theme.py`, `README.md`.
 - Next: Verify the updated landing experience after the hosted Streamlit deployment refreshes.
 

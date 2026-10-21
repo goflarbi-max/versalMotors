@@ -111,9 +111,7 @@ def test_unauthenticated_navigation_does_not_register_protected_pages(monkeypatc
     app = AppTest.from_file(APP, default_timeout=30).run()
 
     assert not app.exception
-    assert [title.value for title in app.title] == [
-        "VersalMotors Business Intelligence"
-    ]
+    assert app.button(key="public_landing_sign_in").label == "Sign in"
     with pytest.raises(ValueError):
         app.switch_page("pages/overview.py")
 
@@ -129,6 +127,7 @@ def test_login_ui_never_keeps_password_in_user_session_state(monkeypatch):
     monkeypatch.setattr(auth, "_is_streamlit_test_session", lambda: False)
 
     app = AppTest.from_file(APP, default_timeout=30).run()
+    app.switch_page("pages/login.py").run()
     app.text_input[0].set_value(DEMO_EMAIL)
     app.text_input[1].set_value(DEMO_PASSWORD)
     app.button(key="sign_in").click().run()
@@ -160,4 +159,3 @@ def test_sign_out_resets_stored_theme_to_light(monkeypatch):
     assert state[sidebar._THEME_KEY] is False
     assert state[sidebar._THEME_CONTEXT_KEY] is False
     assert auth.AUTHENTICATED_KEY not in state
-

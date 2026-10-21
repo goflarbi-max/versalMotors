@@ -35,14 +35,14 @@ def current_route(url: str | None) -> str:
 
 
 def signed_out_default_route(url: str | None) -> str:
-    """Select Login for protected URLs and Landing for ordinary browser visits.
+    """Select Login for known protected URLs and Landing for every root visit.
 
-    ``st.context.url`` is unavailable in Streamlit's in-process AppTest. Keeping
-    Login as that environment's default preserves the established authentication
-    tests while real browser requests use their concrete URL.
+    Some hosted reverse proxies do not expose the original URL through
+    ``st.context.url``. Treating that missing context as the public root keeps
+    the custom-domain entry point on the landing page.
     """
     if url is None:
-        return "login"
+        return "landing"
     return "login" if current_route(url) in PROTECTED_ROUTES else "landing"
 
 
