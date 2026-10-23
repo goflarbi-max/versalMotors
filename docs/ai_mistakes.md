@@ -67,3 +67,16 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The Phase 0 snapshot test compared `metadata.source_git_commit` with the current HEAD. That value correctly records the pre-migration source commit, so it necessarily differs after the Phase 0 commit and every later phase even when all data and business outputs are unchanged.
 - **How it was discovered:** The Phase 1 focused suite failed only at `metadata.source_git_commit`; every stored business output and direct-SQL comparison remained equal.
 - **How it was corrected:** The parity test now treats the recorded commit as immutable provenance and excludes only that moving repository-state comparison. Database hashes, raw-file hashes, row counts, all returned records, display values, and direct-SQL checks remain enforced.
+# Phase 2 frontend shell corrections (2026-10-23)
+
+## Duplicate accessible labels made the mobile close-control test ambiguous
+
+- **What went wrong:** The first mobile shell gave both the hamburger/X control and the dimmed backdrop the accessible name "Close navigation menu." Both controls worked, but assistive-technology and Playwright queries could not identify the intended control uniquely.
+- **How it was discovered:** The first Playwright mobile-drawer run failed strict locator resolution because two buttons had the same role and name.
+- **How it was corrected:** The X retains "Close navigation menu" and the backdrop now uses the distinct, accurate name "Dismiss navigation menu." The behavior and visual design are unchanged.
+
+## Public client navigation was unreliable during the first development-server test
+
+- **What went wrong:** The first port used Next.js client navigation for the public Sign in link. During the initial development-server browser run, the React Server Component destination stream errored and the URL stayed on the landing page.
+- **How it was discovered:** Two Playwright public-flow tests timed out despite the rendered link having the correct destination.
+- **How it was corrected:** The public authentication boundary now uses a normal same-origin anchor, producing a reliable full navigation. The server still selects `/login` for signed-out users and `/overview` for authenticated users.
