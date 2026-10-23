@@ -193,7 +193,7 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 
 ### Day 12 - 2026-10-23 - Navigation, Typography & Theme Regression Fixes
 
-- Done: Added self-hosted Inter typography, a responsive native-sidebar hamburger/X treatment, accessible mobile drawer behaviour, persistent light/dark page and chart palettes, and regression coverage for shared theme state. Diagnosed the Overview-only theme failure in a real browser and corrected authenticated root routing so a theme-switch rerun remains on Overview with navigation, filters, account controls, and the `#0F172A` dark background intact. The full suite passes 72 tests and 24 subtests.
+- Done: Added self-hosted Inter typography, a responsive native-sidebar hamburger/X treatment, accessible mobile drawer behaviour, persistent light/dark page and chart palettes, and regression coverage for shared theme state. Diagnosed the Overview-only theme failure in a real browser and corrected authenticated root routing so a theme-switch rerun remains on Overview with navigation, filters, account controls, and the `#0F172A` dark background intact. Corrected dark-mode CSV/PDF download controls so their labels, icons, hover state, and keyboard focus remain clearly visible. The full suite passes 73 tests and 24 subtests.
 - Files: `.streamlit/config.toml`, `app.py`, `src/ui/theme.py`, `src/ui/sidebar.py`, `src/ui/charts.py`, `static/fonts/`, `tests/test_ui_theme_sidebar_regression.py`, `tests/test_ui_typography.py`, `docs/regression_diagnosis.md`, `docs/ai_mistakes.md`, `docs/architecture.md`, `README.md`.
 - Next: Verify the refreshed navigation and theme switch on the hosted custom domain after deployment.
 

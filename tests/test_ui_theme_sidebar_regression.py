@@ -81,3 +81,12 @@ def test_sidebar_controller_preserves_native_toggle_and_mobile_accessibility():
     assert "versal-sidebar-backdrop" in controller_source
     assert "Escape" in controller_source
     assert "closeButton.click()" in controller_source
+
+
+def test_download_buttons_use_the_active_runtime_palette():
+    runtime_source = inspect.getsource(theme.apply_runtime_theme)
+
+    assert 'data-testid="stDownloadButton"' in runtime_source
+    assert 'palette["secondary_background"]' in runtime_source
+    assert 'palette["text"]' in runtime_source
+    assert 'palette["focus"]' in runtime_source

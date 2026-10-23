@@ -161,6 +161,7 @@ RUNTIME_THEME = {
         "text": "#0F172A",
         "muted_text": "#64748B",
         "border": "#E2E8F0",
+        "focus": "#4F46E5",
         "color_scheme": "light",
     },
     "dark": {
@@ -169,6 +170,7 @@ RUNTIME_THEME = {
         "text": "#F1F5F9",
         "muted_text": "#CBD5E1",
         "border": "#334155",
+        "focus": "#818CF8",
         "color_scheme": "dark",
     },
 }
@@ -687,6 +689,33 @@ def apply_runtime_theme() -> None:
         [data-testid="stMain"] [data-testid="stTable"] {{
             color: {palette["text"]} !important;
             border-color: {palette["border"]} !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stDownloadButton"] button {{
+            min-height: 2.75rem;
+            background-color: {palette["secondary_background"]} !important;
+            border-color: {palette["border"]} !important;
+            color: {palette["text"]} !important;
+            opacity: 1 !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stDownloadButton"] button * {{
+            color: {palette["text"]} !important;
+            fill: currentColor !important;
+            opacity: 1 !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stDownloadButton"] button:hover {{
+            background-color: color-mix(
+                in srgb,
+                {palette["secondary_background"]} 88%,
+                {palette["text"]}
+            ) !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stDownloadButton"] button:focus-visible {{
+            outline: 3px solid {palette["focus"]} !important;
+            outline-offset: 2px;
         }}
 
         [data-baseweb="popover"],
