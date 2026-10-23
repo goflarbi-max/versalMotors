@@ -54,3 +54,16 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The baseline helper called the existing Management Brief KPI function, which opens a thread-local read-only DuckDB connection. I initially left that connection open after capture, so a later existing test could not open the same database read-write to create its temporary compatibility view.
 - **How it was discovered:** The full pytest suite failed in the existing metrics SQL-parity test with “different configuration than existing connections,” while the new focused tests had passed.
 - **How it was corrected:** The Phase 0 helper now closes only the thread-local connection it invokes immediately after Management Brief capture. The database and application connection code remain unchanged.
+# Phase 1 backend parity harness corrections (2026-10-23)
+
+## Login attempts were cleared before reaching lockout
+
+- **What went wrong:** The first implementation of the backend login limiter removed an entry whenever `locked_until <= now`. Pre-lock entries use `locked_until = 0`, so each status check erased the accumulated failure count and the fifth failure never produced the required 60-second lockout.
+- **How it was discovered:** The focused backend security test expected HTTP 429 on the fifth failed login and received HTTP 401.
+- **How it was corrected:** Expiry cleanup now runs only when a positive lock timestamp exists. Pre-lock failures remain accumulated, the fifth failure locks for 60 seconds, and successful authentication still clears the entry.
+
+## Immutable baseline provenance was compared with the moving Git HEAD
+
+- **What went wrong:** The Phase 0 snapshot test compared `metadata.source_git_commit` with the current HEAD. That value correctly records the pre-migration source commit, so it necessarily differs after the Phase 0 commit and every later phase even when all data and business outputs are unchanged.
+- **How it was discovered:** The Phase 1 focused suite failed only at `metadata.source_git_commit`; every stored business output and direct-SQL comparison remained equal.
+- **How it was corrected:** The parity test now treats the recorded commit as immutable provenance and excludes only that moving repository-state comparison. Database hashes, raw-file hashes, row counts, all returned records, display values, and direct-SQL checks remain enforced.

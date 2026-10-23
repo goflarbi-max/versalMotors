@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-import importlib.util
-
-import pytest
-
 from tests.parity_support import (
     assert_nested_equal,
     capture_current_baseline,
@@ -18,6 +14,9 @@ def test_committed_baseline_matches_current_public_functions() -> None:
     """The committed baseline must move only through an intentional regeneration."""
     expected = load_baseline()
     actual = capture_current_baseline()
+    # This field records the source commit that Phase 0 captured. It is immutable
+    # provenance, not a value expected to follow HEAD through later phases.
+    actual["metadata"]["source_git_commit"] = expected["metadata"]["source_git_commit"]
     assert_nested_equal(actual, expected)
 
 
@@ -35,10 +34,12 @@ def test_every_baseline_business_number_matches_direct_sql() -> None:
         assert_nested_equal(sql_actual[section], expected[section], path=section)
 
 
-@pytest.mark.skipif(
-    importlib.util.find_spec("backend") is None,
-    reason="FastAPI backend is introduced in Phase 1; Phase 0 preserves the contract.",
-)
-def test_future_api_matches_committed_baseline() -> None:
-    """Phase 1 replaces this skip with TestClient calls for every API endpoint."""
-    pytest.fail("Phase 1 must implement API TestClient parity assertions")
+def test_phase_one_backend_parity_gate_is_implemented() -> None:
+    """The full endpoint matrix is exercised in backend/tests/test_overview_api.py."""
+    from backend.app.main import app
+
+    paths = app.openapi()["paths"]
+    assert "/api/v1/overview/kpis" in paths
+    assert "/api/v1/overview/revenue-trend" in paths
+    assert "/api/v1/overview/revenue-by-branch" in paths
+    assert "/api/v1/overview/margin-by-model" in paths

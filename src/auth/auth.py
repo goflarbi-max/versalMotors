@@ -4,15 +4,21 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import time
 from collections.abc import Mapping, MutableMapping
 from math import ceil
 from typing import Any
 
-import bcrypt
 import streamlit as st
 from streamlit.errors import StreamlitSecretNotFoundError
+
+from src.auth.credentials import (
+    DEFAULT_DEMO_USERS,
+    EMAIL_RE,
+    INVALID_CREDENTIALS_MESSAGE,
+    normalize_email,
+    password_matches,
+)
 
 
 AUTHENTICATED_KEY = "auth_authenticated"
@@ -21,17 +27,6 @@ FAILED_ATTEMPTS_KEY = "_auth_failed_attempts"
 LOCKED_UNTIL_KEY = "_auth_locked_until"
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
-INVALID_CREDENTIALS_MESSAGE = "Invalid email or password"
-EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
-DEFAULT_DEMO_USERS = {
-    "demo@versalmotors.com": (
-        "$2b$12$Hcb3wXrzER0BeTWmDilcQeWNL8oJMEPLYFJq1StHS7ESHlzkSDzQa"
-    )
-}
-
-# A valid, fixed bcrypt hash used for unknown accounts. It ensures unknown emails
-# still perform the same expensive password check as configured accounts.
-DUMMY_PASSWORD_HASH = b"$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6Ttxu.8N7Yfbp9S2nP5W/w9O1qC6e"
 
 
 class AuthenticationError(ValueError):
@@ -102,7 +97,7 @@ def verify_credentials(email: str | None, password: str | None) -> dict[str, str
     dummy hash, and both unknown-email and wrong-password failures use the same
     public error message.
     """
-    normalized_email = (email or "").strip().lower()
+    normalized_email = normalize_email(email)
     supplied_password = password or ""
 
     if not normalized_email or not supplied_password:
@@ -118,22 +113,7 @@ def verify_credentials(email: str | None, password: str | None) -> dict[str, str
         )
 
     users = _load_users()
-    configured_hash = users.get(normalized_email)
-    password_hash = (configured_hash or DUMMY_PASSWORD_HASH.decode("ascii")).encode(
-        "utf-8"
-    )
-    supplied_bytes = supplied_password.encode("utf-8")
-    password_too_long = len(supplied_bytes) > 72
-    password_for_check = supplied_bytes[:72] if password_too_long else supplied_bytes
-    try:
-        password_matches = bcrypt.checkpw(password_for_check, password_hash)
-        password_matches = password_matches and not password_too_long
-    except ValueError:
-        # Fail closed if an administrator supplied a malformed hash.
-        bcrypt.checkpw(password_for_check, DUMMY_PASSWORD_HASH)
-        password_matches = False
-
-    if configured_hash is None or not password_matches:
+    if not password_matches(normalized_email, supplied_password, users):
         failures = int(state.get(FAILED_ATTEMPTS_KEY, 0) or 0) + 1
         state[FAILED_ATTEMPTS_KEY] = failures
         if failures >= MAX_FAILED_ATTEMPTS:
