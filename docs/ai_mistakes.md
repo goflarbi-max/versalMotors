@@ -31,3 +31,26 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **Situation:** I coupled the custom dark-mode toggle to Streamlit's private `stActiveTheme-*` browser storage and styled an obsolete sidebar-toggle selector. A theme click could remount the frontend, collapse the sidebar, and leave only some custom cards dark, while the native double-chevron remained visible instead of the hamburger.
 - **How discovered:** The user reported both regressions. The follow-up investigation in `docs/regression_diagnosis.md` traced the split theme state and inspected the installed Streamlit frontend to identify its actual `stExpandSidebarButton` and `stSidebarCollapseButton` controls.
 - **How corrected:** I made `sidebar_dark_mode` the protected app's single theme source, removed the private browser-theme bridge, applied one shared runtime palette before protected-page rendering, and targeted the installed Streamlit controls while retaining their native behavior and accessible labels. Regression tests now cover palette selection, one-rerun toggling, login's fixed light theme, preservation of sidebar state, and the installed frontend selectors.
+# Phase 0 diagnostic SQL alias error — 2026-10-23
+
+- **What went wrong:** During read-only inspection for the migration parity baseline, I used `name` as an unquoted SQL alias in a diagnostic salesperson query. DuckDB rejected the query as a parser error.
+- **How it was discovered:** The diagnostic command failed immediately before any files or database rows were changed.
+- **How it was corrected:** I changed the alias to the explicit, non-reserved `salesperson_name`, reran the query successfully, and kept all baseline access read-only.
+
+# Phase 0 Management Brief export assumption — 2026-10-23
+
+- **What went wrong:** I initially assumed the current Management Brief Markdown export could be executed while capturing parity. The export uses `DataFrame.to_markdown()`, but the current environment and `requirements.txt` do not include its optional `tabulate` dependency.
+- **How it was discovered:** The first baseline capture failed with `ModuleNotFoundError: No module named 'tabulate'` before writing the baseline file.
+- **How it was corrected:** I did not change dependencies or application behavior in the baseline phase. The capture now records Markdown and PDF export as unavailable with the exact error type and reason, so the migration cannot silently claim that the current export works.
+
+# Phase 0 direct-SQL dimension ambiguity — 2026-10-23
+
+- **What went wrong:** The first parity verifier joined branch/model dimension aliases to test the same exact-filter fields as the metrics layer, but selected `branch_name` and `model_name` without qualifying which relation supplied them.
+- **How it was discovered:** The new direct-SQL parity test failed with a DuckDB `BinderException` before comparing any values.
+- **How it was corrected:** I qualified displayed branch/model fields with the verified one-row-per-sale base alias and reran the parity test. No metric formula or source data was changed.
+
+# Phase 0 DuckDB test-connection leak — 2026-10-23
+
+- **What went wrong:** The baseline helper called the existing Management Brief KPI function, which opens a thread-local read-only DuckDB connection. I initially left that connection open after capture, so a later existing test could not open the same database read-write to create its temporary compatibility view.
+- **How it was discovered:** The full pytest suite failed in the existing metrics SQL-parity test with “different configuration than existing connections,” while the new focused tests had passed.
+- **How it was corrected:** The Phase 0 helper now closes only the thread-local connection it invokes immediately after Management Brief capture. The database and application connection code remain unchanged.

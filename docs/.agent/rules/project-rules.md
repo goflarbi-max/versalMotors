@@ -3,7 +3,8 @@ trigger: always_on
 ---
 
 # Project Rules
-- Stack: Python, Pandas, DuckDB, Streamlit, Plotly. Do not add new frameworks without asking.
+- Approved migration stack: keep the current Python, Pandas, DuckDB, Streamlit and Plotly app working through cutover while building the approved parallel FastAPI/Pydantic backend and Next.js App Router/TypeScript/Tailwind/Recharts frontend. Do not add other frameworks without asking.
+- During the migration, `src/analytics`, `src/ai`, `src/data`, `scripts`, the DuckDB data and the cleaning log remain the source of truth and must not be rewritten for the new UI.
 - All business metrics live in src/analytics/metrics.py. UI code never calculates metrics.
 - The AI layer must never compute numbers or invent facts. It receives evidence objects and tool results only.
 - Never silently modify data. Every cleaning action is logged in the cleaning log with the reason and row count.
