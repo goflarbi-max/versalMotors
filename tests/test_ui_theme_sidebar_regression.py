@@ -100,3 +100,24 @@ def test_primary_actions_use_inverse_monochrome_palettes():
     assert theme.RUNTIME_THEME["dark"]["primary_action_bg"] == "#FFFFFF"
     assert theme.RUNTIME_THEME["dark"]["primary_action_text"] == "#111111"
     assert 'button[kind="primary"]' in runtime_source
+
+
+def test_ask_chat_input_styles_baseweb_layers_and_submit_action():
+    source = inspect.getsource(theme.apply_ask_business_theme)
+
+    assert '[data-baseweb="base-input"]' in source
+    assert '[data-baseweb="textarea"]' in source
+    assert 'palette["secondary_background"]' in source
+    assert 'palette["primary_action_bg"]' in source
+    assert 'palette["primary_action_text"]' in source
+    assert '[data-testid="stIconMaterial"]' in source
+    assert 'font-family: "Material Symbols Rounded"' in source
+    assert 'fill: currentColor' not in source
+    assert "opacity: 1" in source
+
+    light = theme.RUNTIME_THEME["light"]
+    dark = theme.RUNTIME_THEME["dark"]
+    assert light["secondary_background"] == "#FFFFFF"
+    assert dark["secondary_background"] == "#1E293B"
+    assert light["primary_action_bg"] == dark["primary_action_text"]
+    assert light["primary_action_text"] == dark["primary_action_bg"]

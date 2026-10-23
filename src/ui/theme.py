@@ -2,98 +2,10 @@
 
 import streamlit as st
 
+from src.ui.typography import apply_typography
+
 
 THEME_STATE_KEY = "sidebar_dark_mode"
-
-
-TYPOGRAPHY_THEME = {
-    "font_family": 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
-    "font_weight_body": 400,
-    "font_weight_label": 500,
-    "font_weight_strong": 600,
-    "font_weight_heading": 700,
-    "font_size_body": "16px",
-    "font_size_readable_min": "14px",
-    "font_size_caption": "12px",
-}
-
-
-def apply_typography() -> None:
-    """Apply the shared type system to native and custom Streamlit content."""
-    typography = TYPOGRAPHY_THEME
-    st.html(
-        f"""
-        <style id="versal-typography">
-        :root {{
-            --versal-font-family: {typography["font_family"]};
-            --versal-font-weight-body: {typography["font_weight_body"]};
-            --versal-font-weight-label: {typography["font_weight_label"]};
-            --versal-font-weight-strong: {typography["font_weight_strong"]};
-            --versal-font-weight-heading: {typography["font_weight_heading"]};
-            --versal-font-size-body: {typography["font_size_body"]};
-            --versal-font-size-readable-min: {typography["font_size_readable_min"]};
-            --versal-font-size-caption: {typography["font_size_caption"]};
-        }}
-
-        html,
-        body,
-        .stApp,
-        [data-testid="stAppViewContainer"],
-        [data-testid="stMain"],
-        [data-testid="stSidebar"],
-        button,
-        input,
-        textarea,
-        select {{
-            font-family: var(--versal-font-family) !important;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }}
-
-        body,
-        [data-testid="stMarkdownContainer"] p,
-        [data-testid="stMarkdownContainer"] li {{
-            font-weight: var(--versal-font-weight-body);
-            line-height: 1.5;
-        }}
-
-        h1, h2, h3, h4, h5, h6,
-        [data-testid="stHeadingWithActionElements"] {{
-            font-family: var(--versal-font-family) !important;
-            font-weight: var(--versal-font-weight-heading);
-            letter-spacing: -0.015em;
-        }}
-
-        label,
-        nav,
-        [role="tab"],
-        [data-testid="stWidgetLabel"] {{
-            font-weight: var(--versal-font-weight-label);
-        }}
-
-        [data-testid="stCaptionContainer"],
-        [data-testid="stCaptionContainer"] * {{
-            font-size: var(--versal-font-size-caption) !important;
-        }}
-
-        [data-testid="stMetricValue"],
-        [data-testid="stMetricDelta"],
-        .versal-overview-kpi-value,
-        .versal-overview-change,
-        .versal-summary-value,
-        .versal-summary-ring,
-        .versal-table td {{
-            font-variant-numeric: tabular-nums;
-        }}
-
-        /* Icon ligatures must retain their own typeface. */
-        [data-testid="stIconMaterial"],
-        .material-symbols-rounded {{
-            font-family: "Material Symbols Rounded" !important;
-        }}
-        </style>
-        """
-    )
 
 
 PUBLIC_LANDING_THEME = {
@@ -821,7 +733,11 @@ def apply_ask_business_theme() -> None:
             outline-offset: 2px;
         }}
 
-        [data-testid="stChatInput"] {{
+        [data-testid="stChatInput"],
+        [data-testid="stChatInput"] [data-baseweb="base-input"],
+        [data-testid="stChatInput"] [data-baseweb="base-input"] > div,
+        [data-testid="stChatInput"] [data-baseweb="textarea"],
+        [data-testid="stChatInput"] [data-baseweb="textarea"] > div {{
             border-color: {palette["border"]} !important;
             background: {palette["secondary_background"]} !important;
         }}
@@ -837,9 +753,36 @@ def apply_ask_business_theme() -> None:
             opacity: 1 !important;
         }}
 
-        [data-testid="stChatInput"] button,
+        [data-testid="stChatInput"] button {{
+            border-color: {palette["primary_action_bg"]} !important;
+            background: {palette["primary_action_bg"]} !important;
+            color: {palette["primary_action_text"]} !important;
+        }}
+
         [data-testid="stChatInput"] button * {{
-            color: {palette["text"]} !important;
+            color: {palette["primary_action_text"]} !important;
+        }}
+
+        [data-testid="stChatInput"] button [data-testid="stIconMaterial"] {{
+            font-family: "Material Symbols Rounded" !important;
+            font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+            font-size: 1.25rem !important;
+            line-height: 1;
+        }}
+
+        [data-testid="stChatInput"] button:hover:not(:disabled) {{
+            border-color: {palette["primary_action_hover"]} !important;
+            background: {palette["primary_action_hover"]} !important;
+        }}
+
+        [data-testid="stChatInput"] button:focus-visible {{
+            outline: 3px solid {palette["focus"]} !important;
+            outline-offset: 2px;
+        }}
+
+        [data-testid="stChatInput"] button:disabled {{
+            opacity: 1;
+            cursor: not-allowed;
         }}
 
         [data-baseweb="tab-list"] [data-baseweb="tab"],

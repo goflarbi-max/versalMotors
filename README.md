@@ -93,7 +93,7 @@ The AI layer is optional: reviewed database queries and deterministic summaries 
 - **Python and pandas:** generate, clean, test, and analyse the dataset reproducibly.
 - **Streamlit:** provides responsive multipage navigation, persistent filters, KPI cards, charts, and drill-down evidence.
 - **Navigation:** protected pages use Streamlit's native responsive sidebar with a clear hamburger/close control, preserving filters, direct URLs, and mobile drawer behaviour.
-- **Fonts:** self-hosted Inter Latin WOFF2 assets provide consistent, readable typography without an external runtime request; system sans-serif fonts remain the fallback.
+- **Fonts:** one shared typography module applies self-hosted Inter Latin WOFF2 assets to Streamlit, custom HTML, tables, and Plotly; system sans-serif fonts remain the non-blocking fallback.
 - **bcrypt:** verifies demo-account passwords using salted adaptive hashes instead of stored plaintext credentials.
 - **CSV:** keeps raw and cleaned pipeline stages portable and auditable.
 - **DuckDB:** stores the local analytical model and supports independent SQL verification of important calculations.

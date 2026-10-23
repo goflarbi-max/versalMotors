@@ -7,7 +7,8 @@ from typing import Literal
 import pandas as pd
 import plotly.graph_objects as go
 
-from src.ui.theme import TYPOGRAPHY_THEME, active_overview_theme
+from src.ui.theme import active_overview_theme
+from src.ui.typography import FONT_FAMILY
 
 
 OVERVIEW_CHART_HEIGHT = 400
@@ -72,7 +73,7 @@ def overview_chart(
         plot_bgcolor="rgba(0,0,0,0)",
         font={
             "color": palette["text"],
-            "family": TYPOGRAPHY_THEME["font_family"],
+            "family": FONT_FAMILY,
             "size": 12,
         },
         hovermode="closest",
@@ -81,7 +82,7 @@ def overview_chart(
             "bordercolor": palette["card_outer_border"],
             "font": {
                 "color": palette["chart_tooltip_text"],
-                "family": TYPOGRAPHY_THEME["font_family"],
+                "family": FONT_FAMILY,
                 "size": 12,
             },
         },
@@ -93,7 +94,7 @@ def overview_chart(
             "yanchor": "bottom",
             "font": {
                 "color": palette["label_muted"],
-                "family": TYPOGRAPHY_THEME["font_family"],
+                "family": FONT_FAMILY,
                 "size": 12,
             },
             "itemsizing": "constant",
@@ -108,8 +109,8 @@ def overview_chart(
         showgrid=True,
         gridcolor=palette["chart_grid"],
         griddash="dash",
-        tickfont={"color": palette["label_muted"], "family": TYPOGRAPHY_THEME["font_family"], "size": 12},
-        title_font={"color": palette["label_muted"], "family": TYPOGRAPHY_THEME["font_family"], "size": 12},
+        tickfont={"color": palette["label_muted"], "family": FONT_FAMILY, "size": 12},
+        title_font={"color": palette["label_muted"], "family": FONT_FAMILY, "size": 12},
         automargin=True,
     )
     figure.update_yaxes(
@@ -118,8 +119,8 @@ def overview_chart(
         zeroline=False,
         showgrid=chart_type == "line",
         gridcolor=palette["chart_grid_subtle"],
-        tickfont={"color": palette["label_muted"], "family": TYPOGRAPHY_THEME["font_family"], "size": 12},
-        title_font={"color": palette["label_muted"], "family": TYPOGRAPHY_THEME["font_family"], "size": 12},
+        tickfont={"color": palette["label_muted"], "family": FONT_FAMILY, "size": 12},
+        title_font={"color": palette["label_muted"], "family": FONT_FAMILY, "size": 12},
         automargin=True,
     )
     return figure

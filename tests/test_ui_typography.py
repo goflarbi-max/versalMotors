@@ -3,11 +3,11 @@
 import pandas as pd
 
 from src.ui.charts import overview_chart
-from src.ui.theme import TYPOGRAPHY_THEME
+from src.ui.typography import FONT_FAMILY, TYPOGRAPHY, typography_css
 
 
 def test_theme_exposes_inter_with_sans_serif_fallbacks():
-    family = TYPOGRAPHY_THEME["font_family"]
+    family = TYPOGRAPHY["font_family"]
 
     assert family.startswith("Inter, system-ui")
     assert '"Segoe UI"' in family
@@ -15,6 +15,16 @@ def test_theme_exposes_inter_with_sans_serif_fallbacks():
     assert "Arial" in family
     assert family.endswith("sans-serif")
     assert "serif" not in family.replace("sans-serif", "")
+    assert family == FONT_FAMILY
+
+
+def test_typography_css_uses_swap_and_contains_only_font_properties():
+    css = typography_css()
+
+    assert "font-display: swap" in css
+    assert "background:" not in css
+    assert "color:" not in css
+    assert "overflow:" not in css
 
 
 def test_overview_chart_uses_shared_font_family():
@@ -32,7 +42,7 @@ def test_overview_chart_uses_shared_font_family():
         series_name="Revenue",
     )
 
-    family = TYPOGRAPHY_THEME["font_family"]
+    family = FONT_FAMILY
     assert figure.layout.font.family == family
     assert figure.layout.xaxis.tickfont.family == family
     assert figure.layout.yaxis.tickfont.family == family
