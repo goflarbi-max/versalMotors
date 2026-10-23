@@ -4,17 +4,17 @@ import { currentUser } from "@/lib/auth";
 
 const cards = [
   {
-    icon: "✓",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.25"/><path d="m15.2 15.2 4.4 4.4M8 10.5l1.7 1.7 3.5-3.8"/></svg>,
     title: "Evidence you can trace",
     description: "Every finding shows the data and the query behind it.",
   },
   {
-    icon: "⌁",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.8"/><path d="m19 13.5 1.6 1.2-2 3.4-1.9-.8a8 8 0 0 1-2.2 1.3l-.3 2H10l-.3-2a8 8 0 0 1-2.2-1.3l-1.9.8-2-3.4 1.6-1.2a7 7 0 0 1 0-2.6L3.6 9.7l2-3.4 1.9.8a8 8 0 0 1 2.2-1.3l.3-2h4.1l.3 2a8 8 0 0 1 2.2 1.3l1.9-.8 2 3.4-1.6 1.2a7 7 0 0 1 .1 2.6Z"/></svg>,
     title: "Advanced Analytics",
     description: "Spot unusual patterns across sales, inventory, warranty and complaints.",
   },
   {
-    icon: "◇",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.2h14a2 2 0 0 1 2 2v8.1a2 2 0 0 1-2 2h-8l-5.2 3v-3H5a2 2 0 0 1-2-2V7.2a2 2 0 0 1 2-2Z"/><path d="M7.5 9.2h9M7.5 13h6.2"/></svg>,
     title: "Ask in plain language",
     description: "Get answers grounded in your own business data, with the facts kept separate from opinion.",
   },

@@ -92,6 +92,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .landing-card:hover { transform: translateY(-4px); box-shadow: 0 20px 44px rgba(7,27,74,.18); }
 .landing-card-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border-radius: 12px; background: #eef4ff; color: #1450b8; font-weight: 700; }
+.landing-card-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .landing-card h2 { margin: .1rem 0 .45rem; font-size: 1.05rem; font-weight: 700; }
 .landing-card p { margin: 0; color: #5b677a; font-size: .9rem; line-height: 1.55; }
 
