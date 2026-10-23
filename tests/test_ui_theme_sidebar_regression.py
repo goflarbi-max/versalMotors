@@ -90,3 +90,13 @@ def test_download_buttons_use_the_active_runtime_palette():
     assert 'palette["secondary_background"]' in runtime_source
     assert 'palette["text"]' in runtime_source
     assert 'palette["focus"]' in runtime_source
+
+
+def test_primary_actions_use_inverse_monochrome_palettes():
+    runtime_source = inspect.getsource(theme.apply_runtime_theme)
+
+    assert theme.RUNTIME_THEME["light"]["primary_action_bg"] == "#111111"
+    assert theme.RUNTIME_THEME["light"]["primary_action_text"] == "#FFFFFF"
+    assert theme.RUNTIME_THEME["dark"]["primary_action_bg"] == "#FFFFFF"
+    assert theme.RUNTIME_THEME["dark"]["primary_action_text"] == "#111111"
+    assert 'button[kind="primary"]' in runtime_source

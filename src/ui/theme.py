@@ -162,6 +162,9 @@ RUNTIME_THEME = {
         "muted_text": "#64748B",
         "border": "#E2E8F0",
         "focus": "#4F46E5",
+        "primary_action_bg": "#111111",
+        "primary_action_hover": "#2B2B2B",
+        "primary_action_text": "#FFFFFF",
         "color_scheme": "light",
     },
     "dark": {
@@ -171,6 +174,9 @@ RUNTIME_THEME = {
         "muted_text": "#CBD5E1",
         "border": "#334155",
         "focus": "#818CF8",
+        "primary_action_bg": "#FFFFFF",
+        "primary_action_hover": "#E5E7EB",
+        "primary_action_text": "#111111",
         "color_scheme": "dark",
     },
 }
@@ -714,6 +720,27 @@ def apply_runtime_theme() -> None:
         }}
 
         [data-testid="stMain"] [data-testid="stDownloadButton"] button:focus-visible {{
+            outline: 3px solid {palette["focus"]} !important;
+            outline-offset: 2px;
+        }}
+
+        [data-testid="stMain"] [data-testid="stButton"] button[kind="primary"] {{
+            background: {palette["primary_action_bg"]} !important;
+            border-color: {palette["primary_action_bg"]} !important;
+            color: {palette["primary_action_text"]} !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stButton"] button[kind="primary"] * {{
+            color: {palette["primary_action_text"]} !important;
+            fill: currentColor !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stButton"] button[kind="primary"]:hover {{
+            background: {palette["primary_action_hover"]} !important;
+            border-color: {palette["primary_action_hover"]} !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stButton"] button[kind="primary"]:focus-visible {{
             outline: 3px solid {palette["focus"]} !important;
             outline-offset: 2px;
         }}
