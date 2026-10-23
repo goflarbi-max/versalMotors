@@ -7,7 +7,7 @@ from typing import Literal
 import pandas as pd
 import plotly.graph_objects as go
 
-from src.ui.theme import active_overview_theme
+from src.ui.theme import TYPOGRAPHY_THEME, active_overview_theme
 
 
 OVERVIEW_CHART_HEIGHT = 400
@@ -70,12 +70,20 @@ def overview_chart(
         margin={"l": 12, "r": 12, "t": 28, "b": 12},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font={"color": palette["text"], "size": 11},
+        font={
+            "color": palette["text"],
+            "family": TYPOGRAPHY_THEME["font_family"],
+            "size": 12,
+        },
         hovermode="closest",
         hoverlabel={
             "bgcolor": palette["chart_tooltip_bg"],
             "bordercolor": palette["card_outer_border"],
-            "font": {"color": palette["chart_tooltip_text"], "size": 12},
+            "font": {
+                "color": palette["chart_tooltip_text"],
+                "family": TYPOGRAPHY_THEME["font_family"],
+                "size": 12,
+            },
         },
         legend={
             "orientation": "h",
@@ -83,7 +91,11 @@ def overview_chart(
             "xanchor": "right",
             "y": 1.08,
             "yanchor": "bottom",
-            "font": {"color": palette["label_muted"], "size": 11},
+            "font": {
+                "color": palette["label_muted"],
+                "family": TYPOGRAPHY_THEME["font_family"],
+                "size": 12,
+            },
             "itemsizing": "constant",
         },
         bargap=0.28,
@@ -96,8 +108,8 @@ def overview_chart(
         showgrid=True,
         gridcolor=palette["chart_grid"],
         griddash="dash",
-        tickfont={"color": palette["label_muted"], "size": 11},
-        title_font={"color": palette["label_muted"], "size": 11},
+        tickfont={"color": palette["label_muted"], "family": TYPOGRAPHY_THEME["font_family"], "size": 12},
+        title_font={"color": palette["label_muted"], "family": TYPOGRAPHY_THEME["font_family"], "size": 12},
         automargin=True,
     )
     figure.update_yaxes(
@@ -106,8 +118,8 @@ def overview_chart(
         zeroline=False,
         showgrid=chart_type == "line",
         gridcolor=palette["chart_grid_subtle"],
-        tickfont={"color": palette["label_muted"], "size": 11},
-        title_font={"color": palette["label_muted"], "size": 11},
+        tickfont={"color": palette["label_muted"], "family": TYPOGRAPHY_THEME["font_family"], "size": 12},
+        title_font={"color": palette["label_muted"], "family": TYPOGRAPHY_THEME["font_family"], "size": 12},
         automargin=True,
     )
     return figure

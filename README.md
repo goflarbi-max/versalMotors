@@ -92,6 +92,8 @@ The AI layer is optional: reviewed database queries and deterministic summaries 
 
 - **Python and pandas:** generate, clean, test, and analyse the dataset reproducibly.
 - **Streamlit:** provides responsive multipage navigation, persistent filters, KPI cards, charts, and drill-down evidence.
+- **Navigation:** protected pages use Streamlit's native responsive sidebar with a clear hamburger/close control, preserving filters, direct URLs, and mobile drawer behaviour.
+- **Fonts:** self-hosted Inter Latin WOFF2 assets provide consistent, readable typography without an external runtime request; system sans-serif fonts remain the fallback.
 - **bcrypt:** verifies demo-account passwords using salted adaptive hashes instead of stored plaintext credentials.
 - **CSV:** keeps raw and cleaned pipeline stages portable and auditable.
 - **DuckDB:** stores the local analytical model and supports independent SQL verification of important calculations.
@@ -131,6 +133,7 @@ The raw data intentionally includes missing values, duplicates, name and categor
 - Keeping transparent brand artwork readable across Streamlit light and dark modes, including first renders where server-side theme context is unavailable.
 - Protecting direct multipage URLs without adding authentication code to every business page, while preserving existing headless page tests and shared filter state.
 - Replacing inconsistent native data grids with one safe table renderer while preserving DataFrame values, download payloads, stable numeric/date/text sorting, null ordering, pagination state, and mobile overflow behaviour.
+- Keeping the protected navigation and complete dark palette stable across Streamlit reruns; an authenticated root-route check initially replaced the Overview shell after a theme switch and required browser-level DOM diagnosis.
 
 ## AI Mistakes
 
@@ -187,6 +190,12 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - Add normalized service-volume and model-population denominators to strengthen the management investigations in `docs/management_brief.md`.
 
 ## Daily Progress Log
+
+### Day 12 - 2026-10-23 - Navigation, Typography & Theme Regression Fixes
+
+- Done: Added self-hosted Inter typography, a responsive native-sidebar hamburger/X treatment, accessible mobile drawer behaviour, persistent light/dark page and chart palettes, and regression coverage for shared theme state. Diagnosed the Overview-only theme failure in a real browser and corrected authenticated root routing so a theme-switch rerun remains on Overview with navigation, filters, account controls, and the `#0F172A` dark background intact. The full suite passes 72 tests and 24 subtests.
+- Files: `.streamlit/config.toml`, `app.py`, `src/ui/theme.py`, `src/ui/sidebar.py`, `src/ui/charts.py`, `static/fonts/`, `tests/test_ui_theme_sidebar_regression.py`, `tests/test_ui_typography.py`, `docs/regression_diagnosis.md`, `docs/ai_mistakes.md`, `docs/architecture.md`, `README.md`.
+- Next: Verify the refreshed navigation and theme switch on the hosted custom domain after deployment.
 
 ### Day 11 - 2026-10-21 - Public Landing Visual Polish
 

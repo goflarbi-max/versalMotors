@@ -3,6 +3,99 @@
 import streamlit as st
 
 
+THEME_STATE_KEY = "sidebar_dark_mode"
+
+
+TYPOGRAPHY_THEME = {
+    "font_family": 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
+    "font_weight_body": 400,
+    "font_weight_label": 500,
+    "font_weight_strong": 600,
+    "font_weight_heading": 700,
+    "font_size_body": "16px",
+    "font_size_readable_min": "14px",
+    "font_size_caption": "12px",
+}
+
+
+def apply_typography() -> None:
+    """Apply the shared type system to native and custom Streamlit content."""
+    typography = TYPOGRAPHY_THEME
+    st.html(
+        f"""
+        <style id="versal-typography">
+        :root {{
+            --versal-font-family: {typography["font_family"]};
+            --versal-font-weight-body: {typography["font_weight_body"]};
+            --versal-font-weight-label: {typography["font_weight_label"]};
+            --versal-font-weight-strong: {typography["font_weight_strong"]};
+            --versal-font-weight-heading: {typography["font_weight_heading"]};
+            --versal-font-size-body: {typography["font_size_body"]};
+            --versal-font-size-readable-min: {typography["font_size_readable_min"]};
+            --versal-font-size-caption: {typography["font_size_caption"]};
+        }}
+
+        html,
+        body,
+        .stApp,
+        [data-testid="stAppViewContainer"],
+        [data-testid="stMain"],
+        [data-testid="stSidebar"],
+        button,
+        input,
+        textarea,
+        select {{
+            font-family: var(--versal-font-family) !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }}
+
+        body,
+        [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMarkdownContainer"] li {{
+            font-weight: var(--versal-font-weight-body);
+            line-height: 1.5;
+        }}
+
+        h1, h2, h3, h4, h5, h6,
+        [data-testid="stHeadingWithActionElements"] {{
+            font-family: var(--versal-font-family) !important;
+            font-weight: var(--versal-font-weight-heading);
+            letter-spacing: -0.015em;
+        }}
+
+        label,
+        nav,
+        [role="tab"],
+        [data-testid="stWidgetLabel"] {{
+            font-weight: var(--versal-font-weight-label);
+        }}
+
+        [data-testid="stCaptionContainer"],
+        [data-testid="stCaptionContainer"] * {{
+            font-size: var(--versal-font-size-caption) !important;
+        }}
+
+        [data-testid="stMetricValue"],
+        [data-testid="stMetricDelta"],
+        .versal-overview-kpi-value,
+        .versal-overview-change,
+        .versal-summary-value,
+        .versal-summary-ring,
+        .versal-table td {{
+            font-variant-numeric: tabular-nums;
+        }}
+
+        /* Icon ligatures must retain their own typeface. */
+        [data-testid="stIconMaterial"],
+        .material-symbols-rounded {{
+            font-family: "Material Symbols Rounded" !important;
+        }}
+        </style>
+        """
+    )
+
+
 PUBLIC_LANDING_THEME = {
     "landing_gradient_start": "#000000",
     "landing_gradient_end": "#0A0A0A",
@@ -40,6 +133,9 @@ SIDEBAR_THEME = {
         "sidebar_danger": "#CF291D",
         "sidebar_focus": "#4F46E5",
         "sidebar_shadow": "6px 0 20px rgba(15, 23, 42, 0.06)",
+        "hamburger_line": "#242629",
+        "hamburger_border": "#D4D8DC",
+        "hamburger_hover_bg": "#E3E6E9",
     },
     "dark": {
         "sidebar_bg": "#211E1D",
@@ -51,6 +147,9 @@ SIDEBAR_THEME = {
         "sidebar_danger": "#FF6B61",
         "sidebar_focus": "#A5B4FC",
         "sidebar_shadow": "6px 0 20px rgba(0, 0, 0, 0.22)",
+        "hamburger_line": "#F4F4F5",
+        "hamburger_border": "#45403E",
+        "hamburger_hover_bg": "#34302F",
     },
 }
 
@@ -108,6 +207,24 @@ LOGIN_THEME = {
 def login_theme_type() -> str:
     """Return the fixed login theme, independently of runtime preferences."""
     return "light"
+
+
+def active_theme_type(state=None) -> str:
+    """Return the protected app theme from its single session-state source.
+
+    A missing key always means light, regardless of the browser, operating system,
+    or Streamlit Settings preference. ``state`` is injectable for deterministic
+    state tests and defaults to Streamlit's current session state.
+    """
+    state = st.session_state if state is None else state
+    return "dark" if state.get(THEME_STATE_KEY, False) is True else "light"
+
+
+def initialize_theme_state(state=None) -> bool:
+    """Initialize a new protected-app session to light without overwriting a choice."""
+    state = st.session_state if state is None else state
+    state.setdefault(THEME_STATE_KEY, False)
+    return bool(state[THEME_STATE_KEY])
 
 
 OVERVIEW_THEME = {
@@ -245,7 +362,8 @@ TABLE_COMPONENT_CSS = """
     width: 100%;
     min-width: 0;
     color: var(--table-text);
-    font-family: var(--st-font, sans-serif);
+    font-family: var(--versal-font-family, Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif);
+    font-variant-numeric: tabular-nums;
 }
 
 .versal-table-card {
@@ -270,7 +388,7 @@ TABLE_COMPONENT_CSS = """
     min-width: max-content;
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .versal-table th,
@@ -439,7 +557,7 @@ TABLE_COMPONENT_CSS = """
     box-shadow: var(--table-card-shadow);
     color: var(--table-muted-text);
     text-align: center;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 @media (max-width: 480px) {
@@ -467,50 +585,128 @@ TABLE_COMPONENT_CSS = """
 
 def active_table_theme() -> dict[str, str]:
     """Return table colours for the app's active runtime theme."""
-    selected = st.session_state.get("sidebar_dark_mode")
-    if isinstance(selected, bool):
-        return TABLE_THEME["dark" if selected else "light"]
-    try:
-        dark_mode = st.context.theme.type == "dark"
-    except (AttributeError, RuntimeError):
-        dark_mode = False
-    return TABLE_THEME["dark" if dark_mode else "light"]
+    return TABLE_THEME[active_theme_type()]
 
 
 def active_overview_theme() -> dict[str, object]:
     """Return Overview colours matching the app's current runtime selection."""
-    selected = st.session_state.get("sidebar_dark_mode")
-    if isinstance(selected, bool):
-        return OVERVIEW_THEME["dark" if selected else "light"]
-    try:
-        dark_mode = st.context.theme.type == "dark"
-    except (AttributeError, RuntimeError):
-        dark_mode = False
-    return OVERVIEW_THEME["dark" if dark_mode else "light"]
+    return OVERVIEW_THEME[active_theme_type()]
 
 
 def active_summary_card_theme() -> dict[str, str]:
     """Return Ask the Business summary-card colours for the active theme."""
-    selected = st.session_state.get("sidebar_dark_mode")
-    if isinstance(selected, bool):
-        return SUMMARY_CARD_THEME["dark" if selected else "light"]
-    try:
-        dark_mode = st.context.theme.type == "dark"
-    except (AttributeError, RuntimeError):
-        dark_mode = False
-    return SUMMARY_CARD_THEME["dark" if dark_mode else "light"]
+    return SUMMARY_CARD_THEME[active_theme_type()]
 
 
 def active_runtime_theme() -> dict[str, str]:
     """Return the current main-content palette selected by the sidebar toggle."""
-    selected = st.session_state.get("sidebar_dark_mode")
-    if isinstance(selected, bool):
-        return RUNTIME_THEME["dark" if selected else "light"]
-    try:
-        dark_mode = st.context.theme.type == "dark"
-    except (AttributeError, RuntimeError):
-        dark_mode = False
-    return RUNTIME_THEME["dark" if dark_mode else "light"]
+    return RUNTIME_THEME[active_theme_type()]
+
+
+def apply_runtime_theme() -> None:
+    """Inject the active protected-page palette once, before page rendering."""
+    palette = active_runtime_theme()
+    st.html(
+        f"""
+        <style id="versal-runtime-theme">
+        :root {{
+            color-scheme: {palette["color_scheme"]};
+            --background-color: {palette["background"]} !important;
+            --secondary-background-color: {palette["secondary_background"]} !important;
+            --text-color: {palette["text"]} !important;
+            --muted-text-color: {palette["muted_text"]} !important;
+            --border-color: {palette["border"]} !important;
+        }}
+
+        .stApp,
+        [data-testid="stAppViewContainer"],
+        [data-testid="stMain"] {{
+            background-color: {palette["background"]} !important;
+            color: {palette["text"]} !important;
+        }}
+
+        [data-testid="stHeader"] {{
+            background-color: transparent !important;
+        }}
+
+        [data-testid="stVerticalBlockBorderWrapper"],
+        div[data-testid="stMetric"] {{
+            border-color: {palette["border"]} !important;
+        }}
+
+        [data-testid="stMain"] h1,
+        [data-testid="stMain"] h2,
+        [data-testid="stMain"] h3,
+        [data-testid="stMain"] h4,
+        [data-testid="stMain"] h5,
+        [data-testid="stMain"] h6,
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"],
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] li,
+        [data-testid="stMain"] [data-testid="stMetricLabel"],
+        [data-testid="stMain"] [data-testid="stMetricLabel"] *,
+        [data-testid="stMain"] [data-testid="stMetricValue"],
+        [data-testid="stMain"] [data-testid="stMetricValue"] *,
+        [data-testid="stMain"] label,
+        [data-testid="stMain"] legend {{
+            color: {palette["text"]} !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stCaptionContainer"],
+        [data-testid="stMain"] [data-testid="stCaptionContainer"] *,
+        [data-testid="stMain"] small {{
+            color: {palette["muted_text"]} !important;
+        }}
+
+        [data-testid="stMain"] div[data-testid="stMetric"],
+        [data-testid="stMain"] [data-testid="stExpander"],
+        [data-testid="stMain"] [data-testid="stExpander"] details {{
+            background-color: {palette["secondary_background"]} !important;
+            border-color: {palette["border"]} !important;
+            color: {palette["text"]} !important;
+        }}
+
+        [data-testid="stMain"] input,
+        [data-testid="stMain"] textarea,
+        [data-testid="stMain"] [data-baseweb="select"] > div,
+        [data-testid="stMain"] [data-baseweb="base-input"] {{
+            background-color: {palette["secondary_background"]} !important;
+            border-color: {palette["border"]} !important;
+            color: {palette["text"]} !important;
+        }}
+
+        [data-testid="stMain"] input,
+        [data-testid="stMain"] textarea,
+        [data-testid="stMain"] [data-baseweb="select"] *,
+        [data-testid="stMain"] [data-baseweb="base-input"] *,
+        [data-testid="stMain"] [data-testid="stExpander"] * {{
+            color: {palette["text"]} !important;
+        }}
+
+        [data-testid="stMain"] [data-testid="stDataFrame"],
+        [data-testid="stMain"] [data-testid="stTable"] {{
+            color: {palette["text"]} !important;
+            border-color: {palette["border"]} !important;
+        }}
+
+        [data-baseweb="popover"],
+        [data-baseweb="tooltip"],
+        [role="tooltip"],
+        [data-testid="stTooltipContent"] {{
+            background-color: {palette["secondary_background"]} !important;
+            border-color: {palette["border"]} !important;
+            color: {palette["text"]} !important;
+        }}
+
+        [data-baseweb="popover"] *,
+        [data-baseweb="tooltip"] *,
+        [role="tooltip"] *,
+        [data-testid="stTooltipContent"] * {{
+            color: {palette["text"]} !important;
+        }}
+        </style>
+        """
+    )
 
 
 def apply_ask_business_theme() -> None:
@@ -1015,6 +1211,7 @@ def apply_login_theme() -> None:
     # keys only; authentication state remains owned by ``src.auth.auth``.
     st.session_state["sidebar_dark_mode"] = False
     st.session_state["sidebar_theme_context"] = False
+    apply_typography()
     st.html(
         """
         <span id="versal-theme-bootstrap" hidden></span>
@@ -1048,24 +1245,25 @@ def apply_login_theme() -> None:
     st.html(
         f"""
         <style>
-        html:root {{
+        html:has(body [class*="st-key-login_shell"]) {{
             color-scheme: light !important;
             --background-color: {glass["page_background"]} !important;
             --secondary-background-color: {glass["field_background"]} !important;
             --text-color: {glass["text"]} !important;
         }}
 
-        [data-testid="stSidebar"],
-        [data-testid="stSidebarCollapsedControl"],
-        [data-testid="stHeader"],
-        [data-testid="stToolbar"],
-        footer {{
+        body:has([class*="st-key-login_shell"]) [data-testid="stSidebar"],
+        body:has([class*="st-key-login_shell"]) [data-testid="stSidebarCollapsedControl"],
+        body:has([class*="st-key-login_shell"]) [data-testid="stExpandSidebarButton"],
+        body:has([class*="st-key-login_shell"]) [data-testid="stHeader"],
+        body:has([class*="st-key-login_shell"]) [data-testid="stToolbar"],
+        body:has([class*="st-key-login_shell"]) footer {{
             display: none !important;
         }}
 
-        html body .stApp,
-        html body [data-testid="stAppViewContainer"],
-        html body [data-testid="stMain"] {{
+        body:has([class*="st-key-login_shell"]) .stApp,
+        body:has([class*="st-key-login_shell"]) [data-testid="stAppViewContainer"],
+        body:has([class*="st-key-login_shell"]) [data-testid="stMain"] {{
             background-color: {glass["page_background"]} !important;
             background-image: none !important;
             color: {glass["text"]} !important;
@@ -1073,34 +1271,34 @@ def apply_login_theme() -> None:
             overflow: hidden !important;
         }}
 
-        [data-testid="stHeader"] {{
+        body:has([class*="st-key-login_shell"]) [data-testid="stHeader"] {{
             background: {glass["page_background"]} !important;
         }}
 
-        body,
-        [data-testid="stToast"],
-        [data-baseweb="toast"],
-        [data-testid="stDialog"] [role="dialog"],
-        [data-baseweb="modal"] [role="dialog"] {{
+        body:has([class*="st-key-login_shell"]),
+        body:has([class*="st-key-login_shell"]) [data-testid="stToast"],
+        body:has([class*="st-key-login_shell"]) [data-baseweb="toast"],
+        body:has([class*="st-key-login_shell"]) [data-testid="stDialog"] [role="dialog"],
+        body:has([class*="st-key-login_shell"]) [data-baseweb="modal"] [role="dialog"] {{
             background-color: {glass["field_background"]} !important;
             color: {glass["text"]} !important;
         }}
 
-        [data-testid="stToast"] *,
-        [data-baseweb="toast"] *,
-        [data-testid="stDialog"] [role="dialog"] *,
-        [data-baseweb="modal"] [role="dialog"] * {{
+        body:has([class*="st-key-login_shell"]) [data-testid="stToast"] *,
+        body:has([class*="st-key-login_shell"]) [data-baseweb="toast"] *,
+        body:has([class*="st-key-login_shell"]) [data-testid="stDialog"] [role="dialog"] *,
+        body:has([class*="st-key-login_shell"]) [data-baseweb="modal"] [role="dialog"] * {{
             color: {glass["text"]} !important;
         }}
 
-        html,
-        body,
-        [data-testid="stAppViewContainer"] > .main {{
+        html:has(body [class*="st-key-login_shell"]),
+        body:has([class*="st-key-login_shell"]),
+        body:has([class*="st-key-login_shell"]) [data-testid="stAppViewContainer"] > .main {{
             height: 100dvh;
             overflow: hidden !important;
         }}
 
-        .block-container {{
+        body:has([class*="st-key-login_shell"]) .block-container {{
             width: 100%;
             max-width: 100% !important;
             padding: 1rem !important;
@@ -1317,7 +1515,7 @@ def apply_login_theme() -> None:
         }}
 
         @media (max-width: 480px) {{
-            .block-container {{
+            body:has([class*="st-key-login_shell"]) .block-container {{
                 padding: 0.75rem !important;
             }}
 
@@ -1346,8 +1544,9 @@ def hide_landing_navigation() -> None:
     st.html(
         """
         <style>
-        [data-testid="stSidebar"],
-        [data-testid="stSidebarCollapsedControl"] {
+        body:has([class*="st-key-public_landing_shell"]) [data-testid="stSidebar"],
+        body:has([class*="st-key-public_landing_shell"]) [data-testid="stSidebarCollapsedControl"],
+        body:has([class*="st-key-public_landing_shell"]) [data-testid="stExpandSidebarButton"] {
             display: none !important;
         }
         </style>
@@ -1359,6 +1558,7 @@ def apply_public_landing_theme() -> None:
     """Apply the fixed public landing design without reading runtime theme state."""
     palette = PUBLIC_LANDING_THEME
     hide_landing_navigation()
+    apply_typography()
     st.html(
         f"""
         <style id="versal-public-landing-theme">
@@ -1371,8 +1571,7 @@ def apply_public_landing_theme() -> None:
         [data-testid="stMain"]:has([class*="st-key-public_landing_shell"]) {{
             background: {palette["landing_band_bg"]} !important;
             color: {palette["landing_card_text"]} !important;
-            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
-                         "Segoe UI", sans-serif !important;
+            font-family: var(--versal-font-family) !important;
         }}
 
         [data-testid="stAppViewContainer"]:has([class*="st-key-public_landing_shell"])
@@ -1891,6 +2090,7 @@ def apply_public_landing_theme() -> None:
 
 def apply_theme() -> None:
     """Apply existing visual polish to authenticated business pages."""
+    apply_typography()
     st.html(
         """
         <style>

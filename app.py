@@ -1,5 +1,6 @@
 """versalMotors Business Intelligence application shell."""
 
+from importlib import reload
 import logging
 
 from dotenv import load_dotenv
@@ -9,8 +10,25 @@ from src.auth.auth import is_authenticated, require_login
 from src.database.bootstrap import database_is_ready, ensure_database
 from src.ui.components import active_logo_path
 from src.ui.landing import PROTECTED_ROUTES, current_route, signed_out_default_route
-from src.ui.sidebar import render_sidebar
-from src.ui.theme import apply_theme
+from src.ui import sidebar as sidebar_module
+from src.ui import theme as theme_module
+
+
+# Streamlit's file watcher can rerun app.py while retaining the previously
+# imported theme module. Reload only when a newly added public helper is absent,
+# so hot reloads cannot surface a stale-module ImportError.
+_THEME_HELPERS = ("apply_runtime_theme", "apply_theme", "initialize_theme_state")
+if not all(hasattr(theme_module, name) for name in _THEME_HELPERS):
+    theme_module = reload(theme_module)
+apply_runtime_theme = theme_module.apply_runtime_theme
+apply_theme = theme_module.apply_theme
+initialize_theme_state = theme_module.initialize_theme_state
+
+# The file watcher can also retain an incomplete sidebar module while app.py has
+# already reloaded. Refresh only when the shared renderer is missing.
+if not hasattr(sidebar_module, "render_sidebar"):
+    sidebar_module = reload(sidebar_module)
+render_sidebar = sidebar_module.render_sidebar
 
 
 load_dotenv()
@@ -77,7 +95,7 @@ overview_page = st.Page(
 # restoring a Home item to the protected sidebar. Post-login navigation still
 # goes explicitly to Overview; browser Back can therefore return to the landing
 # page, whose Sign in control also returns an authenticated user to Overview.
-if requested_route in {"", "landing"} and st.context.url is not None:
+if requested_route == "landing" and st.context.url is not None:
     landing_page = st.Page(
         "pages/landing.py",
         title="Welcome",
@@ -110,6 +128,8 @@ if requested_route == "login":
     st.stop()
 
 apply_theme()
+initialize_theme_state()
+apply_runtime_theme()
 pages = [
     overview_page,
     st.Page("pages/investigate.py", title="Investigate", icon=":material/search_insights:"),

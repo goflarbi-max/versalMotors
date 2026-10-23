@@ -122,3 +122,9 @@ python -m streamlit run app.py
 ## Verification boundary
 
 Formula tests use hand-calculated fixtures. Integration tests independently compare revenue, units, and gross margin with direct DuckDB SQL. Streamlit `AppTest` exercises all five pages and AI failure paths. The full stress-test record and limitations are maintained in `docs/test_log.md`.
+
+## Presentation shell
+
+Protected pages share Streamlit's native responsive sidebar. Its native collapse and mobile-drawer controls are visually presented as a hamburger/close control, so navigation, direct URLs, active-page state, filters, keyboard handling, and mobile backdrop behaviour remain owned by Streamlit rather than duplicated in application logic. The public landing and login routes continue to hide the sidebar control.
+
+Inter is served locally from `static/fonts/` through Streamlit static serving in four Latin WOFF2 weights (400, 500, 600 and 700). Native Streamlit typography is configured in `.streamlit/config.toml`; custom HTML and Plotly use the same shared UI token, with system sans-serif fonts as the failure fallback.

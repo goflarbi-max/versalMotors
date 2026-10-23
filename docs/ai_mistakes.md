@@ -25,3 +25,9 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **Situation:** I verified that a fresh clone could run after a manual database build, but the deployed Streamlit app had no shell step to create the ignored DuckDB file and showed an unavailable-database error.
 - **How discovered:** The hosted Overview screenshot showed `data/business.duckdb` was missing and instructed an end user to run a local command that is unavailable on the hosted page.
 - **How corrected:** I added a locked, validated first-start bootstrap before page navigation. The app now builds DuckDB from the nine committed raw CSVs, verifies every required table, and shows a safe deployment message only if automatic preparation fails.
+
+## Theme toggle and hamburger regression - Oct 22 2026
+
+- **Situation:** I coupled the custom dark-mode toggle to Streamlit's private `stActiveTheme-*` browser storage and styled an obsolete sidebar-toggle selector. A theme click could remount the frontend, collapse the sidebar, and leave only some custom cards dark, while the native double-chevron remained visible instead of the hamburger.
+- **How discovered:** The user reported both regressions. The follow-up investigation in `docs/regression_diagnosis.md` traced the split theme state and inspected the installed Streamlit frontend to identify its actual `stExpandSidebarButton` and `stSidebarCollapseButton` controls.
+- **How corrected:** I made `sidebar_dark_mode` the protected app's single theme source, removed the private browser-theme bridge, applied one shared runtime palette before protected-page rendering, and targeted the installed Streamlit controls while retaining their native behavior and accessible labels. Regression tests now cover palette selection, one-rerun toggling, login's fixed light theme, preservation of sidebar state, and the installed frontend selectors.
