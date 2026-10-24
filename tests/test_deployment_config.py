@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from deployment.verify_database import verify
@@ -40,3 +39,13 @@ def test_docker_context_excludes_local_secrets_and_generated_database() -> None:
     assert ".streamlit/secrets.toml" in ignored
     assert "data/business.duckdb" in ignored
     assert "data/generator_truth.md" in ignored
+
+
+def test_frontend_uses_same_origin_proxy_and_security_headers() -> None:
+    next_config = (ROOT / "frontend" / "next.config.ts").read_text(encoding="utf-8")
+    assert "process.env.API_ORIGIN" in next_config
+    assert 'source: "/api/:path*"' in next_config
+    assert "X-Content-Type-Options" in next_config
+    assert "Content-Security-Policy" in next_config
+    assert "frame-ancestors 'none'" in next_config
+    assert "poweredByHeader: false" in next_config

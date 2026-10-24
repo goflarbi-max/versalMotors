@@ -25,7 +25,7 @@ const webServer: PlaywrightTestConfig["webServer"] = process.env.PLAYWRIGHT_EXTE
     url: "http://127.0.0.1:3000",
     reuseExistingServer: true,
     timeout: 120_000,
-    env: { BACKEND_URL: "http://127.0.0.1:8000" },
+    env: { API_ORIGIN: "http://127.0.0.1:8000" },
   },
 ];
 
@@ -37,7 +37,7 @@ export default defineConfig({
   reporter: "list",
   expect: { timeout: 20_000 },
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000",
     trace: "retain-on-failure",
   },
   projects: [
