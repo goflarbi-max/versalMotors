@@ -278,6 +278,23 @@ html[data-theme="dark"] .evidence-table-card th { color: #111827; background: #e
 .brief-sections { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }.brief-sections article { padding: 1.15rem; }.brief-sections h2,.brief-evidence>h2 { margin: 0 0 .55rem; font-size: 1.05rem; }.brief-sections p { margin: 0; white-space: pre-wrap; }
 .brief-evidence { padding: 1.15rem; }.brief-evidence-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; margin-bottom: 1rem; }.brief-evidence-summary article { min-width: 0; padding: .9rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-soft); }.brief-evidence-summary span { color: var(--text-muted); font-size: .72rem; }.brief-evidence-summary strong { display: block; overflow-wrap: anywhere; font-size: 1.15rem; font-variant-numeric: tabular-nums; }.brief-evidence-summary p { margin: .25rem 0 0; color: var(--text-muted); font-size: .72rem; }.brief-evidence details+details { margin-top: .6rem; }
 
+/* Phase 6 Data Quality: exact checks and auditable cleaning-log records. */
+.quality-page { width: min(100%,1200px); margin: 0 auto; }
+.quality-header { max-width: none; margin-bottom: 1.5rem; }
+.quality-summary-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 1rem; }
+.quality-summary-card { min-width: 0; padding: 1.2rem; border-radius: 22px; color: var(--text); background: linear-gradient(180deg,color-mix(in srgb,var(--surface) 96%,white),var(--surface)); box-shadow: 0 12px 30px var(--card-shadow),inset 0 1px color-mix(in srgb,var(--text) 8%,transparent); transition: transform 180ms ease; }
+.quality-summary-card:hover { transform: translateY(-2px); }
+.quality-summary-card>span { display: block; color: var(--text-muted); font-size: .78rem; font-weight: 600; }
+.quality-summary-card>strong { display: block; margin-top: .25rem; overflow-wrap: anywhere; font-size: clamp(1.7rem,3vw,2.1rem); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.quality-summary-card p,.quality-summary-card small { color: var(--text-muted); font-size: .73rem; }.quality-summary-card p { min-height: 2.2rem; margin: .55rem 0 .25rem; }.quality-summary-card small { display: block; }
+.quality-section { margin-top: 1rem; padding: 1.1rem; border: 1px solid var(--border); border-radius: 18px; color: var(--text); background: var(--surface); box-shadow: 0 10px 28px var(--card-shadow); }
+.quality-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }.quality-heading h2 { margin: 0; font-size: 1.2rem; }.quality-heading p { margin: .25rem 0 0; color: var(--text-muted); font-size: .78rem; }
+.quality-downloads { display: flex; gap: .6rem; }.quality-downloads a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: .6rem .85rem; border: 1px solid var(--border); border-radius: .7rem; color: var(--sidebar-active-text); background: var(--sidebar-active); font-size: .78rem; font-weight: 650; text-decoration: none; }
+.quality-section>.investigate-table-card { box-shadow: none; }
+.quality-details { margin-top: 1rem; }.quality-details h3 { margin: 0; font-size: 1rem; }.quality-details>p { margin: .25rem 0 .8rem; color: var(--text-muted); font-size: .76rem; }
+.quality-details details { border: 1px solid var(--border); border-radius: 11px; background: var(--surface-soft); }.quality-details details+details { margin-top: .5rem; }.quality-details summary { min-height: 44px; padding: .65rem .8rem; cursor: pointer; font-size: .78rem; font-weight: 600; }.quality-details details>div { display: grid; grid-template-columns: minmax(200px,.7fr) 2fr; gap: 1rem; padding: .8rem; border-top: 1px solid var(--border); }.quality-details dl { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem .6rem; margin: 0; }.quality-details dt { color: var(--text-muted); font-size: .7rem; }.quality-details dd { margin: 0; font-size: .78rem; font-weight: 650; font-variant-numeric: tabular-nums; }.quality-details details p { margin: 0; color: var(--text-muted); font-size: .78rem; }
+.quality-state,.quality-log-empty { padding: 1.5rem; border: 1px solid var(--border); border-radius: 16px; color: var(--text); background: var(--surface); }.quality-state h2 { margin: 0 0 .3rem; }.quality-state p { margin: 0; color: var(--text-muted); }.quality-loading { min-height: 480px; border-radius: 18px; background: linear-gradient(100deg,var(--surface-soft) 20%,var(--border) 50%,var(--surface-soft) 80%); background-size: 220% 100%; animation: overview-shimmer 1.4s linear infinite; }
+
 @media (min-width: 641px) {
   .app-shell.sidebar-open .app-main { margin-left: 286px; }
   .sidebar-backdrop { display: none; }
@@ -294,8 +311,9 @@ html[data-theme="dark"] .evidence-table-card th { color: #111827; background: #e
   .ask-summary-grid,.brief-sections,.brief-evidence-summary { grid-template-columns: 1fr; }
   .brief-controls { grid-template-columns: 1fr; }.brief-controls button { width: 100%; }
   .brief-result-header { align-items: flex-start; flex-direction: column; }.brief-downloads { width: 100%; flex-direction: column; }.brief-downloads a { justify-content: center; }
+  .quality-summary-grid { grid-template-columns: 1fr; }.quality-heading { align-items: flex-start; flex-direction: column; }.quality-downloads { width: 100%; flex-direction: column; }.quality-downloads a { width: 100%; }.quality-details details>div { grid-template-columns: 1fr; }
 }
-@media (min-width: 641px) and (max-width: 1000px) { .ask-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.brief-evidence-summary { grid-template-columns: repeat(2,minmax(0,1fr)); }.brief-controls { grid-template-columns: repeat(2,minmax(0,1fr)); }.brief-controls button { grid-column: 1/-1; } }
+@media (min-width: 641px) and (max-width: 1000px) { .ask-summary-grid,.quality-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.brief-evidence-summary { grid-template-columns: repeat(2,minmax(0,1fr)); }.brief-controls { grid-template-columns: repeat(2,minmax(0,1fr)); }.brief-controls button { grid-column: 1/-1; } }
 @media (max-width: 700px) {
   .landing-hero { min-height: 76vh; padding: 1.1rem 1rem 4rem; }.landing-topbar img { width: 10.5rem; }.landing-sign-in { min-width: auto; padding: .55rem .9rem; }
   .landing-copy { margin-top: 4.5rem; }.landing-copy h1 { font-size: clamp(2.45rem,13vw,3.8rem); }.landing-copy p { font-size: .98rem; }
