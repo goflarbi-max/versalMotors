@@ -80,3 +80,9 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The first port used Next.js client navigation for the public Sign in link. During the initial development-server browser run, the React Server Component destination stream errored and the URL stayed on the landing page.
 - **How it was discovered:** Two Playwright public-flow tests timed out despite the rendered link having the correct destination.
 - **How it was corrected:** The public authentication boundary now uses a normal same-origin anchor, producing a reliable full navigation. The server still selects `/login` for signed-out users and `/overview` for authenticated users.
+
+## Phase 3 filter-option test assumed title-case status values
+
+- **What went wrong:** I initially asserted that the filter-options endpoint would contain `Completed`, although the cleaned sales table and existing Streamlit filter expose the exact lowercase value `completed`.
+- **How it was found:** The new backend filter-options test failed while comparing the endpoint response with the current application choices.
+- **How it was fixed:** I corrected only the test expectation to the source-of-truth lowercase value. The adapter, data, filters, and metric formulas were left unchanged.
