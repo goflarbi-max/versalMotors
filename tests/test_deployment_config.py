@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import deployment.verify_database as database_verifier
+
 from deployment.verify_database import verify
 
 
@@ -12,6 +14,15 @@ def test_deployment_database_matches_frozen_baseline() -> None:
     result = verify(ROOT / "data" / "business.duckdb", ROOT / "tests" / "parity_baseline.json")
     assert result["table_row_counts"]["sales"] == 20_520
     assert result["table_row_counts"]["cleaning_log"] == 150
+
+
+def test_deployment_database_allows_platform_specific_file_hash(monkeypatch) -> None:
+    monkeypatch.setattr(database_verifier, "sha256", lambda _path: "platform-specific-hash")
+
+    result = verify(ROOT / "data" / "business.duckdb", ROOT / "tests" / "parity_baseline.json")
+
+    assert result["database_sha256_matches"] is False
+    assert result["table_row_counts"]["sales"] == 20_520
 
 
 def test_backend_container_is_non_root_read_only_data_and_single_worker() -> None:

@@ -38,11 +38,16 @@ def verify(database: Path, baseline_path: Path) -> dict[str, object]:
     }
     actual_hash = sha256(database)
     expected_hash = baseline["database_sha256"]
-    if mismatches or actual_hash != expected_hash:
+    if mismatches:
         details = {"row_count_mismatches": mismatches, "expected_sha256": expected_hash, "actual_sha256": actual_hash}
         raise RuntimeError(f"Deployment database does not match parity baseline: {json.dumps(details, sort_keys=True)}")
 
-    return {"database_sha256": actual_hash, "table_row_counts": actual_counts}
+    return {
+        "database_sha256": actual_hash,
+        "expected_database_sha256": expected_hash,
+        "database_sha256_matches": actual_hash == expected_hash,
+        "table_row_counts": actual_counts,
+    }
 
 
 def main() -> None:

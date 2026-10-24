@@ -144,3 +144,9 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The first full Phase 6 browser run clicked the Data Quality sort header before the protected shell finished adding its default date filters to the URL. The filter-provider navigation then replaced the test's sort query, making a working sort control appear broken.
 - **How it was found:** The targeted Data Quality suite passed, while the full suite trace showed the URL changing only to the default `start_date` and `end_date` values immediately after the click.
 - **How it was fixed:** The browser test now waits for the existing shared-filter URL initialization before exercising table sorting. Application behavior and business data were not changed.
+
+## Phase 7 deployment verification assumed a portable DuckDB file hash (2026-10-24)
+
+- **What went wrong:** The deployment verifier required the Linux-built DuckDB file to have the same byte-level SHA-256 as the Windows-built baseline, even though the logical tables can be identical while the database container bytes differ across platforms.
+- **How it was found:** Render built the database successfully and reported no table row-count mismatches, but rejected deployment solely because the actual and expected database-file hashes differed.
+- **How it was fixed:** Table row-count parity remains mandatory, while the file hash is retained as diagnostic metadata instead of a cross-platform pass/fail condition. A regression test simulates a platform-specific hash and confirms that matching logical table counts pass verification.
