@@ -122,3 +122,8 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The new Investigate breadcrumb and the existing sidebar both expose a legitimate link named “Overview.” An older browser test used an unscoped role/name locator and therefore matched both links.
 - **How it was found:** The full Playwright regression run passed 20 tests and failed only the shared-filter navigation test with a strict-locator ambiguity.
 - **How it was fixed:** I scoped the existing assertion to the `Primary navigation` complementary landmark. The breadcrumb, sidebar links, accessible names, filters, and routing behavior remain unchanged.
+## Phase 5 browser verification used a stale preview server (2026-10-24)
+
+- **What went wrong:** The first Ask and Management Brief Playwright run reused an older Next.js process on port 3000, so it tested migration placeholders instead of the current production build. Two assertions also targeted wording and the transparent `body` rather than the existing `.app-shell` theme surface.
+- **How it was found:** The Playwright accessibility snapshot showed the exact old placeholder copy despite the current source and successful Next.js build.
+- **How it was fixed:** The stale test-port processes were identified by command line and restarted, deterministic AI-disabled browser-test environment variables were added, and assertions were aligned with the actual safe-refusal copy and app-shell theme surface. The responsive brief controls were tightened at tablet width after the browser test exposed a 20-pixel overflow.

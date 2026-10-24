@@ -15,6 +15,8 @@ const webServer: PlaywrightTestConfig["webServer"] = process.env.PLAYWRIGHT_EXTE
       VERSALMOTORS_ALLOWED_ORIGINS: "http://127.0.0.1:3000",
       VERSALMOTORS_SECURE_COOKIES: "false",
       VERSALMOTORS_SESSION_SECRET: "phase-two-browser-test-secret",
+      GEMINI_API_KEY: "",
+      GOOGLE_API_KEY: "",
     },
   },
   {
