@@ -10,7 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from backend.app.api.routes import auth, filters, health, overview
+from backend.app.api.routes import auth, filters, health, investigate, overview
 from backend.app.core.config import get_settings
 from backend.app.core.rate_limit import LoginRateLimiter
 from backend.app.core.security import SessionStore
@@ -85,3 +85,4 @@ app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(filters.router)
 app.include_router(overview.router)
+app.include_router(investigate.router)
