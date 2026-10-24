@@ -10,9 +10,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from backend.app.api.routes import auth, filters, health, investigate, overview
+from backend.app.api.routes import ask, auth, filters, health, investigate, overview
 from backend.app.core.config import get_settings
 from backend.app.core.rate_limit import LoginRateLimiter
+from backend.app.core.report_store import ReportStore
+from backend.app.core.request_rate_limit import TokenBucketRateLimiter
 from backend.app.core.security import SessionStore
 from backend.app.services.data_loader import get_data_bundle
 
@@ -24,6 +26,8 @@ async def lifespan(app: FastAPI):
     app.state.data_bundle = get_data_bundle()
     app.state.sessions = SessionStore(settings.session_secret, settings.session_hours * 3600)
     app.state.login_limiter = LoginRateLimiter()
+    app.state.ask_limiter = TokenBucketRateLimiter(requests_per_minute=10, burst=3)
+    app.state.report_store = ReportStore()
     yield
 
 
@@ -86,3 +90,4 @@ app.include_router(auth.router)
 app.include_router(filters.router)
 app.include_router(overview.router)
 app.include_router(investigate.router)
+app.include_router(ask.router)

@@ -7,7 +7,7 @@ from typing import Annotated, Literal
 
 from fastapi import Depends, HTTPException, Query, Request, status
 
-from backend.app.core.security import SESSION_COOKIE, Session
+from backend.app.core.security import CSRF_COOKIE, SESSION_COOKIE, Session, csrf_matches
 from backend.app.services.data_loader import DataBundle
 from src.analytics.metrics import Filters
 
@@ -21,6 +21,14 @@ def require_api_user(request: Request) -> Session:
     if session is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
     return session
+
+
+def require_mutation_security(request: Request) -> None:
+    origin = (request.headers.get("origin") or "").rstrip("/")
+    if origin not in request.app.state.settings.allowed_origins:
+        raise HTTPException(status_code=403, detail="Request origin is not allowed")
+    if not csrf_matches(request.cookies.get(CSRF_COOKIE), request.headers.get("x-csrf-token")):
+        raise HTTPException(status_code=403, detail="Invalid request token")
 
 
 def _limited(values: list[str] | None, name: str) -> tuple[str, ...]:
