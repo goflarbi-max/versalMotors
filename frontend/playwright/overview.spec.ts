@@ -76,7 +76,7 @@ test("shared filters use the URL and persist across protected pages", async ({ p
   await expect(page).toHaveURL(/branch=Accra/);
   await page.getByRole("link", { name: "Investigate" }).click();
   await expect(page).toHaveURL(/\/investigate\?.*branch=Accra/);
-  await page.getByRole("link", { name: "Overview" }).click();
+  await page.getByRole("complementary", { name: "Primary navigation" }).getByRole("link", { name: "Overview" }).click();
   await expect.poll(() => page.getByLabel("Branch").evaluate((element) => Array.from((element as HTMLSelectElement).selectedOptions, (option) => option.value))).toEqual(["Accra"]);
   await expect(page.locator('[data-metric="Revenue"] .kpi-value-row > strong')).toHaveText("GHS 277,136,681");
 });

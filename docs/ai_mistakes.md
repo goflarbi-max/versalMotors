@@ -104,3 +104,21 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The first error-state assertion selected every element with the ARIA `alert` role, which included both the intended Overview error card and Next.js's built-in route announcer.
 - **How it was found:** Playwright strict mode rejected the ambiguous locator even though the friendly Overview error message was rendered correctly.
 - **How it was fixed:** The test now targets the scoped `.overview-state[role=alert]` component, preserving the accessibility role while avoiding framework-owned elements.
+
+## Phase 4 investigation route parameters collided with global filters
+
+- **What went wrong:** I initially named the FastAPI drill-down path variables `model` and `branch`. Those names already belong to the shared global-filter dependency, so FastAPI treated the dependency parameters as path parameters and rejected application startup.
+- **How it was found:** The first focused backend test failed while importing the application, before any endpoint or data mutation ran.
+- **How it was fixed:** I renamed only the Python path variables to `selected_model` and `selected_branch`. The public endpoint shape, global filters, existing analytics functions, and returned values remain unchanged.
+
+## Phase 4 integer Literal did not accept HTTP query strings
+
+- **What went wrong:** I modeled `page_size` as `Literal[10, 25, 50]`. With the installed FastAPI/Pydantic versions, query-string values such as `page_size=50` were not coerced to those integer literals and returned HTTP 422.
+- **How it was found:** The new API parity and export tests failed for every request that explicitly supplied a page size.
+- **How it was fixed:** The route now parses `page_size` as an integer and applies an explicit allowlist of 10, 25, or 50 before calling the paging adapter. Invalid values still return HTTP 422, while valid URL query strings work as designed.
+
+## Phase 4 breadcrumb made an older browser locator ambiguous
+
+- **What went wrong:** The new Investigate breadcrumb and the existing sidebar both expose a legitimate link named “Overview.” An older browser test used an unscoped role/name locator and therefore matched both links.
+- **How it was found:** The full Playwright regression run passed 20 tests and failed only the shared-filter navigation test with a strict-locator ambiguity.
+- **How it was fixed:** I scoped the existing assertion to the `Primary navigation` complementary landmark. The breadcrumb, sidebar links, accessible names, filters, and routing behavior remain unchanged.
