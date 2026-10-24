@@ -1,3 +1,15 @@
+## Phase 7 local smoke cookie configuration
+
+- **What went wrong:** I first launched the temporary local FastAPI server with its production default of Secure cookies while the smoke browser used plain `http://127.0.0.1`. Login verification succeeded, but the browser correctly refused to retain the Secure session cookie, so the protected-page smoke checks stayed on Login.
+- **How it was discovered:** The same-origin proxy/header check passed, while both authenticated mobile and desktop smoke tests timed out waiting for the Overview redirect. The URL remained `/login`, isolating the problem to local session persistence rather than routing or page rendering.
+- **How it was corrected:** I restarted only the temporary test API with `VERSALMOTORS_SECURE_COOKIES=false`, the existing local-test setting, and an exact localhost allowed origin. All three deployment smoke tests then passed. Production and staging keep Secure cookies enabled over HTTPS.
+
+## Phase 7 cache lock contention
+
+- **What went wrong:** My first bounded TTL cache held its single bookkeeping lock while running the metric factory. The four different Overview endpoints therefore calculated one after another even though their work is independent.
+- **How it was discovered:** A full Playwright parity run showed an Overview alert after the KPI card wait timed out, while isolated pages and direct parity tests passed. The shared lock explained why the loaded browser run exceeded its UI wait without producing a data mismatch.
+- **How it was corrected:** Cache lookup and insertion remain thread-safe, but independent keys calculate outside the bookkeeping lock. A per-key pending `Future` makes concurrent requests for the same key share one calculation, preventing a cold-cache stampede. Metrics, filter keys, response records, and parity formulas are unchanged.
+
 ## Metrics verification - Oct 1 2026
 Checked for double-counting, list_price vs net_sale_price mix, nulls dropped.
 Result: Fixed import path and schema. Verified revenue via raw SQL vs metrics.py - exact match. 3/3 tests passed.

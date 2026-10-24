@@ -137,3 +137,50 @@ The SQL joined `sales` to `inventory` once on `inventory_id`, applied the same c
 - First-start build completed in approximately 46 seconds in the local deployment simulation. Later reruns only perform the inexpensive schema-readiness check.
 - Added unit coverage for missing, complete, and incomplete database states in `tests/test_database_bootstrap.py`.
 - Final suite after the hosting fix: 38 tests passed, 24 subtests passed; the two warnings are non-failing SDK deprecation and pytest-cache warnings.
+
+---
+
+# Phase 7 Deployment Verification
+
+Date: 2026-10-24
+
+Scope: repository-side Docker/Railway/Vercel configuration, same-origin proxying, security headers, privacy-safe API observability, bounded Overview response caching, and desktop/mobile deployment smoke coverage. Production DNS and the existing Streamlit deployment were not changed.
+
+## Data and metric parity
+
+- Verified database SHA-256: `968d3bd917873f7b2d19de558a3565d26fb744dda38d39aea0ada68e0d649f6f`.
+- Readiness returned all frozen row counts: branches 15, complaints 1,855, inventory 25,000, models 54, sales 20,520, salespeople 225, satisfaction 15,007, service records 48,025, and warranty claims 3,058.
+- The full Python suite included the frozen-baseline and direct-DuckDB SQL parity tests. No metric mismatch was found and no analytics formula was changed.
+- Phase 7 adds no new business number to the interface; it caches the exact serialized Overview records already produced by the existing API adapters.
+
+## Automated verification
+
+- Python: **128 passed, 24 subtests passed** in 221.96 seconds. Three non-failing warnings concerned Starlette's future httpx2 migration, a Google SDK deprecation, and pytest cache creation on Windows.
+- Playwright: **32 passed** in 5.6 minutes using one Chromium worker against the local Next.js/FastAPI deployment pair.
+- Deployment smoke coverage passed for the same-origin API proxy, response security headers, authenticated desktop and mobile navigation, protected routes, responsive widths, and light/dark themes.
+- Frontend lint and production build passed with Next.js 16.4.3.
+
+## Local API measurement
+
+The API process was restarted immediately before measurement so the first Overview request was genuinely uncached.
+
+| Check | Result |
+|---|---:|
+| Readiness response | 134.69 ms |
+| Uncached Overview KPIs | 2,171.66 ms |
+| Requests / concurrency | 50 / 5 |
+| Successful responses | 50 / 50 |
+| Warm minimum | 35.84 ms |
+| Warm mean | 59.49 ms |
+| Warm p50 | 58.79 ms |
+| Warm p95 | 75.37 ms |
+| Warm maximum | 84.21 ms |
+
+The warm path is stable, but the uncached Overview request does not meet the proposed sub-second target. The bounded five-minute cache prevents repeated cold work without altering filter keys, records, or formulas. Railway memory, image-build duration, and public cold-start timing remain to be measured on the actual staging service.
+
+## Environment limitations and safe stop
+
+- Docker, Railway CLI, Vercel CLI, `RAILWAY_TOKEN`, and `VERCEL_TOKEN` are not available in this workspace, so the container could not be built locally and no remote staging deployment was created from this session.
+- The Docker build verifies the generated database during its builder stage, but that build remains pending on a Docker-capable host.
+- Repository-side Phase 7 work and local deployment verification are complete. Remote Railway/Vercel staging remains pending credentials and must be completed before Phase 7 can be declared fully deployed.
+- `autobusiness.goflarbi.com` still points to the existing Streamlit/Worker production path. Phase 8 was not started.

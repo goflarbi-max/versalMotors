@@ -88,6 +88,8 @@ Raw CSVs      -> Audited Cleaning -> DuckDB   -> Metrics  -> Objects  -> Optiona
 
 The AI layer is optional: reviewed database queries and deterministic summaries keep the dashboard operational during missing credentials, timeouts, rate limits, invalid generated SQL, and Gemini service failures. See `docs/architecture.md` for the Mermaid diagrams and exported PNG.
 
+The Phase 7 migration preview packages the read-only FastAPI service in a verified non-root Docker image and serves the Next.js interface through Vercel with a same-origin `/api/*` proxy. Railway hosts the preview API; the Streamlit deployment remains the production rollback target until the separately approved cutover phase. See `docs/deployment.md`.
+
 ## Technologies (What + Why)
 
 - **Python and pandas:** generate, clean, test, and analyse the dataset reproducibly.
@@ -101,6 +103,7 @@ The AI layer is optional: reviewed database queries and deterministic summaries 
 - **Google Gen AI SDK:** provides optional evidence-grounded questions and management narratives using the configurable `gemini-3.8-flash` model.
 - **fpdf2:** creates genuine downloadable PDF management briefs and operational reports.
 - **Git and GitHub:** provide version control, traceability, and project history.
+- **FastAPI, Docker, Railway, Next.js and Vercel:** provide the parallel, parity-tested deployment path while the current Streamlit application remains available for rollback.
 
 ## AI Usage
 

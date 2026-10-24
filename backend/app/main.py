@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import logging
+import time
 import uuid
 from contextlib import asynccontextmanager
 
@@ -12,11 +15,15 @@ from fastapi.responses import JSONResponse
 
 from backend.app.api.routes import ask, auth, data_quality, filters, health, investigate, management_brief, overview
 from backend.app.core.config import get_settings
+from backend.app.core.cache import TTLCache
 from backend.app.core.rate_limit import LoginRateLimiter
 from backend.app.core.report_store import ReportStore
 from backend.app.core.request_rate_limit import TokenBucketRateLimiter
 from backend.app.core.security import SessionStore
 from backend.app.services.data_loader import get_data_bundle
+
+
+logger = logging.getLogger("versalmotors.api")
 
 
 @asynccontextmanager
@@ -28,6 +35,7 @@ async def lifespan(app: FastAPI):
     app.state.login_limiter = LoginRateLimiter()
     app.state.ask_limiter = TokenBucketRateLimiter(requests_per_minute=10, burst=3)
     app.state.report_store = ReportStore()
+    app.state.response_cache = TTLCache(ttl_seconds=300, max_entries=256, max_concurrent_creations=4)
     yield
 
 
@@ -45,6 +53,31 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "X-CSRF-Token", "X-Request-ID"],
 )
+
+
+@app.middleware("http")
+async def request_log(request: Request, call_next):
+    """Emit one query-free structured access record without sensitive values."""
+    started = time.perf_counter()
+    status_code = 500
+    response = None
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        return response
+    finally:
+        duration_ms = round((time.perf_counter() - started) * 1000, 2)
+        error_category = "none" if status_code < 400 else ("client_error" if status_code < 500 else "server_error")
+        record = {
+            "request_id": getattr(request.state, "request_id", "pending"),
+            "route": request.url.path,
+            "method": request.method,
+            "duration_ms": duration_ms,
+            "status": status_code,
+            "cache_result": response.headers.get("x-cache-result", "none") if response else "none",
+            "error_category": error_category,
+        }
+        logger.info(json.dumps(record, separators=(",", ":"), sort_keys=True))
 
 
 @app.middleware("http")

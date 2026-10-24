@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request, Response
 
 from backend.app.api.dependencies import BundleDependency, FilterDependency, require_api_user
 from backend.app.schemas.common import Envelope, Meta
@@ -42,21 +42,27 @@ def _response(data: list[dict], bundle: BundleDependency, filters: FilterDepende
     )
 
 
+def _cached(request: Request, response: Response, bundle: BundleDependency, filters: FilterDependency, name: str, factory) -> Envelope:
+    data, hit = request.app.state.response_cache.get_or_create((bundle.version, name, filters), factory)
+    response.headers["X-Cache-Result"] = "hit" if hit else "miss"
+    return _response(data, bundle, filters)
+
+
 @router.get("/kpis", response_model=Envelope)
-def get_kpis(bundle: BundleDependency, filters: FilterDependency) -> Envelope:
-    return _response(overview.kpis(bundle, filters), bundle, filters)
+def get_kpis(request: Request, response: Response, bundle: BundleDependency, filters: FilterDependency) -> Envelope:
+    return _cached(request, response, bundle, filters, "kpis", lambda: overview.kpis(bundle, filters))
 
 
 @router.get("/revenue-trend", response_model=Envelope)
-def get_revenue_trend(bundle: BundleDependency, filters: FilterDependency) -> Envelope:
-    return _response(overview.revenue_trend(bundle, filters), bundle, filters)
+def get_revenue_trend(request: Request, response: Response, bundle: BundleDependency, filters: FilterDependency) -> Envelope:
+    return _cached(request, response, bundle, filters, "revenue-trend", lambda: overview.revenue_trend(bundle, filters))
 
 
 @router.get("/revenue-by-branch", response_model=Envelope)
-def get_revenue_by_branch(bundle: BundleDependency, filters: FilterDependency) -> Envelope:
-    return _response(overview.branch_revenue(bundle, filters), bundle, filters)
+def get_revenue_by_branch(request: Request, response: Response, bundle: BundleDependency, filters: FilterDependency) -> Envelope:
+    return _cached(request, response, bundle, filters, "revenue-by-branch", lambda: overview.branch_revenue(bundle, filters))
 
 
 @router.get("/margin-by-model", response_model=Envelope)
-def get_margin_by_model(bundle: BundleDependency, filters: FilterDependency) -> Envelope:
-    return _response(overview.model_margin(bundle, filters), bundle, filters)
+def get_margin_by_model(request: Request, response: Response, bundle: BundleDependency, filters: FilterDependency) -> Envelope:
+    return _cached(request, response, bundle, filters, "margin-by-model", lambda: overview.model_margin(bundle, filters))

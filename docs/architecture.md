@@ -1,5 +1,20 @@
 # VersalMotors Architecture
 
+## Phase 7 parallel deployment architecture
+
+```mermaid
+flowchart LR
+    B[Browser] -->|Preview UI| V[Vercel Next.js]
+    V -->|Same-origin /api proxy| R[Railway FastAPI container]
+    R -->|Read-only| D[(Verified DuckDB image artifact)]
+    D --> A[Existing analytics, AI guardrails and evidence]
+    A --> R
+    S[Streamlit production] -->|Current production path| M[Management]
+    V -->|Preview only| M
+```
+
+The Phase 7 backend image builds DuckDB from tracked raw data, verifies it against the frozen parity baseline, then copies the verified file into a slim non-root runtime. Railway readiness uses `/health/ready`; Vercel forwards `/api/*` without exposing the API origin to browser code. Streamlit and its current DNS route remain unchanged until the Phase 8 approval gate.
+
 ## End-to-end architecture
 
 ```mermaid
