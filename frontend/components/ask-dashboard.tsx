@@ -80,7 +80,7 @@ export function AskDashboard() {
         {!messages.length ? <p className="conversation-empty">Ask a question or choose a reviewed prompt. Every numeric answer is checked against evidence.</p> : messages.map((message, index) => <article className="exchange" key={`${message.question}-${index}`}>
           <div className="user-question"><span aria-hidden="true">?</span><p>{message.question}</p></div>
           <div className="assistant-answer"><span aria-hidden="true">V</span><div>
-            {message.result.mode === "reviewed_fallback" ? <p className="fallback-note">Verified deterministic result</p> : null}
+            {message.result.mode === "deterministic" ? <p className="fallback-note">Verified data result</p> : null}
             {message.result.facts ? <section><h3>Facts</h3><p>{message.result.facts}</p></section> : <p>{message.result.answer}</p>}
             {message.result.interpretation ? <section><h3>Interpretation</h3><p>{message.result.interpretation}</p></section> : null}
             {message.result.recommendations.length ? <section><h3>Recommendations</h3><ul>{message.result.recommendations.map((item) => <li key={item}>{item}</li>)}</ul></section> : null}

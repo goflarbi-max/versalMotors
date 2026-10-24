@@ -43,11 +43,16 @@ def test_reviewed_questions_match_baseline_and_direct_sql(api_client, question_k
     assert "sql" not in str(data).lower()
 
 
-def test_failed_ai_uses_reviewed_grounded_fallback_without_raw_error(api_client, monkeypatch):
+def test_ask_uses_reviewed_data_without_calling_external_ai(api_client, monkeypatch):
     authenticate(api_client)
+    monkeypatch.setenv("GEMINI_API_KEY", "must-not-be-used")
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("Ask the Business must not call an external AI model")
+
     monkeypatch.setattr(
-        "backend.app.services.ask.generate_text",
-        lambda *args, **kwargs: {"ok": False, "text": "", "reason": "service_unavailable_503"},
+        "src.ai.gemini_client.generate_text",
+        fail_if_called,
     )
     response = api_client.post(
         "/api/v1/ask/questions",
@@ -57,10 +62,27 @@ def test_failed_ai_uses_reviewed_grounded_fallback_without_raw_error(api_client,
 
     assert response.status_code == 200
     data = response.json()["data"]
-    assert data["mode"] == "reviewed_fallback"
+    assert data["mode"] == "deterministic"
+    assert data["status"] == "verified"
     assert data["table"] and data["evidence"]
-    assert "503" not in data["answer"]
-    assert "error" not in data["answer"].lower()
+    assert "gemini" not in data["answer"].lower()
+    assert "ai" not in data["answer"].lower()
+
+
+def test_unregistered_business_question_returns_safe_reviewed_scope_message(api_client):
+    authenticate(api_client)
+    response = api_client.post(
+        "/api/v1/ask/questions",
+        json={"question": "Which salesperson has the best customer retention?"},
+        headers=_headers(api_client),
+    )
+
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["status"] == "unanswerable"
+    assert data["mode"] == "deterministic"
+    assert "reviewed VersalMotors data query" in data["answer"]
+    assert data["evidence"] == []
 
 
 @pytest.mark.parametrize(

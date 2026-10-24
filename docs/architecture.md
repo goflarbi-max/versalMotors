@@ -31,8 +31,8 @@ flowchart LR
     DB --> ANALYTICS[Analytics and deterministic insight engine<br/>metrics.py, drilldown.py, fallback registry]
     ANALYTICS --> EVIDENCE[Evidence objects<br/>facts, values, filters and source tables]
 
-    EVIDENCE --> TOOLS[AI tools<br/>reviewed SQL boundary and optional Gemini]
-    TOOLS --> GUARDS[Guardrails<br/>input validation, SQL allowlist,<br/>number grounding, retry and fallback]
+    EVIDENCE --> TOOLS[Question tools<br/>reviewed SQL and deterministic summaries]
+    TOOLS --> GUARDS[Guardrails<br/>input validation, reviewed scope,<br/>evidence-only answers]
 
     GUARDS --> UI[Streamlit pages<br/>Overview, Investigate, Ask the Business,<br/>Management Brief, Data Quality]
     UI --> MGMT[Management<br/>monitor, investigate and decide]
@@ -65,42 +65,33 @@ flowchart LR
 1. `scripts/generate_dataset.py` can reproduce the synthetic raw source with its fixed seed.
 2. `scripts/build_database.py` calls the cleaning pipeline, writes cleaned CSVs, verifies table row counts, and loads DuckDB.
 3. Pure pandas functions calculate metrics from cleaned tables. Question and drill-down tools query the same governed data.
-4. Evidence objects are passed to optional AI narration and to deterministic fallback summaries.
+4. Ask the Business converts reviewed question intents into deterministic summaries of evidence objects; it makes no external model call. Management Brief may use optional AI narration separately.
 5. The public landing and login routes are available without loading DuckDB or the AI layer; direct protected URLs select Login.
 6. Successful bcrypt verification registers the protected page set with Overview as the default, then management can inspect supporting records.
 
-## Resilient Ask the Business flow
+## Deterministic Ask the Business flow
 
 ```mermaid
 flowchart TD
     Q[Business question] --> INPUT{Input is valid and in scope?}
     INPUT -- No --> SAFE[Safe guidance; no model call]
-    INPUT -- Yes --> ROUTE{Reviewed offline question?}
+    INPUT -- Yes --> ROUTE{Reviewed data question?}
     ROUTE -- Yes --> QUERY[Reviewed read-only query]
-    ROUTE -- No --> GEMINI[Gemini primary model]
-    GEMINI -- 429, 5xx or timeout --> RETRY[Bounded retry and lighter-model failover]
-    GEMINI -- SQL proposed --> SQL[SQL safety allowlist]
-    RETRY --> SQL
-    SQL -- Rejected or unavailable --> FALLBACK[Reviewed fallback registry]
-    SQL -- Approved --> QUERY
-    FALLBACK --> QUERY
+    ROUTE -- No --> SCOPE[Explain reviewed question scope]
     QUERY --> EV[Structured evidence objects]
-    EV --> VERIFY{All narrative numbers grounded?}
-    VERIFY -- Yes --> ANSWER[Verified answer and evidence]
-    VERIFY -- No --> DET[Deterministic evidence summary]
-    DET --> ANSWER
+    EV --> DET[Deterministic evidence summary]
+    DET --> ANSWER[Verified answer and evidence]
 ```
 
-`src/ai/gemini_client.py` owns bounded retry and model failover. `src/database/connection.py` accepts a single `SELECT` or `WITH` statement against allowlisted business tables and blocks mutation, attachment, extensions, and file-reading functions. `src/ai/guardrails.py` checks response numbers against the request evidence. Gemini is therefore an optional interpretation layer, not the source of business facts.
+Ask the Business never calls `src/ai/gemini_client.py` and never accepts generated SQL. Its supported intents map to reviewed `SELECT` statements, `src/database/connection.py` enforces the read-only boundary, and deterministic formatters build answers from the returned evidence. Optional Gemini narration remains separate in the Management Brief and legacy Streamlit workflow.
 
 ## Failure behavior
 
 | Condition | User-visible result |
 |---|---|
-| API key absent | Reviewed deterministic query and grounded summary where supported. |
-| Gemini returns `429`, `5xx`, or timeout | Bounded retry, lighter-model failover, then deterministic fallback. |
-| Generated SQL is unsafe or invalid | SQL is rejected and the reviewed fallback is attempted. |
-| AI narrative contains an unsupported number | Narrative is suppressed and evidence is summarized deterministically. |
+| API key absent | Ask the Business is unaffected because it does not use an AI key. |
+| External AI service unavailable | Ask the Business is unaffected because every supported answer is local and deterministic. |
+| Question has no reviewed query | The supported data-question scope is explained without generating SQL. |
 | Question is unsupported by available data | The limitation is explained without guessing. |
 | Filters return no rows | A no-data message is shown without a page crash. |
 

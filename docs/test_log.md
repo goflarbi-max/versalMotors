@@ -186,6 +186,16 @@ The later checklist audit measured local process start through successful `/heal
 - Browser API calls use same-origin `/api/*`; `API_ORIGIN` is server-only and is not exposed with a `NEXT_PUBLIC_` prefix.
 - These checks passed locally. They must be repeated against the Vercel preview because no Railway or Vercel deployment URL is available in this workspace.
 
+## Deterministic Ask the Business verification
+
+Date: 2026-10-24
+
+- Removed external model calls and generated SQL from the FastAPI Ask the Business workflow. Supported questions now use reviewed read-only DuckDB queries and deterministic evidence summaries only.
+- A regression test sets an AI key and replaces the Gemini client with a function that raises immediately if called; the reviewed revenue question still returns the verified baseline answer and evidence.
+- Unregistered business questions return a clear reviewed-scope message with no guessed answer or generated query.
+- Full Python result: **129 passed, 24 subtests passed**. The Ask API results remain equal to the frozen baseline and direct SQL verification.
+- Production-mode Ask/Brief browser result: **4 passed** at the approved responsive widths and themes. Management Brief behavior was intentionally unchanged.
+
 The warm path is stable, but the uncached Overview request does not meet the proposed sub-second target. The bounded five-minute cache prevents repeated cold work without altering filter keys, records, or formulas. Railway memory, image-build duration, and public cold-start timing remain to be measured on the actual staging service.
 
 ## Environment limitations and safe stop

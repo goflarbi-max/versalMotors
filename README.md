@@ -77,7 +77,7 @@ The `assets/` folder contains the theme-aware VersalMotors logos and preserved e
 5. `src/analytics/metrics.py` calculates tested business metrics without UI or database side effects.
 6. Signed-out sessions can view the public landing or login page; direct protected URLs choose Login. Successful authentication opens Overview without disturbing shared filter state.
 7. Streamlit presents persistent filters, management KPIs, period comparisons, charts, responsive sortable and paginated tables, warranty drill-down evidence, data-quality checks, and PDF exports. Theme-aware logo assets are stored in `assets/`.
-8. The optional Gemini layer tries a primary model and lighter fallback model with bounded transient-error retries. Reviewed queries and deterministic evidence summaries remain available when every model is unavailable.
+8. Ask the Business uses reviewed read-only queries and deterministic evidence summaries only; it never sends a question or business record to Gemini. Optional Gemini narration remains limited to the Management Brief and legacy Streamlit workflow.
 
 ## Architecture
 
@@ -86,7 +86,7 @@ Business Data -> Data Processing -> Database -> Analysis -> Evidence -> AI & Gua
 Raw CSVs      -> Audited Cleaning -> DuckDB   -> Metrics  -> Objects  -> Optional Gemini  -> Streamlit -> Decisions
 ```
 
-The AI layer is optional: reviewed database queries and deterministic summaries keep the dashboard operational during missing credentials, timeouts, rate limits, invalid generated SQL, and Gemini service failures. See `docs/architecture.md` for the Mermaid diagrams and exported PNG.
+Ask the Business is data-only: reviewed queries run against the uploaded DuckDB tables and return deterministic answers with evidence. Optional AI narration is separate and is never required to ask about the business. See `docs/architecture.md` for the Mermaid diagrams and exported PNG.
 
 The Phase 7 migration preview packages the read-only FastAPI service in a verified non-root Docker image and serves the Next.js interface through Vercel with a same-origin `/api/*` proxy. Railway hosts the preview API; the Streamlit deployment remains the production rollback target until the separately approved cutover phase. See `docs/deployment.md`.
 
@@ -107,7 +107,7 @@ The Phase 7 migration preview packages the read-only FastAPI service in a verifi
 
 ## AI Usage
 
-AI has assisted development by drafting code, documentation, dataset patterns, tests, and quality checks. At runtime, Gemini can translate supported business questions into read-only queries and turn returned evidence into concise narratives. Every generated query passes through table and operation allowlists, and response numbers are checked against request evidence. For `429`, `5xx`, and timeout failures, the client uses bounded retries and then tries a configured lighter model. If all models fail, credentials are absent, SQL is rejected, or a narrative is unverified, reviewed deterministic queries and evidence summaries take over without exposing provider errors. AI does not calculate source metrics, make business decisions, silently repair ambiguous records, or replace database evidence.
+AI has assisted development by drafting code, documentation, dataset patterns, tests, and quality checks. Ask the Business does not use an external AI service: supported intents map to reviewed read-only DuckDB queries, and every response is produced deterministically from returned evidence. Questions outside that reviewed registry are declined rather than converted into generated SQL. Optional Gemini narration remains available only in the Management Brief and legacy Streamlit path; it does not calculate source metrics, make business decisions, silently repair ambiguous records, or replace database evidence.
 
 ## Data Quality
 

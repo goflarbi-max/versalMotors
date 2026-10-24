@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-import os
 from typing import Any
 
-from backend.app.services.data_loader import DataBundle
 from backend.app.services.serialization import frame_records, json_value
 from src.ai.fallback import (
     build_fallback_evidence,
     fallback_response,
-    run_with_reviewed_fallback,
+    fallback_sql_for_question,
 )
-from src.ai.gemini_client import generate_text
-from src.ai.guardrails import build_grounded_response, handle_unanswerable, validate_question
+from src.ai.guardrails import handle_unanswerable, validate_question
 from src.database.connection import run_readonly_sql
 
 SUGGESTIONS = {
@@ -50,14 +47,8 @@ def summary() -> dict[str, Any]:
     }
 
 
-def _schema(bundle: DataBundle) -> str:
-    return "\n".join(
-        f"TABLE {table} ({', '.join(str(column) for column in frame.columns)})"
-        for table, frame in bundle.analytics.__dict__.items()
-    )
-
-
-def answer_question(question: str, bundle: DataBundle) -> dict[str, Any]:
+def answer_question(question: str, _bundle: object) -> dict[str, Any]:
+    """Answer only through reviewed SQL and deterministic evidence summaries."""
     valid, error = validate_question(question)
     if not valid:
         return {"status": "invalid", "mode": "guardrail", "answer": error, "facts": None, "interpretation": None, "recommendations": [], "evidence": [], "table": []}
@@ -65,42 +56,30 @@ def answer_question(question: str, bundle: DataBundle) -> dict[str, Any]:
     if unsupported:
         return {"status": "unanswerable", "mode": "safe_refusal", "answer": unsupported, "facts": None, "interpretation": None, "recommendations": [], "evidence": [], "table": []}
 
-    reviewed = question.strip() in SUGGESTIONS.values()
-    model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
-    sql_result = {"ok": False, "text": "", "reason": "reviewed_quick_question"}
-    if not reviewed:
-        prompt = (
-            f"Schema:\n{_schema(bundle)}\nQuestion: {question}\n"
-            "Return one DuckDB SELECT only. Use net_sale_price for revenue, "
-            "exclude ERROR rows, and limit detail to 100 rows."
-        )
-        sql_result = generate_text(prompt, model=model)
-    generated_sql = None
-    if sql_result["ok"]:
-        generated_sql = str(sql_result["text"]).replace("```sql", "").replace("```", "").strip()
+    reviewed_sql, _ = fallback_sql_for_question(question)
+    if not reviewed_sql:
+        return {
+            "status": "unanswerable",
+            "mode": "deterministic",
+            "answer": (
+                "This question does not match a reviewed VersalMotors data query yet. "
+                "Try Revenue trend, Best branch, Aged inventory, or Complaints."
+            ),
+            "facts": None,
+            "interpretation": None,
+            "recommendations": [],
+            "evidence": [],
+            "table": [],
+        }
 
-    result, mode_message, used_fallback = run_with_reviewed_fallback(
-        question, generated_sql, run_readonly_sql
-    )
-    if result is None:
-        return {"status": "unanswerable", "mode": "reviewed_fallback", "answer": mode_message, "facts": None, "interpretation": None, "recommendations": [], "evidence": [], "table": []}
-
+    result = run_readonly_sql(reviewed_sql)
     evidence = build_fallback_evidence(question, result)
     deterministic = fallback_response(question, evidence)
-    answer_result = {"ok": False, "text": "", "reason": "deterministic_fallback"}
-    if not used_fallback:
-        answer_prompt = (
-            f"Question: {question}\nEvidence: {result.to_json(orient='records', date_format='iso')[:12000]}\n"
-            "Answer directly and concisely. Use only numbers in evidence; do not add a FACTS heading."
-        )
-        answer_result = generate_text(answer_prompt, model=model)
-    grounded = build_grounded_response(str(answer_result["text"]), evidence, deterministic)
-    mode = "ai" if grounded["status"] == "verified" else "reviewed_fallback"
     return {
-        "status": grounded["status"],
-        "mode": mode,
-        "answer": grounded["response"],
-        "facts": grounded["response"],
+        "status": "verified",
+        "mode": "deterministic",
+        "answer": deterministic,
+        "facts": deterministic,
         "interpretation": None,
         "recommendations": [],
         "evidence": json_value(evidence),

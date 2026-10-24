@@ -23,7 +23,7 @@ async function signIn(page: Page) {
   await expect(page).toHaveURL(/\/overview(?:\?.*)?$/);
 }
 
-test("Ask summary and reviewed fallback match the frozen baseline", async ({ page }) => {
+test("Ask summary and deterministic data answer match the frozen baseline", async ({ page }) => {
   await signIn(page);
   await page.goto("/ask-the-business");
   await expect(page.getByRole("heading", { name: "Ask the Business" })).toBeVisible();
