@@ -209,6 +209,41 @@ html[data-theme="dark"] .sidebar-logo-dark { display: none; } html:not([data-the
 .skeleton-block,.chart-skeleton,.skeleton-title,.skeleton-line { border-radius: 16px; background: linear-gradient(100deg,var(--surface-soft) 20%,var(--border) 50%,var(--surface-soft) 80%); background-size: 220% 100%; animation: overview-shimmer 1.4s linear infinite; }.skeleton-block { min-height: 220px; }.chart-skeleton { min-height: 340px; margin-top: 1rem; }.skeleton-title { width: 280px; max-width: 70%; height: 42px; }.skeleton-line { width: 620px; max-width: 90%; height: 20px; margin-top: .8rem; }
 @keyframes overview-shimmer { to { background-position: -220% 0; } }
 
+/* Phase 4 Investigate: three evidence-preserving warranty levels. */
+.investigate-page { width: min(100%, 1200px); margin: 0 auto; }
+.investigate-header { max-width: none; margin-bottom: 1rem; }
+.investigate-breadcrumbs { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; margin-bottom: 1rem; color: var(--text-muted); font-size: .84rem; }
+.investigate-breadcrumbs a,.investigate-breadcrumbs button { padding: .2rem; border: 0; color: var(--text-muted); background: transparent; cursor: pointer; text-decoration: none; }
+.investigate-breadcrumbs a:hover,.investigate-breadcrumbs button:hover { color: var(--text); text-decoration: underline; }
+.investigate-breadcrumbs [aria-current="page"] { color: var(--text); font-weight: 650; }
+.investigate-table-card,.investigate-record-header,.investigate-state { border: 1px solid var(--border); border-radius: 18px; color: var(--text); background: var(--surface); box-shadow: 0 10px 28px var(--card-shadow); }
+.investigate-table-card { overflow: hidden; }
+.table-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.15rem; }
+.table-heading h2 { margin: 0; font-size: 1.08rem; }
+.table-heading label { display: flex; align-items: center; gap: .45rem; color: var(--text-muted); font-size: .75rem; }
+.table-heading select { min-height: 38px; border: 1px solid var(--border); border-radius: .55rem; color: var(--text); background: var(--surface-soft); }
+.table-scroll { max-width: 100%; overflow-x: auto; }
+.investigate-table-card table { width: 100%; min-width: 720px; border-collapse: separate; border-spacing: 0; font-size: .8rem; }
+.investigate-table-card th { position: sticky; top: 0; padding: 0; color: #fff; background: #46515f; text-align: left; }
+html[data-theme="dark"] .investigate-table-card th { color: #111827; background: #e6eaf0; }
+.investigate-table-card th button { display: flex; align-items: center; justify-content: space-between; gap: .5rem; width: 100%; min-height: 46px; padding: .7rem .85rem; border: 0; color: inherit; background: transparent; cursor: pointer; font-size: .76rem; font-weight: 650; text-align: left; white-space: nowrap; }
+.investigate-table-card th button span { opacity: .72; font-size: .65rem; }
+.investigate-table-card td { max-width: 320px; padding: .72rem .85rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); color: var(--text); vertical-align: top; }
+.investigate-table-card tbody tr:hover td { background: var(--surface-soft); }
+.investigate-table-card td:first-child { position: sticky; left: 0; z-index: 1; font-weight: 600; }
+.row-action,.export-links a { min-height: 40px; border: 1px solid var(--border); border-radius: .65rem; color: var(--sidebar-active-text); background: var(--sidebar-active); cursor: pointer; font-weight: 650; text-decoration: none; white-space: nowrap; }
+.row-action { display: inline-flex; align-items: center; gap: .45rem; padding: .48rem .7rem; }
+.table-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .8rem; padding: .85rem 1.15rem; color: var(--text-muted); font-size: .76rem; }
+.table-footer nav { display: flex; align-items: center; gap: .55rem; }
+.table-footer button { min-width: 40px; min-height: 40px; border: 1px solid var(--border); border-radius: .65rem; color: var(--text); background: var(--surface-soft); cursor: pointer; }
+.table-footer button:disabled { cursor: not-allowed; opacity: .45; }
+.investigate-table-card.empty,.investigate-state { padding: 1.5rem; }.investigate-table-card.empty h2,.investigate-state h2 { margin: 0 0 .35rem; }.investigate-table-card.empty p,.investigate-state p { margin: 0; color: var(--text-muted); }
+.investigate-record-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; padding: 1rem 1.15rem; }
+.investigate-record-header span,.investigate-record-header p { color: var(--text-muted); font-size: .78rem; }.investigate-record-header strong { display: block; font-size: 1.7rem; font-variant-numeric: tabular-nums; }.investigate-record-header p { margin: .1rem 0 0; }
+.export-links { display: flex; gap: .6rem; }.export-links a { display: inline-flex; align-items: center; justify-content: center; padding: .55rem .8rem; }
+.investigate-loading { min-height: 420px; border-radius: 18px; background: linear-gradient(100deg,var(--surface-soft) 20%,var(--border) 50%,var(--surface-soft) 80%); background-size: 220% 100%; animation: overview-shimmer 1.4s linear infinite; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
 @media (min-width: 641px) {
   .app-shell.sidebar-open .app-main { margin-left: 286px; }
   .sidebar-backdrop { display: none; }
@@ -219,6 +254,9 @@ html[data-theme="dark"] .sidebar-logo-dark { display: none; } html:not([data-the
   .app-main { padding: 5.5rem 1rem 2rem; }
   .kpi-grid,.overview-chart-grid { grid-template-columns: 1fr; }
   .overview-kpi { padding: 1rem; }.kpi-value-row>strong { font-size: 1.55rem; }.chart-canvas,.chart-canvas.chart-tall { height: 300px; }
+  .table-heading,.investigate-record-header { align-items: flex-start; flex-direction: column; }
+  .export-links { width: 100%; }.export-links a { flex: 1; }
+  .table-footer { align-items: flex-start; flex-direction: column; }
 }
 @media (max-width: 700px) {
   .landing-hero { min-height: 76vh; padding: 1.1rem 1rem 4rem; }.landing-topbar img { width: 10.5rem; }.landing-sign-in { min-width: auto; padding: .55rem .9rem; }
