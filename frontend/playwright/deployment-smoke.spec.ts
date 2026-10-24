@@ -20,6 +20,28 @@ test("same-origin API proxy and browser security headers are healthy", async ({ 
   expect((await proxiedApi.json()).csrf_token).toBeTruthy();
 });
 
+test("browser traffic stays same-origin and rendered pages contain no Streamlit branding", async ({ page }) => {
+  const foreignRequests: string[] = [];
+  const sensitiveRequests: string[] = [];
+  const sensitiveNames = /GEMINI_API_KEY|VERSALMOTORS_SESSION_SECRET|VERSALMOTORS_AUTH_USERS_JSON/i;
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      const expectedOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000").origin;
+      if (url.origin !== expectedOrigin) foreignRequests.push(request.url());
+    }
+    if (sensitiveNames.test(`${request.url()} ${request.postData() ?? ""}`)) sensitiveRequests.push(request.url());
+  });
+
+  await signIn(page);
+  for (const path of ["/overview", "/investigate", "/ask-the-business", "/management-brief", "/data-quality"]) {
+    await page.goto(path);
+    await expect(page.locator("body")).not.toContainText(/streamlit/i);
+  }
+  expect(foreignRequests).toEqual([]);
+  expect(sensitiveRequests).toEqual([]);
+});
+
 for (const viewport of [{ name: "mobile", width: 375, height: 800 }, { name: "desktop", width: 1280, height: 800 }]) {
   test(`${viewport.name} deployment smoke reaches every protected page`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });

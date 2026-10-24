@@ -156,7 +156,7 @@ Scope: repository-side Docker/Railway/Vercel configuration, same-origin proxying
 ## Automated verification
 
 - Python: **128 passed, 24 subtests passed** in 221.96 seconds. Three non-failing warnings concerned Starlette's future httpx2 migration, a Google SDK deprecation, and pytest cache creation on Windows.
-- Playwright: **32 passed** in 5.6 minutes using one Chromium worker against the local Next.js/FastAPI deployment pair.
+- Playwright: **33 passed** in 6.1 minutes using one Chromium worker against the local production-mode Next.js/FastAPI deployment pair. The added deployment audit visited every protected page, observed no cross-origin browser request, found no secret-variable name in request URLs/bodies, and found no rendered Streamlit branding.
 - Deployment smoke coverage passed for the same-origin API proxy, response security headers, authenticated desktop and mobile navigation, protected routes, responsive widths, and light/dark themes.
 - Frontend lint and production build passed with Next.js 16.4.3.
 
@@ -175,6 +175,16 @@ The API process was restarted immediately before measurement so the first Overvi
 | Warm p50 | 58.79 ms |
 | Warm p95 | 75.37 ms |
 | Warm maximum | 84.21 ms |
+
+The later checklist audit measured local process start through successful `/health/ready` at **6,982.85 ms**. This is a local non-container measurement, not a Railway cold-start result.
+
+## Frontend bundle security audit
+
+- Next.js 16.4.3 lint and optimized production build: PASS.
+- The build was executed with the fake sentinel `PHASE7_AI_KEY_SENTINEL_DO_NOT_DEPLOY`.
+- Recursive search of `frontend/.next` found no sentinel value, `GEMINI_API_KEY`, `VERSALMOTORS_SESSION_SECRET`, `VERSALMOTORS_AUTH_USERS_JSON`, or `streamlit` string.
+- Browser API calls use same-origin `/api/*`; `API_ORIGIN` is server-only and is not exposed with a `NEXT_PUBLIC_` prefix.
+- These checks passed locally. They must be repeated against the Vercel preview because no Railway or Vercel deployment URL is available in this workspace.
 
 The warm path is stable, but the uncached Overview request does not meet the proposed sub-second target. The bounded five-minute cache prevents repeated cold work without altering filter keys, records, or formulas. Railway memory, image-build duration, and public cold-start timing remain to be measured on the actual staging service.
 

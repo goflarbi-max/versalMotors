@@ -39,6 +39,7 @@ def test_docker_context_excludes_local_secrets_and_generated_database() -> None:
     assert ".streamlit/secrets.toml" in ignored
     assert "data/business.duckdb" in ignored
     assert "data/generator_truth.md" in ignored
+    assert "legacy" in ignored
 
 
 def test_frontend_uses_same_origin_proxy_and_security_headers() -> None:

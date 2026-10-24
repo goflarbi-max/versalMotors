@@ -20,4 +20,5 @@ frontend/.next
 frontend/playwright-report
 frontend/test-results
 docs/screenshots
+legacy
 *.log

@@ -33,11 +33,55 @@ Configure these service/shared variables in Railway:
 
 The API logs only request ID, route path, method, duration, status, cache result, and normalized error category. It does not log query strings, request bodies, credentials, cookies, SQL, or provider keys.
 
+### Create and deploy the Railway service
+
+1. Push the tested Phase 7 commits to the GitHub `main` branch.
+2. Sign in to Railway, select **New Project**, then **Deploy from GitHub repo**. Connect GitHub if prompted and choose `goflarbi-max/versalMotors` on `main`.
+3. Open the new service's **Settings**. Confirm Railway detected the root `Dockerfile`, set the region to Amsterdam (`europe-west4`), keep one replica, and disable Serverless for the always-on production service.
+4. Set the health-check path to `/health/ready` with a 300-second deployment timeout. Do not override the image command or `PORT`; Railway supplies `PORT` and the Docker command reads it.
+5. In **Variables**, add the following runtime values. Paste values in the Railway dashboard, never into Git, build arguments, or frontend variables:
+
+   ```text
+   VERSALMOTORS_SESSION_SECRET=<long random value>
+   VERSALMOTORS_AUTH_USERS_JSON={"demo@versalmotors.com":"<bcrypt hash>"}
+   VERSALMOTORS_ALLOWED_ORIGINS=https://<vercel-preview>,https://autobusiness.goflarbi.com
+   VERSALMOTORS_SECURE_COOKIES=true
+   VERSALMOTORS_SESSION_HOURS=8
+   GEMINI_API_KEY=<optional Google AI key>
+   GEMINI_MODEL=gemini-3.8-flash
+   GEMINI_FALLBACK_MODELS=gemini-3.5-flash-lite
+   GEMINI_MAX_ATTEMPTS=2
+   ```
+
+   Generate the bcrypt value locally with `.\.venv\Scripts\python.exe scripts\create_user.py`; do not paste the plain password into Railway's JSON variable.
+6. Review Railway's staged changes and select **Deploy**. The build must show that the root Dockerfile was detected, database verification passed, and the readiness health check succeeded.
+7. In **Settings > Networking**, select **Generate Domain**. Record the resulting HTTPS `*.up.railway.app` origin; this is the server-only `API_ORIGIN` used by Vercel.
+8. Verify `https://<railway-origin>/health/live` and `/health/ready` before creating the frontend deployment. The readiness response must contain the frozen database hash and expected table counts.
+
 ## Vercel frontend
 
 Create a Vercel project from the same repository with Root Directory set to `frontend`. Configure `API_ORIGIN` as the HTTPS Railway service origin in Preview and Production environments. `next.config.ts` proxies browser `/api/*` requests to that origin, so cookies and application requests remain same-origin. It also applies CSP, HSTS, frame denial, referrer, permissions, and MIME-sniffing headers.
 
 Do not add `NEXT_PUBLIC_` to `API_ORIGIN`; it is server-only. Environment changes apply only to new Vercel deployments, so redeploy after updating it.
+
+### Deploy the frontend from GitHub
+
+1. Sign in to Vercel, select **Add New > Project**, import `goflarbi-max/versalMotors`, and grant the Vercel GitHub app access if prompted.
+2. Set **Framework Preset** to Next.js and **Root Directory** to `frontend`. Keep the repository's normal install and build commands.
+3. Add `API_ORIGIN=https://<railway-origin>` to both **Preview** and **Production** environments. It must not be named `NEXT_PUBLIC_API_ORIGIN`, and the URL must not end in `/api`.
+4. Select **Deploy**. Test the generated Vercel preview hostname before assigning the production domain. If `API_ORIGIN` changes, update it in Project Settings and redeploy; existing deployments do not inherit changed values.
+5. In **Settings > Domains**, add `autobusiness.goflarbi.com`. Copy the exact DNS record target Vercel displays for this project; do not substitute a generic Vercel hostname.
+
+### Change the Cloudflare record manually after preview approval
+
+These are operator instructions only. This repository and its deployment scripts do not modify DNS.
+
+1. Before editing anything, record/export the current `autobusiness` DNS record and Cloudflare Worker route so rollback is exact.
+2. In Cloudflare **DNS > Records**, locate the existing `autobusiness` record. Remove any Worker route that intercepts the hostname only when the Vercel preview, Railway readiness, login, exports, and responsive smoke tests have passed.
+3. Replace the old record with the type, name, and target Vercel showed—normally a `CNAME` with name `autobusiness` and Vercel's project-specific target.
+4. Set **Proxy status** to **DNS only** (grey cloud) and save. Do not guess the CNAME target, and do not leave conflicting A, AAAA, or CNAME records on the same hostname.
+5. Wait for DNS and Vercel certificate validation, then verify `https://autobusiness.goflarbi.com` in a private browser window.
+6. If health, authentication, exports, parity, or TLS fails, immediately restore the recorded Worker route/previous DNS record. Keep Streamlit running until the agreed observation window has completed.
 
 ## Staging verification
 
@@ -62,6 +106,17 @@ Do not add `NEXT_PUBLIC_` to `API_ORIGIN`; it is server-only. Environment change
    ```
 
 5. Record first readiness response, warm p50/p95, error count, Railway peak memory, image build duration, region, and Vercel deployment URL in `docs/test_log.md`.
+
+6. Inspect the browser Network panel while testing. Application requests must remain on the Vercel/custom origin under `/api/*`; no request URL, request body, response, cookie, or browser bundle may contain `GEMINI_API_KEY`, `VERSALMOTORS_SESSION_SECRET`, or `VERSALMOTORS_AUTH_USERS_JSON`.
+7. Search the production frontend output with a unique sentinel before release:
+
+   ```powershell
+   $env:GEMINI_API_KEY='PHASE7_AI_KEY_SENTINEL_DO_NOT_DEPLOY'
+   npm.cmd --prefix frontend run build
+   rg -n -i 'PHASE7_AI_KEY_SENTINEL_DO_NOT_DEPLOY|GEMINI_API_KEY|streamlit' frontend/.next
+   ```
+
+   The command must return no match. The sentinel is deliberately fake; never place a real AI key in the frontend environment, command line, or build logs.
 
 ## Rollback boundary
 
