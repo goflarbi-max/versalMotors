@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   BriefIcon, ChatIcon, LogoutIcon, MoonIcon, OverviewIcon,
   QualityIcon, SearchIcon, SunIcon,
 } from "@/components/icons";
+import { BusinessFilterPanel, FilterProvider } from "@/components/filter-provider";
 
 const navigation = [
   { href: "/overview", label: "Overview", icon: OverviewIcon },
@@ -32,9 +33,14 @@ function subscribeTheme(callback: () => void) {
 }
 function themeSnapshot() { return document.documentElement.dataset.theme === "dark"; }
 
-export function AppShell({ email, children }: Props) {
+export function AppShell(props: Props) {
+  return <FilterProvider><AppShellContent {...props}/></FilterProvider>;
+}
+
+function AppShellContent({ email, children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const mobile = useSyncExternalStore(subscribeMobile, mobileSnapshot, () => false);
   const dark = useSyncExternalStore(subscribeTheme, themeSnapshot, () => false);
   const [manualOpen, setManualOpen] = useState<boolean | null>(null);
@@ -86,9 +92,11 @@ export function AppShell({ email, children }: Props) {
             {navigation.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
-              return <Link key={item.href} href={item.href} onClick={() => { if (mobile) setManualOpen(false); }} className={`sidebar-link${active ? " active" : ""}`} aria-current={active ? "page" : undefined}><Icon />{item.label}</Link>;
+              const query = searchParams.toString();
+              return <Link key={item.href} href={`${item.href}${query ? `?${query}` : ""}`} onClick={() => { if (mobile) setManualOpen(false); }} className={`sidebar-link${active ? " active" : ""}`} aria-current={active ? "page" : undefined}><Icon />{item.label}</Link>;
             })}
           </nav>
+          <BusinessFilterPanel />
           <div className="sidebar-footer">
             <p className="sidebar-email"><strong>Signed in</strong><br />{email}</p>
             <button className="theme-button" type="button" onClick={toggleTheme}>{dark ? <SunIcon /> : <MoonIcon />}{dark ? "Light mode" : "Dark mode"}</button>

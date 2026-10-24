@@ -86,3 +86,21 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** I initially asserted that the filter-options endpoint would contain `Completed`, although the cleaned sales table and existing Streamlit filter expose the exact lowercase value `completed`.
 - **How it was found:** The new backend filter-options test failed while comparing the endpoint response with the current application choices.
 - **How it was fixed:** I corrected only the test expectation to the source-of-truth lowercase value. The adapter, data, filters, and metric formulas were left unchanged.
+
+## Phase 3 first frontend build exposed two implementation errors
+
+- **What went wrong:** The first Overview build mixed `||` with `??` without parentheses in date-input props, and the initial data effect synchronously reset React state in a pattern rejected by the configured React hooks lint rule.
+- **How it was found:** `npm run lint` and the Next.js production build failed before any commit was created.
+- **How it was fixed:** I made the nullish-coalescing precedence explicit and modeled request status by the query attached to each asynchronous result, so a changed URL naturally shows the loading state without a synchronous state reset inside the effect.
+
+## Phase 3 Overview requests aborted themselves and default filters raced navigation
+
+- **What went wrong:** The first browser implementation made the Overview request effect depend on a reconstructed filter object, so renders could abort and restart the KPI request. Default dates were also canonicalized with a router navigation that could win a race against a user immediately selecting another page.
+- **How it was found:** Playwright showed the three chart requests completing while the KPI card never appeared, and a tablet navigation click returned to Overview.
+- **How it was fixed:** The request effect now depends only on the stable serialized query string. Default dates use the browser history replacement supported by Next.js, updating the shareable URL without starting a competing route navigation.
+
+## Phase 3 error-state test selected Next.js's route announcer
+
+- **What went wrong:** The first error-state assertion selected every element with the ARIA `alert` role, which included both the intended Overview error card and Next.js's built-in route announcer.
+- **How it was found:** Playwright strict mode rejected the ambiguous locator even though the friendly Overview error message was rendered correctly.
+- **How it was fixed:** The test now targets the scoped `.overview-state[role=alert]` component, preserving the accessibility role while avoiding framework-owned elements.
