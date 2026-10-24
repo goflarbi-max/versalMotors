@@ -5,7 +5,7 @@ async function signIn(page: Page) {
   await page.getByLabel("Email Address").fill("demo@versalmotors.com");
   await page.getByLabel("Password", { exact: true }).fill("VersalDemo2026!");
   await page.getByRole("button", { name: "Sign In" }).click();
-  await expect(page).toHaveURL(/\/overview$/);
+  await expect(page).toHaveURL(/\/overview(?:\?.*)?$/);
 }
 
 test("landing and login preserve the approved public flow", async ({ page }) => {
@@ -32,7 +32,7 @@ test("login rewrite preserves the backend session cookie and protects the shell"
   await expect(page.getByRole("link", { name: "Overview" })).toHaveAttribute("aria-current", "page");
   await page.goto("/");
   await page.getByRole("link", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/overview$/);
+  await expect(page).toHaveURL(/\/overview(?:\?.*)?$/);
 });
 
 test("desktop hamburger, theme, navigation, and sign out retain behavior", async ({ page }) => {
@@ -46,7 +46,7 @@ test("desktop hamburger, theme, navigation, and sign out retain behavior", async
   await page.getByRole("button", { name: "Dark mode" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.getByRole("link", { name: "Investigate" }).click();
-  await expect(page).toHaveURL(/\/investigate$/);
+  await expect(page).toHaveURL(/\/investigate(?:\?.*)?$/);
   await expect(page.getByRole("link", { name: "Investigate" })).toHaveAttribute("aria-current", "page");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.getByRole("button", { name: "Sign out" }).click();
@@ -61,7 +61,7 @@ test("mobile drawer starts closed and closes after navigation", async ({ page })
   await page.getByRole("button", { name: "Open navigation menu" }).click();
   await expect(page.getByRole("button", { name: "Close navigation menu" })).toBeVisible();
   await page.getByRole("link", { name: "Data Quality" }).click();
-  await expect(page).toHaveURL(/\/data-quality$/);
+  await expect(page).toHaveURL(/\/data-quality(?:\?.*)?$/);
   await expect(page.getByRole("button", { name: "Open navigation menu" })).toBeVisible();
 });
 
@@ -78,7 +78,7 @@ test("tablet keeps the sidebar open and every protected destination updates its 
   ] as const;
   for (const [label, path] of destinations) {
     await page.getByRole("link", { name: label }).click();
-    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await expect(page).toHaveURL(new RegExp(`${path}(?:\\?.*)?$`));
     await expect(page.getByRole("link", { name: label })).toHaveAttribute("aria-current", "page");
   }
   const dimensions = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));

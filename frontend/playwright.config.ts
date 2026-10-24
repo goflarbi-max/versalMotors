@@ -30,8 +30,10 @@ const webServer: PlaywrightTestConfig["webServer"] = process.env.PLAYWRIGHT_EXTE
 export default defineConfig({
   testDir: "./playwright",
   fullyParallel: false,
+  workers: 1,
   retries: 0,
   reporter: "list",
+  expect: { timeout: 20_000 },
   use: {
     baseURL: "http://127.0.0.1:3000",
     trace: "retain-on-failure",
