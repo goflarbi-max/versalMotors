@@ -127,3 +127,8 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The first Ask and Management Brief Playwright run reused an older Next.js process on port 3000, so it tested migration placeholders instead of the current production build. Two assertions also targeted wording and the transparent `body` rather than the existing `.app-shell` theme surface.
 - **How it was found:** The Playwright accessibility snapshot showed the exact old placeholder copy despite the current source and successful Next.js build.
 - **How it was fixed:** The stale test-port processes were identified by command line and restarted, deterministic AI-disabled browser-test environment variables were added, and assertions were aligned with the actual safe-refusal copy and app-shell theme surface. The responsive brief controls were tightened at tablet width after the browser test exposed a 20-pixel overflow.
+## Phase 6 browser test raced shared-filter initialization (2026-10-24)
+
+- **What went wrong:** The first full Phase 6 browser run clicked the Data Quality sort header before the protected shell finished adding its default date filters to the URL. The filter-provider navigation then replaced the test's sort query, making a working sort control appear broken.
+- **How it was found:** The targeted Data Quality suite passed, while the full suite trace showed the URL changing only to the default `start_date` and `end_date` values immediately after the click.
+- **How it was fixed:** The browser test now waits for the existing shared-filter URL initialization before exercising table sorting. Application behavior and business data were not changed.

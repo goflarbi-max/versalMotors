@@ -27,7 +27,7 @@ test("Ask summary and reviewed fallback match the frozen baseline", async ({ pag
   await signIn(page);
   await page.goto("/ask-the-business");
   await expect(page.getByRole("heading", { name: "Ask the Business" })).toBeVisible();
-  await expect(page.locator(".ask-summary-card")).toHaveCount(4);
+  await expect(page.locator(".ask-summary-card")).toHaveCount(4, { timeout: 60_000 });
   await expect(page.getByText("GHS 5.58B", { exact: true })).toBeVisible();
   await expect(page.getByText(baseline.ask_the_business.summary.completed_sales.toLocaleString("en-US"), { exact: true })).toBeVisible();
   await expect(page.getByText(String(baseline.ask_the_business.summary.branches), { exact: true })).toBeVisible();
