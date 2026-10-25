@@ -1,0 +1,644 @@
+{
+  "scenarios": {
+    "default_90_days": {
+      "filters": {
+        "start_date": "2025-04-02",
+        "end_date": "2025-06-30",
+        "branch": [],
+        "model": [],
+        "brand": [],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 1094358170.03,
+          "previous_value": 906645934.42,
+          "change": 187712235.61,
+          "change_rate": 0.20704028825771265
+        },
+        {
+          "metric": "Gross margin",
+          "value": 136911453.65,
+          "previous_value": 114327309.63999999,
+          "change": 22584144.01000002,
+          "change_rate": 0.19753936378905612
+        },
+        {
+          "metric": "Units sold",
+          "value": 3906.0,
+          "previous_value": 3246.0,
+          "change": 660.0,
+          "change_rate": 0.2033271719038817
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.08592044986134374,
+          "previous_value": 0.08373247098103917,
+          "change": 0.0021879788803045724,
+          "change_rate": 0.026130590136292885
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 1094358170.03,
+        "revenue_by_branch": 1094358170.03,
+        "gross_margin_by_model": 136911453.65
+      },
+      "chart_rows": {
+        "revenue_trend": 3,
+        "revenue_by_branch": 11,
+        "gross_margin_by_model": 8
+      },
+      "warranty_table_rows": 8
+    },
+    "full_range": {
+      "filters": {
+        "start_date": "2022-11-10",
+        "end_date": "2025-06-30",
+        "branch": [],
+        "model": [],
+        "brand": [],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 5554215470.18,
+          "previous_value": 0.0,
+          "change": 5554215470.18,
+          "change_rate": null
+        },
+        {
+          "metric": "Gross margin",
+          "value": 742414300.62,
+          "previous_value": 0.0,
+          "change": 742414300.62,
+          "change_rate": null
+        },
+        {
+          "metric": "Units sold",
+          "value": 19646.0,
+          "previous_value": 0.0,
+          "change": 19646.0,
+          "change_rate": null
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.07643552126621483,
+          "previous_value": null,
+          "change": null,
+          "change_rate": null
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 5554215470.18,
+        "revenue_by_branch": 5554215470.18,
+        "gross_margin_by_model": 742414300.62
+      },
+      "chart_rows": {
+        "revenue_trend": 32,
+        "revenue_by_branch": 11,
+        "gross_margin_by_model": 8
+      },
+      "warranty_table_rows": 8
+    },
+    "branch_accra": {
+      "filters": {
+        "start_date": "2022-11-10",
+        "end_date": "2025-06-30",
+        "branch": [
+          "Accra"
+        ],
+        "model": [],
+        "brand": [],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 1367002542.24,
+          "previous_value": 0.0,
+          "change": 1367002542.24,
+          "change_rate": null
+        },
+        {
+          "metric": "Gross margin",
+          "value": 182733646.93,
+          "previous_value": 0.0,
+          "change": 182733646.93,
+          "change_rate": null
+        },
+        {
+          "metric": "Units sold",
+          "value": 4858.0,
+          "previous_value": 0.0,
+          "change": 4858.0,
+          "change_rate": null
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.07629078235413407,
+          "previous_value": null,
+          "change": null,
+          "change_rate": null
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 1367002542.24,
+        "revenue_by_branch": 1367002542.24,
+        "gross_margin_by_model": 182733646.92999998
+      },
+      "chart_rows": {
+        "revenue_trend": 31,
+        "revenue_by_branch": 1,
+        "gross_margin_by_model": 8
+      },
+      "warranty_table_rows": 8
+    },
+    "branch_kumasi_90_days": {
+      "filters": {
+        "start_date": "2025-04-02",
+        "end_date": "2025-06-30",
+        "branch": [
+          "Kumasi"
+        ],
+        "model": [],
+        "brand": [],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 214995750.37,
+          "previous_value": 179862248.41,
+          "change": 35133501.96000001,
+          "change_rate": 0.1953356097267972
+        },
+        {
+          "metric": "Gross margin",
+          "value": 26957004.070000004,
+          "previous_value": 22663083.61,
+          "change": 4293920.460000005,
+          "change_rate": 0.18946761764164027
+        },
+        {
+          "metric": "Units sold",
+          "value": 760.0,
+          "previous_value": 639.0,
+          "change": 121.0,
+          "change_rate": 0.18935837245696402
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.0854897462383333,
+          "previous_value": 0.08336359915999088,
+          "change": 0.0021261470783424247,
+          "change_rate": 0.02550450196208464
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 214995750.37,
+        "revenue_by_branch": 214995750.37,
+        "gross_margin_by_model": 26957004.07
+      },
+      "chart_rows": {
+        "revenue_trend": 3,
+        "revenue_by_branch": 1,
+        "gross_margin_by_model": 8
+      },
+      "warranty_table_rows": 8
+    },
+    "model_hilux": {
+      "filters": {
+        "start_date": "2022-11-10",
+        "end_date": "2025-06-30",
+        "branch": [],
+        "model": [
+          "Hilux"
+        ],
+        "brand": [],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 1544683172.98,
+          "previous_value": 0.0,
+          "change": 1544683172.98,
+          "change_rate": null
+        },
+        {
+          "metric": "Gross margin",
+          "value": 208143774.1,
+          "previous_value": 0.0,
+          "change": 208143774.1,
+          "change_rate": null
+        },
+        {
+          "metric": "Units sold",
+          "value": 4843.0,
+          "previous_value": 0.0,
+          "change": 4843.0,
+          "change_rate": null
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.07487377444759746,
+          "previous_value": null,
+          "change": null,
+          "change_rate": null
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 1544683172.98,
+        "revenue_by_branch": 1544683172.98,
+        "gross_margin_by_model": 208143774.1
+      },
+      "chart_rows": {
+        "revenue_trend": 30,
+        "revenue_by_branch": 11,
+        "gross_margin_by_model": 1
+      },
+      "warranty_table_rows": 1
+    },
+    "model_corolla_90_days": {
+      "filters": {
+        "start_date": "2025-04-02",
+        "end_date": "2025-06-30",
+        "branch": [],
+        "model": [
+          "Corolla"
+        ],
+        "brand": [],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 89230287.2,
+          "previous_value": 62312941.760000005,
+          "change": 26917345.439999998,
+          "change_rate": 0.431970384959081
+        },
+        {
+          "metric": "Gross margin",
+          "value": 10990773.34,
+          "previous_value": 7896377.75,
+          "change": 3094395.59,
+          "change_rate": 0.3918753241003446
+        },
+        {
+          "metric": "Units sold",
+          "value": 388.0,
+          "previous_value": 278.0,
+          "change": 110.0,
+          "change_rate": 0.39568345323741005
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.08596634321091662,
+          "previous_value": 0.08361150711456591,
+          "change": 0.0023548360963507042,
+          "change_rate": 0.028164019255436545
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 89230287.2,
+        "revenue_by_branch": 89230287.2,
+        "gross_margin_by_model": 10990773.34
+      },
+      "chart_rows": {
+        "revenue_trend": 3,
+        "revenue_by_branch": 11,
+        "gross_margin_by_model": 1
+      },
+      "warranty_table_rows": 1
+    },
+    "brand_elara": {
+      "filters": {
+        "start_date": "2022-11-10",
+        "end_date": "2025-06-30",
+        "branch": [],
+        "model": [],
+        "brand": [
+          "Elara"
+        ],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 702806494.15,
+          "previous_value": 0.0,
+          "change": 702806494.15,
+          "change_rate": null
+        },
+        {
+          "metric": "Gross margin",
+          "value": 91886352.11000001,
+          "previous_value": 0.0,
+          "change": 91886352.11000001,
+          "change_rate": null
+        },
+        {
+          "metric": "Units sold",
+          "value": 2351.0,
+          "previous_value": 0.0,
+          "change": 2351.0,
+          "change_rate": null
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.08017994819283694,
+          "previous_value": null,
+          "change": null,
+          "change_rate": null
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 702806494.15,
+        "revenue_by_branch": 702806494.15,
+        "gross_margin_by_model": 91886352.11
+      },
+      "chart_rows": {
+        "revenue_trend": 32,
+        "revenue_by_branch": 11,
+        "gross_margin_by_model": 1
+      },
+      "warranty_table_rows": 1
+    },
+    "completed_90_days": {
+      "filters": {
+        "start_date": "2025-04-02",
+        "end_date": "2025-06-30",
+        "branch": [],
+        "model": [],
+        "brand": [],
+        "salesperson": [],
+        "status": [
+          "completed"
+        ],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 1094358170.03,
+          "previous_value": 906645934.42,
+          "change": 187712235.61,
+          "change_rate": 0.20704028825771265
+        },
+        {
+          "metric": "Gross margin",
+          "value": 136911453.65,
+          "previous_value": 114327309.63999999,
+          "change": 22584144.01000002,
+          "change_rate": 0.19753936378905612
+        },
+        {
+          "metric": "Units sold",
+          "value": 3906.0,
+          "previous_value": 3246.0,
+          "change": 660.0,
+          "change_rate": 0.2033271719038817
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.08592044986134374,
+          "previous_value": 0.08373247098103917,
+          "change": 0.0021879788803045724,
+          "change_rate": 0.026130590136292885
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 1094358170.03,
+        "revenue_by_branch": 1094358170.03,
+        "gross_margin_by_model": 136911453.65
+      },
+      "chart_rows": {
+        "revenue_trend": 3,
+        "revenue_by_branch": 11,
+        "gross_margin_by_model": 8
+      },
+      "warranty_table_rows": 8
+    },
+    "single_day": {
+      "filters": {
+        "start_date": "2025-06-30",
+        "end_date": "2025-06-30",
+        "branch": [],
+        "model": [],
+        "brand": [],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 50356750.84,
+          "previous_value": 10415391.38,
+          "change": 39941359.46,
+          "change_rate": 3.8348399981105654
+        },
+        {
+          "metric": "Gross margin",
+          "value": 7829003.14,
+          "previous_value": 1262541.46,
+          "change": 6566461.68,
+          "change_rate": 5.200986967984401
+        },
+        {
+          "metric": "Units sold",
+          "value": 176.0,
+          "previous_value": 38.0,
+          "change": 138.0,
+          "change_rate": 3.6315789473684212
+        },
+        {
+          "metric": "Discount rate",
+          "value": 0.05012740196022554,
+          "previous_value": 0.08914726899900755,
+          "change": -0.039019867038782005,
+          "change_rate": -0.4377012047246944
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 50356750.84,
+        "revenue_by_branch": 50356750.839999996,
+        "gross_margin_by_model": 7829003.14
+      },
+      "chart_rows": {
+        "revenue_trend": 1,
+        "revenue_by_branch": 11,
+        "gross_margin_by_model": 8
+      },
+      "warranty_table_rows": 8
+    },
+    "valid_empty_pair": {
+      "filters": {
+        "start_date": "2025-04-02",
+        "end_date": "2025-06-30",
+        "branch": [
+          "Kasoa"
+        ],
+        "model": [
+          "Yaris"
+        ],
+        "brand": [],
+        "salesperson": [],
+        "status": [],
+        "period": "M"
+      },
+      "matches": {
+        "kpis": true,
+        "revenue_chart": true,
+        "branch_chart": true,
+        "model_chart": true,
+        "warranty_table_row_count": true
+      },
+      "kpis": [
+        {
+          "metric": "Revenue",
+          "value": 0.0,
+          "previous_value": 0.0,
+          "change": 0.0,
+          "change_rate": null
+        },
+        {
+          "metric": "Gross margin",
+          "value": 0.0,
+          "previous_value": 0.0,
+          "change": 0.0,
+          "change_rate": null
+        },
+        {
+          "metric": "Units sold",
+          "value": 0.0,
+          "previous_value": 0.0,
+          "change": 0.0,
+          "change_rate": null
+        },
+        {
+          "metric": "Discount rate",
+          "value": null,
+          "previous_value": null,
+          "change": null,
+          "change_rate": null
+        }
+      ],
+      "chart_totals": {
+        "revenue_trend": 0.0,
+        "revenue_by_branch": 0.0,
+        "gross_margin_by_model": 0.0
+      },
+      "chart_rows": {
+        "revenue_trend": 0,
+        "revenue_by_branch": 0,
+        "gross_margin_by_model": 0
+      },
+      "warranty_table_rows": 1
+    }
+  },
+  "mismatches": [],
+  "ask_summary": {
+    "streamlit_direct_values": {
+      "revenue": 5583810339.939992,
+      "completed_sales": 19755.0,
+      "branches": 15.0,
+      "available_over_90_days": 4484.0
+    },
+    "nextjs_api_values": {
+      "revenue": 5583810339.939992,
+      "completed_sales": 19755,
+      "branches": 15,
+      "available_over_90_days": 4484
+    },
+    "nextjs_display": {
+      "revenue": "GHS 5.58B",
+      "completed_sales": "19,755",
+      "branches": "15",
+      "available_over_90_days": "4,484"
+    },
+    "matches": true,
+    "note": "Both implementations expose these four cards without shared filters."
+  },
+  "all_match": true
+}
