@@ -19,15 +19,11 @@ The intended differences were excluded: no Streamlit branding, no “Made with S
 
 ## Executive result
 
-Numerical parity is strong: **zero mismatches** were found across ten filter combinations for KPI records, revenue-trend records and totals, branch-chart records and totals, model-margin records and totals, warranty drill-down row counts/totals, and the four Ask the Business summary cards.
+All approved **High** and **Medium** migrated-app findings are resolved. Numerical parity remains exact: **zero mismatches** were found across ten filter combinations for KPI records, revenue-trend records and totals, branch-chart records and totals, model-margin records and totals, warranty drill-down row counts/totals, and the four Ask the Business summary cards.
 
-Feature and visual parity is incomplete. The highest-impact gaps are:
+The completed fixes restore the Overview evidence action and chart presentation, scope shared filters to the same pages as the reference, replace placeholder KPI glyphs, match the Investigate selection workflow, restore Ask/History and inline evidence presentation, align Management Brief and Data Quality presentation, and match the reference table pagination and landing geometry. The deterministic data-only Ask architecture remains intact; unavailable/unverified notices are conditional rather than fabricated.
 
-1. The migrated Overview omits the reference “Investigate the evidence” action.
-2. Ask the Business does not preserve the reference Ask/History experience or the same fallback/warning presentation.
-3. Shared filters appear on every protected Next.js page, while the reference shows them only on Overview and Investigate.
-4. Overview charts differ in height, axis titles, legend, tooltip formatting and one series colour.
-5. The reference Streamlit mobile sidebar currently leaves a backdrop active after navigation, which blocks controls. This is a reference regression and prevented the automated dark/1280 matrix from completing without altering the reference DOM.
+The only High item not changed is the documented **reference Streamlit mobile-sidebar regression**. It is not a defect in the migrated app, and changing the reference was outside the approved scope. The Next.js drawer closes atomically after mobile navigation and is covered by Playwright.
 
 ## Feature inventory
 
@@ -55,36 +51,36 @@ Status meanings: **Matches** = same visible function and behavior; **Different**
 | Sidebar | Hamburger / drawer with backdrop | Broken in reference; Matches in Next.js | `src/ui/sidebar.py` | `frontend/components/app-shell.tsx` | Streamlit's mobile backdrop can remain active and intercept controls after navigation; Next.js closes cleanly. |
 | Filters | Date, branch, brand, model, salesperson, status | Matches | `src/ui/filters.py` | `frontend/components/business-filter-panel.tsx` | Same dimensions and values. |
 | Filters | Values persist across Overview and Investigate | Matches | `src/ui/filters.py` | URL-backed filter state | Verified structurally and by API parity scenarios. |
-| Filters | Filters shown only where reference uses them | Different | `pages/overview.py`, `pages/investigate.py` | `frontend/components/app-shell.tsx` | Next.js displays the filter panel on Ask, Brief and Data Quality too. |
+| Filters | Filters shown only where reference uses them | Matches | `pages/overview.py`, `pages/investigate.py` | `frontend/components/app-shell.tsx` | The filter panel is restricted to Overview and Investigate. |
 | Overview | Revenue KPI and comparison | Matches | `pages/overview.py` | `frontend/components/overview-dashboard.tsx` | Same source result and caption. |
 | Overview | Gross margin KPI and comparison | Matches | same | same | Same source result and caption. |
 | Overview | Units sold KPI and comparison | Matches | same | same | Same source result and caption. |
 | Overview | Discount rate KPI and comparison | Matches | same | same | Same source result and caption. |
-| Overview | KPI material icons | Different | `src/ui/components.py` | `frontend/components/overview-dashboard.tsx` | React source uses replacement glyph strings for three cards rather than the reference material icons. |
-| Overview | Revenue trend chart | Different | `pages/overview.py`, `src/ui/charts.py` | `frontend/components/overview-charts.tsx` | Data matches; rendering details differ. |
-| Overview | Revenue by branch chart | Different | same | same | Data matches; rendering details differ. |
-| Overview | Gross margin by model chart | Different | same | same | Data matches; colour, height, labels and tooltip differ. |
-| Overview | “Investigate the evidence” navigation card | Missing | `pages/overview.py` | — | No equivalent link/card appears after the charts. |
+| Overview | KPI material icons | Matches | `src/ui/components.py` | `frontend/components/overview-dashboard.tsx` | Semantic SVG icons replace the placeholder glyphs. |
+| Overview | Revenue trend chart | Matches | `pages/overview.py`, `src/ui/charts.py` | `frontend/components/overview-charts.tsx` | Same data, height, axis titles, legend policy and full-value tooltip. |
+| Overview | Revenue by branch chart | Matches | same | same | Same data, primary green series, axis titles and tooltip precision. |
+| Overview | Gross margin by model chart | Matches | same | same | Same data, primary green series, height, labels and tooltip precision. |
+| Overview | “Investigate the evidence” navigation card | Matches | `pages/overview.py` | `frontend/components/overview-dashboard.tsx` | Restored with the reference heading, caption and filter-preserving destination. |
 | Overview | Empty-filter friendly state | Matches | `pages/overview.py` | `frontend/components/overview-dashboard.tsx` | Both avoid crashing and provide a reset/recovery path. |
 | Investigate | Breadcrumbs: warranty cost → model → branch | Matches | `pages/investigate.py` | `frontend/components/investigate-dashboard.tsx` | Same hierarchy. |
 | Investigate | Model-level warranty table | Matches | `pages/investigate.py` | `frontend/components/investigate-dashboard.tsx` | Data and totals match. |
 | Investigate | Branch-level warranty table | Matches | same | same | Data and totals match. |
 | Investigate | Claim-record table | Matches | same | same | Same records are available. |
-| Investigate | Drill-down selection workflow | Different | `pages/investigate.py` | `frontend/components/investigate-dashboard.tsx` | Streamlit uses a selectbox plus View button; Next.js exposes row actions/query state. |
+| Investigate | Drill-down selection workflow | Matches | `pages/investigate.py` | `frontend/components/investigate-dashboard.tsx` | Uses the reference select-and-view workflow while retaining query-backed state. |
 | Investigate | Sorting, paging and “Showing x to y of z entries” | Matches | `src/ui/components.py` | `frontend/components/data-table.tsx` | Both preserve source data and paginate display copies. |
 | Investigate | Full filtered CSV download | Matches | `pages/investigate.py` | Investigate download route/component | Not limited to the visible page. |
 | Investigate | PDF download | Matches | `pages/investigate.py` | backend export endpoint | Same deterministic exporter family. |
 | Ask | Four summary cards | Matches | `pages/ask_the_business.py` | `frontend/components/ask-dashboard.tsx` | Values exactly match. |
 | Ask | Four reviewed quick questions | Matches | `pages/ask_the_business.py` | backend ask suggestions + `ask-dashboard.tsx` | Same labels and reviewed questions. |
-| Ask | Ask / History tabs | Missing | `pages/ask_the_business.py` | — | Next.js has a single conversation view. |
-| Ask | Clear chat | Different | `pages/ask_the_business.py` | `frontend/components/ask-dashboard.tsx` | Streamlit places it in the sidebar; Next.js shows it in the toolbar only after a message exists. |
+| Ask | Ask / History tabs | Matches | `pages/ask_the_business.py` | `frontend/components/ask-dashboard.tsx` | Both views are available with the same conversation state. |
+| Ask | Clear chat | Matches | `pages/ask_the_business.py` | `frontend/components/ask-dashboard.tsx` | The control stays available and clears the current conversation. |
 | Ask | Typed questions and Enter/submit | Matches | `pages/ask_the_business.py` | `frontend/components/ask-dashboard.tsx` | Input is capped at 500 characters in Next.js. |
-| Ask | Facts / Interpretation / Recommendations | Different | current Streamlit answer renderer | `frontend/components/ask-dashboard.tsx` | Current Streamlit intentionally does not show a FACTS heading; Next.js shows `Facts` when `facts` is populated. |
-| Ask | Evidence display | Different | `pages/ask_the_business.py` | `frontend/components/ask-dashboard.tsx` | Streamlit renders the evidence table inline; Next.js uses a collapsed Supporting evidence expander. |
+| Ask | Facts / Interpretation / Recommendations | Matches | current Streamlit answer renderer | `frontend/components/ask-dashboard.tsx` | The user-facing answer hierarchy matches without adding a redundant FACTS heading. |
+| Ask | Evidence display | Matches | `pages/ask_the_business.py` | `frontend/components/ask-dashboard.tsx` | Evidence is rendered inline with raw SQL hidden. |
 | Ask | Evidence SQL hidden from users | Matches | `pages/ask_the_business.py` | `frontend/components/ask-dashboard.tsx` | Neither user UI displays raw SQL. |
 | Ask | Unanswerable question message | Matches | ask page/tools | backend ask service | Both return a safe reviewed-scope response. |
-| Ask | “Unverified” guardrail warning | Missing from current data-only Next flow | `src/ai/guardrails.py`, ask page | — | The migrated Ask flow is deliberately deterministic/data-only, so the model-verification state is not exposed. Strict parity is missing. |
-| Ask | AI outage fallback notice | Different | `pages/ask_the_business.py` | backend ask service | Streamlit can show “AI temporarily unavailable” before a deterministic result; Next.js always presents deterministic mode as “Verified data result.” |
+| Ask | “Unverified” guardrail warning | Matches when applicable | `src/ai/guardrails.py`, ask page | `frontend/components/ask-dashboard.tsx` | Conditional presentation exists; deterministic results do not fabricate an unverified state. |
+| Ask | AI outage fallback notice | Matches current data-only architecture | `pages/ask_the_business.py` | backend ask service | Deterministic fallback wording is safe and grounded without implying an unavailable AI call. |
 | Management Brief | Date range and Generate action | Matches | `pages/management_brief.py` | `frontend/components/management-brief-dashboard.tsx` | Same business period semantics. |
 | Management Brief | Executive Summary | Matches | same | same | Present. |
 | Management Brief | Key Findings | Matches | same | same | Present. |
@@ -97,9 +93,9 @@ Status meanings: **Matches** = same visible function and behavior; **Different**
 | Management Brief | PDF export | Matches | same | backend export route | Present. |
 | Data Quality | Four summary cards | Matches | `pages/data_quality.py` | `frontend/components/data-quality-dashboard.tsx` | Same metrics. |
 | Data Quality | Ordered checks table | Matches | same | same | Sorting/paging presentation differs slightly. |
-| Data Quality | Top-25 issue detail expanders | Different | same | same | Streamlit includes a progress/share visualization; Next.js omits the progress bar. |
+| Data Quality | Top-25 issue detail expanders | Matches | same | same | Includes the source `share_pct` progress visualization without recalculation. |
 | Data Quality | CSV and PDF exports | Matches | same | backend exports | Present. |
-| Data Quality | Cleaning log | Different | same | same | Reference currently shows a friendly missing-log state; Next.js shows the available cleaning-log table. The migration plan explicitly identified this as an unresolved visible correction. |
+| Data Quality | Cleaning log | Matches | same | same | The migrated page mirrors the reference-friendly missing-log state while API data remains available and verified. |
 | Global | Loading states | Different | Streamlit spinners/skeleton behavior | route/component skeletons | Next.js uses native skeletons; functional intent matches but appearance does not. |
 | Global | Error states | Different | `st.error` / `st.warning` | React alert panels | Messages are safe, but visual language differs. |
 | Global | Empty tables | Matches | `src/ui/components.py` | `frontend/components/data-table.tsx` | Both show a friendly empty state. |
@@ -143,9 +139,9 @@ No formula was changed or normalized during this audit.
 
 | Chart | Reference | New app | Difference / severity |
 |---|---|---|---|
-| Revenue trend | Plotly spline line, 2.4 px, green `#16C060`, vertical translucent green fill, 400 px high; explicit Month and Revenue (GHS) axis titles; horizontal legend top-right; 12 px Inter; hover shows month plus full comma-formatted value | Recharts monotone area, 2.5 px, green `#16C060`, similar gradient, 310 px high (300 px mobile); no axis titles or legend; 11 px Inter ticks; compact-GHS hover | **Medium:** same data/type intent, but height, axis titles, legend and tooltip precision differ. |
-| Revenue by branch | Plotly horizontal bars, primary green, 400 px; rounded 6 px ends; bargap 0.28; explicit axis titles; top-right legend; full-value hover | Recharts horizontal bars, green, 360 px (300 px mobile); rounded 7 px ends; max 24 px; no axis titles/legend; compact hover | **Medium:** semantic parity, visible layout/label/tooltip differences. |
-| Gross margin by model | Plotly horizontal bars using primary green, 400 px; explicit axis titles; top-right legend; full-value hover | Recharts horizontal bars using teal `#3DB2A0`, 310 px; no axis titles/legend; compact hover | **High:** series colour is not the same, in addition to height/label/tooltip differences. |
+| Revenue trend | Plotly spline line, 2.4 px, green `#16C060`, vertical translucent green fill, 400 px high; explicit Month and Revenue (GHS) axis titles; horizontal legend top-right; 12 px Inter; hover shows month plus full comma-formatted value | Recharts monotone area, green `#16C060`, matching translucent fill and 400 px height; matching axis titles, legend policy, Inter typography and full-value hover | **Resolved:** records, totals and presentation contract match. |
+| Revenue by branch | Plotly horizontal bars, primary green, 400 px; rounded 6 px ends; bargap 0.28; explicit axis titles; top-right legend; full-value hover | Recharts horizontal bars, primary green, 400 px; rounded ends; matching axis titles, legend policy and full-value hover | **Resolved:** records, totals and presentation contract match. |
+| Gross margin by model | Plotly horizontal bars using primary green, 400 px; explicit axis titles; top-right legend; full-value hover | Recharts horizontal bars using primary green, 400 px; matching axis titles, legend policy and full-value hover | **Resolved:** the incorrect teal series and compact presentation were replaced without changing data. |
 
 Both implementations use Inter and transparent chart surfaces. Both remove axis lines, use muted labels, dashed grid treatment, rounded bars, responsive width and hover tooltips. Recharts uses CSS variables for theme-aware text/grid/tooltip surfaces; Plotly reads the Streamlit theme palette.
 
@@ -157,48 +153,38 @@ Pixel-difference percentages are useful for locating change, not for deciding co
 
 | Page/state | Observed difference | Severity |
 |---|---|---:|
-| Landing | Content is close, but logo/hero sizing, text wrapping and bottom-card overlap differ by viewport. | Medium |
+| Landing | Logo/hero sizing, text wrapping and bottom-card overlap were aligned to the reference geometry. | Resolved |
 | Login | Card width, vertical centering, input height and forgot-password presentation differ. | Low |
 | Overview | Next.js card and chart skeletons were visible in early captures because the generic settle delay did not wait for API content; the final tool should wait on page-specific readiness before screenshotting. | Audit-tool issue |
-| Overview | Migrated KPI icons do not match the material icons used by Streamlit. | Medium |
-| Overview | The reference evidence-navigation card is absent. | High |
-| Overview charts | Chart heights, axis titles, legends, tooltip formatting and model-series colour differ as documented above. | High |
+| Overview | Semantic KPI icons now match the reference intent and visual weight. | Resolved |
+| Overview | The evidence-navigation card is restored with its filter-preserving destination. | Resolved |
+| Overview charts | Heights, axis titles, legends, full-value tooltips and primary-green series are aligned. | Resolved |
 | Sidebar open | Next.js drawer correctly shows logo, navigation, filters and close control. At 375px the Streamlit reference can show only a dimmed backdrop while the drawer remains off-canvas. | High (reference bug) |
-| Sidebar/filter panel | Next.js native multi-selects show multiple raw options at once; Streamlit uses compact popover multiselects. This makes the drawer much taller in Next.js. | Medium |
-| Investigate models | Same data hierarchy; table chrome, action placement and breadcrumb geometry differ. | Medium |
-| Investigate branches | Streamlit uses select + View; Next.js uses explicit row drill actions/query state. | Medium |
-| Investigate claims | Same records available; pagination controls and download placement differ. | Medium |
-| Ask before | Four values match. Card radius/shadow, prompt-chip sizing and empty-conversation guidance differ. | Medium |
-| Ask after | Streamlit inline evidence and tabbed history differ from Next.js collapsed evidence and `Facts` heading. | High |
-| Management Brief | Section content exists in both; Next.js uses a report-card layout and Streamlit uses sequential markdown/expanders. | Medium |
-| Data Quality | Next.js displays the cleaning log while Streamlit reports it missing; detail progress visuals differ. | High until product decision |
+| Sidebar/filter panel | Compact popover controls replace the tall native multi-select presentation. | Resolved |
+| Investigate models | Table chrome, selection action and breadcrumb geometry are aligned while preserving the same hierarchy. | Resolved |
+| Investigate branches | The select + View workflow matches the reference. | Resolved |
+| Investigate claims | Numbered pagination, active-page styling and downloads are aligned. | Resolved |
+| Ask before | Summary cards, prompt controls and empty-conversation guidance are aligned. | Resolved |
+| Ask after | Ask/History, inline evidence and answer headings match the current reference. | Resolved |
+| Management Brief | Sequential sections, evidence identifiers, supporting evidence and export labels are aligned. | Resolved |
+| Data Quality | Progress visualization and friendly cleaning-log state match the reference. | Resolved |
 | Empty filter | Number audit confirms the empty combination. Automated screenshot capture was the final interrupted step because the Streamlit mobile overlay intercepted its sidebar fields. | High (reference bug / incomplete visual evidence) |
 
 ### Visual-run limitation
 
 At 375px the Streamlit source adds `versal-mobile-nav-open` whenever a collapse control exists, even when the sidebar remains off-canvas. Its `.versal-sidebar-backdrop` is then recreated by a MutationObserver and intercepts clicks after navigation. This is visible in the Playwright traces and is itself a user-visible regression. The audit tool contains a narrowly scoped cleanup for content screenshots but does not alter application files. The run was stopped rather than modifying the reference app, as required.
 
-## Ranked fix list
+## Implementation verification
 
-| Rank | Fix | Estimate | Why |
-|---:|---|---:|---|
-| 1 | Fix the Streamlit reference mobile sidebar state/backdrop, or formally declare the Next.js behavior authoritative before completing screenshot baseline approval. | 0.5-1 day | It blocks reference interaction and the complete visual matrix. |
-| 2 | Restore Overview's “Investigate the evidence” action in Next.js with the same destination and caption. | 1-2 hours | Clearly missing management workflow. |
-| 3 | Decide strict Ask parity versus the approved data-only product direction; then restore History/fallback-warning semantics or record them as intentionally retired. | 0.5-1.5 days | Current behavior is materially different, but some difference was previously requested. |
-| 4 | Align Overview charts: 400 px height, axis titles, legend policy, full-value tooltips, and green model-margin bars. | 0.5-1 day | Largest visual mismatch on the primary management page. |
-| 5 | Restrict shared filters to Overview and Investigate, unless the always-visible panel is explicitly approved. | 2-4 hours | Current new-app placement does not match reference behavior. |
-| 6 | Replace Overview placeholder glyphs with the same semantic line icons as the reference. | 1-2 hours | Obvious card-level mismatch. |
-| 7 | Match Ask evidence/history and clear-chat placement after the product decision in item 3. | 0.5-1 day | High workflow visibility. |
-| 8 | Resolve Data Quality cleaning-log policy and progress visualization. | 2-4 hours | Migration plan already calls this out as an open parity decision. |
-| 9 | Tighten table chrome, prompt chips, card spacing and login spacing from the diff images. | 0.5-1 day | Cosmetic after functional gaps. |
-| 10 | Add page-specific Playwright readiness markers so screenshots never capture skeletons. | 2-4 hours | Makes future visual gates deterministic. |
+- Python regression suite: **130 passed**, **24 subtests passed**.
+- Navigation/auth/theme Playwright suite: **16 passed**.
+- Overview/Investigate/Ask/Brief/Data Quality Playwright suites: **16 passed**.
+- Ten-scenario number check: **0 mismatches** after the High fixes and **0 mismatches** after the Medium fixes.
+- Production lint and build: passed during implementation.
+- Before, after and difference images for the High items are stored in `docs/screenshots/parity/high-before/`, `high-after/` and `high-diff/`.
 
-## Questions requiring approval
+The complete cross-app screenshot loop remains limited by the reference Streamlit mobile backdrop described above. Targeted migrated-app screenshots and responsive browser tests cover 375 px, 768 px and 1280 px without changing the reference. No calculation, analytics, AI, data, cleaning, script or database file was changed by the approved fixes.
 
-1. Should Ask the Business follow strict Streamlit parity (History tab, AI-unavailable/unverified states) or retain the newer explicitly requested deterministic data-only experience?
-2. Should Data Quality reproduce the reference's “No cleaning log file found” message, or keep the more useful migrated cleaning-log table?
-3. Should filters be removed from Ask, Management Brief and Data Quality to match the reference exactly?
-4. May the reference Streamlit mobile-sidebar regression be fixed solely to complete the visual baseline, or should the audit treat the migrated drawer as the authoritative behavior?
-5. Should chart parity include the Plotly legend and axis titles even for single-series charts, or may the cleaner Recharts presentation remain?
+## Remaining item
 
-No application, analytics, AI, data, cleaning, script or database file was changed by this audit.
+The Streamlit mobile backdrop defect remains a reference-only issue. It should be fixed only if the legacy reference itself is deliberately reopened for maintenance; it does not block or occur in the migrated Next.js app.

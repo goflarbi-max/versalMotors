@@ -150,3 +150,35 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The deployment verifier required the Linux-built DuckDB file to have the same byte-level SHA-256 as the Windows-built baseline, even though the logical tables can be identical while the database container bytes differ across platforms.
 - **How it was found:** Render built the database successfully and reported no table row-count mismatches, but rejected deployment solely because the actual and expected database-file hashes differed.
 - **How it was fixed:** Table row-count parity remains mandatory, while the file hash is retained as diagnostic metadata instead of a cross-platform pass/fail condition. A regression test simulates a platform-specific hash and confirms that matching logical table counts pass verification.
+
+## Parity implementation verification corrections (2026-10-25)
+
+### Audit-only TypeScript branch failed the production build
+
+- **What went wrong:** The first visual-audit harness compared a value that TypeScript had already narrowed to a single literal, so the production compiler rejected the unreachable comparison even though the application code was valid.
+- **How it was discovered:** `next build` failed immediately after the audit tooling was added.
+- **How it was corrected:** The harness now records the resolved production state without the invalid comparison. No application behavior or business value changed.
+
+### Browser checks used selectors made ambiguous by the parity fixes
+
+- **What went wrong:** Restoring the Overview evidence link introduced a second legitimate link named “Investigate,” and the compact filter labels shared text with chart labels. Older tests used broad name matching and also expected filters on pages where parity now intentionally removes them.
+- **How it was discovered:** The focused Playwright suites failed strict locator resolution and one outdated URL assertion while the intended controls were visible.
+- **How it was corrected:** Browser checks now use exact names and scoped landmarks, and their filter expectation follows the reference placement. The accessible UI labels and application behavior were not weakened to satisfy tests.
+
+### Mobile drawer closed before navigation committed
+
+- **What went wrong:** The first mobile link handler closed the drawer immediately and unmounted its navigation link before Next.js committed the route change.
+- **How it was discovered:** The 375 px Playwright test showed the drawer closing while the URL remained on the original page.
+- **How it was corrected:** Mobile navigation now calls `router.push()` with the selected destination before closing the drawer. A targeted test and the full 16-test navigation suite confirm the destination changes and the drawer closes.
+
+### Full cross-app visual loop retried a known legacy blocker
+
+- **What went wrong:** I initially reran the complete visual comparator even though the legacy Streamlit mobile backdrop had already been identified as intercepting reference controls.
+- **How it was discovered:** The comparator stalled again at the reference mobile navigation step while targeted Next.js checks remained healthy.
+- **How it was corrected:** The reference was left untouched. Existing before images were preserved, targeted after/diff images were generated for the High findings, and the migrated app was verified independently at all three approved widths.
+
+### After-capture tool waited on an implementation class instead of stable content
+
+- **What went wrong:** The first High-fix screenshot rerun waited for a CSS class whose presence was not part of the page's user-visible contract, making the audit tool report a false readiness failure while all four summary cards were visible.
+- **How it was discovered:** The Playwright accessibility snapshot showed the complete Ask summary despite the class-count assertion returning zero.
+- **How it was corrected:** The capture tool now waits for stable visible labels and retries transient API readiness. The complete 375 px, 768 px and 1280 px light/dark capture then passed.
