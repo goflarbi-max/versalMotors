@@ -150,6 +150,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .sign-in-button:hover { transform: translateY(-1px); background: #2f343e; }.sign-in-button:active { transform: none; }.sign-in-button:disabled { cursor: not-allowed; opacity: .58; }
 .login-message { margin: .8rem 0 0; padding: .7rem .85rem; border-radius: 10px; color: #991b1b; background: #fee2e2; font-size: .86rem; }
 .login-message.info { color: #1e3a8a; background: #dbeafe; }
+.demo-access { margin: .85rem 0 0; color: #64748b; font-size: .75rem; line-height: 1.45; text-align: center; }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .login-card { background: rgba(255,255,255,.96); } }
 
 /* Protected application shell. */
