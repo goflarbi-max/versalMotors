@@ -97,7 +97,8 @@ function AppShellContent({ email, children, showBusinessFilters }: Props & { sho
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
               const query = searchParams.toString();
-              return <Link key={item.href} href={`${item.href}${query ? `?${query}` : ""}`} onClick={() => { if (mobile) setManualOpen(false); }} className={`sidebar-link${active ? " active" : ""}`} aria-current={active ? "page" : undefined}><Icon />{item.label}</Link>;
+              const destination = `${item.href}${query ? `?${query}` : ""}`;
+              return <Link key={item.href} href={destination} onClick={(event) => { if (mobile) { event.preventDefault(); router.push(destination); setManualOpen(false); } }} className={`sidebar-link${active ? " active" : ""}`} aria-current={active ? "page" : undefined}><Icon />{item.label}</Link>;
             })}
           </nav>
           {showBusinessFilters ? <BusinessFilterPanel /> : null}
