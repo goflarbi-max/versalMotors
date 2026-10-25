@@ -27,6 +27,16 @@ const cardDetails: Record<string, { caption: string; icon: string }> = {
   "Discount rate": { caption: "How much of gross price was given up through discounts?", icon: "%" },
 };
 
+function KpiIcon({ metric }: { metric: string }) {
+  const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  return <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+    {metric === "Revenue" ? <><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M17 14h.01M9 12h6"/><circle cx="12" cy="12" r="2.5"/></> : null}
+    {metric === "Gross margin" ? <><rect x="4" y="4" width="14" height="16" rx="2"/><path d="M8 8h6M8 12h2M14 12h3v5h-7v-3"/></> : null}
+    {metric === "Units sold" ? <><path d="M5 16l1.5-5h11L19 16M3.5 16h17v3h-2v-2h-13v2h-2z"/><path d="M8 11l1.5-3h5L16 11"/></> : null}
+    {metric === "Discount rate" ? <><circle cx="8" cy="8" r="2"/><circle cx="16" cy="16" r="2"/><path d="M17.5 6.5l-11 11"/></> : null}
+  </svg>;
+}
+
 async function getData<T>(path: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(path, { credentials: "include", signal });
   if (!response.ok) throw new Error("Overview data could not be loaded.");
@@ -74,7 +84,7 @@ export function OverviewDashboard() {
         const detail = cardDetails[row.metric];
         const change = formatChange(row.change_rate);
         return <article className="overview-kpi" key={row.metric} data-metric={row.metric}>
-          <div className="kpi-top"><span className="kpi-label">{row.metric}</span><span className="kpi-icon" aria-hidden="true">{detail?.icon}</span></div>
+          <div className="kpi-top"><span className="kpi-label">{row.metric}</span><span className="kpi-icon"><KpiIcon metric={row.metric}/></span></div>
           <div className="kpi-value-row"><strong>{formatKpi(row.metric, row.value)}</strong>{change ? <span className={`kpi-badge ${row.change_rate! < 0 ? "down" : "up"}`}>{row.change_rate! < 0 ? "↓" : "↑"} {change.split(" vs")[0].replace(/^\+/, "")}</span> : null}</div>
           <p>{detail?.caption}</p>
           <footer>{change ? <><strong>{change.split(" vs")[0]}</strong> vs prior period</> : <span>Prior-period comparison unavailable</span>}</footer>

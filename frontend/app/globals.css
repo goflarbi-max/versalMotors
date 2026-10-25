@@ -196,6 +196,7 @@ html[data-theme="dark"] .sidebar-logo-dark { display: none; } html:not([data-the
 .kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .kpi-label,.overview-chart-card header>span { color: var(--text-muted); font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
 .kpi-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border: 1px solid color-mix(in srgb,var(--icon-tile-fg) 35%,transparent); border-radius: 9px; color: var(--icon-tile-fg); background: var(--icon-tile-bg); font-size: 1rem; font-weight: 700; }
+.kpi-icon svg { width: 20px; height: 20px; }
 .kpi-value-row { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem; margin-top: .5rem; }.kpi-value-row>strong { font-size: clamp(1.65rem,3vw,2rem); line-height: 1.15; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
 .kpi-badge { padding: .28rem .5rem; border-radius: 999px; font-size: .72rem; font-weight: 700; font-variant-numeric: tabular-nums; }.kpi-badge.up { color: var(--badge-up-text); background: var(--badge-up-bg); }.kpi-badge.down { color: var(--badge-down-text); background: var(--badge-down-bg); }
 .overview-kpi>p { min-height: 2.8rem; margin: .65rem 0 1.1rem; color: var(--text-muted); font-size: .8rem; }

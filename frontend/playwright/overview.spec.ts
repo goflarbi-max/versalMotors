@@ -58,6 +58,7 @@ test("every Overview display value and API record matches the frozen baseline", 
       await expect(page.locator('[aria-label^="Revenue trend chart"]')).toHaveAttribute("aria-label", `Revenue trend chart with ${scenario.revenue_trend.row_count} periods`);
       await expect(page.locator('[aria-label^="Revenue by branch chart"]')).toHaveAttribute("aria-label", `Revenue by branch chart with ${scenario.revenue_by_branch.row_count} branches`);
       await expect(page.locator('[aria-label^="Gross margin by model chart"]')).toHaveAttribute("aria-label", `Gross margin by model chart with ${scenario.gross_margin_by_model.row_count} models`);
+      await expect(page.locator(".kpi-icon svg")).toHaveCount(4);
       await expect(page.getByText("Revenue (GHS)").first()).toBeVisible();
       await expect(page.getByText("Gross margin (GHS)")).toBeVisible();
     }
