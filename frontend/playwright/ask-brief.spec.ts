@@ -35,10 +35,16 @@ test("Ask summary and deterministic data answer match the frozen baseline", asyn
 
   const expected = baseline.ask_the_business.questions.revenue_trend;
   await page.getByRole("button", { name: "Revenue trend" }).click();
-  await expect(page.getByRole("heading", { name: "Facts" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Facts" })).toHaveCount(0);
   await expect(page.getByText(expected.answer, { exact: true })).toBeVisible();
-  await expect(page.getByText(/Supporting evidence \(32\)/)).toBeVisible();
+  await expect(page.getByRole("table", { name: /Evidence for:/ })).toBeVisible();
+  await expect(page.getByText("AI is temporarily unavailable. Showing the verified database result.")).toBeVisible();
   await expect(page.getByText(/SELECT |FROM sales|WITH /i)).toHaveCount(0);
+  await page.getByRole("tab", { name: "History" }).click();
+  await expect(page.getByText(expected.question, { exact: true })).toBeVisible();
+  await expect(page.getByText(expected.answer, { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Clear chat" }).click();
+  await expect(page.getByText("No questions have been asked in this session.")).toBeVisible();
 });
 
 test("Ask input submits with Enter and failures remain friendly", async ({ page }) => {

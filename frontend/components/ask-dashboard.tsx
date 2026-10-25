@@ -40,6 +40,7 @@ export function AskDashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [question, setQuestion] = useState("");
   const [pending, setPending] = useState(false);
+  const [activeTab, setActiveTab] = useState<"ask" | "history">("ask");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -74,21 +75,23 @@ export function AskDashboard() {
       {cards.map(([label, key, caption, icon]) => <article className="ask-summary-card" key={key}><span className="summary-icon"><SummaryIcon name={icon}/></span><div><span>{label}</span><strong>{summary.display[key]}</strong><p>{caption}</p></div></article>)}
     </section>
     <section className="ask-workspace">
-      <div className="ask-toolbar"><div><h2>Ask</h2><p>Quick questions</p></div>{messages.length ? <button type="button" onClick={() => { setMessages([]); setError(""); }}>Clear chat</button> : null}</div>
-      <div className="suggestion-row">{suggestions.map((item) => <button type="button" key={item.label} disabled={pending} onClick={() => void ask(item.question)}>{item.label}</button>)}</div>
+      <div className="ask-tabs" role="tablist" aria-label="Ask the Business views"><button type="button" role="tab" aria-selected={activeTab === "ask"} onClick={() => setActiveTab("ask")}>Ask</button><button type="button" role="tab" aria-selected={activeTab === "history"} onClick={() => setActiveTab("history")}>History</button></div>
+      <div className="ask-toolbar"><div>{activeTab === "ask" ? <p>Quick questions</p> : <p>Questions asked in this session</p>}</div><button type="button" onClick={() => { setMessages([]); setError(""); }}>Clear chat</button></div>
+      {activeTab === "ask" ? <><div className="suggestion-row">{suggestions.map((item) => <button type="button" key={item.label} disabled={pending} onClick={() => void ask(item.question)}>{item.label}</button>)}</div>
       <div className="conversation" aria-live="polite">
         {!messages.length ? <p className="conversation-empty">Ask a question or choose a reviewed prompt. Every numeric answer is checked against evidence.</p> : messages.map((message, index) => <article className="exchange" key={`${message.question}-${index}`}>
           <div className="user-question"><span aria-hidden="true">?</span><p>{message.question}</p></div>
+          {message.result.table.length ? <EvidenceTable records={message.result.table} caption={`Evidence for: ${message.question}`}/> : null}
           <div className="assistant-answer"><span aria-hidden="true">V</span><div>
-            {message.result.mode === "deterministic" ? <p className="fallback-note">Verified data result</p> : null}
-            {message.result.facts ? <section><h3>Facts</h3><p>{message.result.facts}</p></section> : <p>{message.result.answer}</p>}
+            {message.result.mode === "deterministic" ? <p className="fallback-note">AI is temporarily unavailable. Showing the verified database result.</p> : null}
+            {message.result.status === "unverified" ? <p className="unverified-note" role="alert">This answer could not be verified against the available evidence.</p> : null}
+            {message.result.facts ? <p>{message.result.facts}</p> : <p>{message.result.answer}</p>}
             {message.result.interpretation ? <section><h3>Interpretation</h3><p>{message.result.interpretation}</p></section> : null}
             {message.result.recommendations.length ? <section><h3>Recommendations</h3><ul>{message.result.recommendations.map((item) => <li key={item}>{item}</li>)}</ul></section> : null}
           </div></div>
-          {message.result.table.length ? <details className="evidence-expander"><summary>Supporting evidence ({message.result.table.length})</summary><EvidenceTable records={message.result.table} caption={`Evidence for: ${message.question}`}/></details> : null}
         </article>)}
       </div>
-      <form className="ask-form" onSubmit={submit}><label className="sr-only" htmlFor="business-question">Ask about the business</label><input id="business-question" value={question} maxLength={500} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask about revenue, branches, inventory, or complaints" disabled={pending}/><button type="submit" disabled={pending || !question.trim()} aria-label="Send question">{pending ? "..." : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg>}</button></form>
+      <form className="ask-form" onSubmit={submit}><label className="sr-only" htmlFor="business-question">Ask about the business</label><input id="business-question" value={question} maxLength={500} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask about the business" disabled={pending}/><button type="submit" disabled={pending || !question.trim()} aria-label="Send question">{pending ? "..." : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg>}</button></form></> : <div className="conversation history-conversation">{!messages.length ? <p className="conversation-empty">No questions have been asked in this session.</p> : messages.map((message, index) => <article className="exchange" key={`history-${message.question}-${index}`}><div className="user-question"><span aria-hidden="true">?</span><p>{message.question}</p></div><div className="assistant-answer"><span aria-hidden="true">V</span><p>{message.result.facts ?? message.result.answer}</p></div></article>)}</div>}
       {error ? <p className="ask-error" role="alert">{error}</p> : null}
     </section>
   </>;
