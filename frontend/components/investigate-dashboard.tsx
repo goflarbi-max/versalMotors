@@ -56,6 +56,7 @@ export function InvestigateDashboard() {
   const sortDir = (["original","asc","desc"].includes(searchParams.get("sort_dir") ?? "") ? searchParams.get("sort_dir") : "original") as SortDirection;
   const level = selectedModel ? (selectedBranch ? "claims" : "branches") : "models";
   const [state, setState] = useState<{ key: string; data: Result | null; error: string | null }>({ key: "", data: null, error: null });
+  const [drillChoice, setDrillChoice] = useState("");
 
   const requestKey = useMemo(() => {
     if (!query) return "";
@@ -72,7 +73,7 @@ export function InvestigateDashboard() {
     if (!requestKey) return;
     const controller = new AbortController();
     getInvestigationPage<ModelWarrantyRecord | BranchWarrantyRecord | WarrantyClaimRecord>(requestKey, controller.signal)
-      .then((data) => setState({ key: requestKey, data, error: null }))
+      .then((data) => { setState({ key: requestKey, data, error: null }); setDrillChoice(""); })
       .catch((reason: unknown) => {
         if (!(reason instanceof DOMException && reason.name === "AbortError")) setState({ key: requestKey, data: null, error: "Warranty investigation is temporarily unavailable. Please try again." });
       });
@@ -96,6 +97,8 @@ export function InvestigateDashboard() {
 
   const loading = filtersLoading || !requestKey || state.key !== requestKey;
   const result = state.data;
+  const modelRecords = (result?.records ?? []) as ModelWarrantyRecord[];
+  const branchRecords = (result?.records ?? []) as BranchWarrantyRecord[];
   const overviewHref = `/overview${query ? `?${query}` : ""}`;
   const exportQuery = new URLSearchParams(query);
   if (sortBy) exportQuery.set("sort_by", sortBy);
@@ -110,9 +113,9 @@ export function InvestigateDashboard() {
       {selectedBranch ? <><span aria-hidden="true">›</span><span aria-current="page">{selectedBranch}</span></> : null}
     </nav>
     {loading ? <div className="investigate-loading" aria-label="Loading warranty investigation"/> : filtersError || state.error || !result ? <section className="investigate-state error" role="alert"><h2>We could not load the investigation</h2><p>{filtersError ?? state.error ?? "Please try again."}</p></section> : level === "models" ?
-      <InvestigateTable caption="Warranty cost by model" columns={modelColumns} result={result as PageResult<ModelWarrantyRecord>} onPage={(value) => navigate({ table_page: String(value) })} onPageSize={(value) => navigate({ page_size: String(value), table_page: "1" })} onSort={onSort} rowAction={{ label: "View branches", onSelect: (record) => resetTable({ focus_model: record.model, focus_branch: null }) }}/>
+      <><InvestigateTable caption="Warranty cost by model" columns={modelColumns} result={result as PageResult<ModelWarrantyRecord>} onPage={(value) => navigate({ table_page: String(value) })} onPageSize={(value) => navigate({ page_size: String(value), table_page: "1" })} onSort={onSort}/><div className="drill-controls"><label>Choose a model to investigate<select value={drillChoice || String(modelRecords[0]?.model ?? "")} onChange={(event) => setDrillChoice(event.target.value)}>{modelRecords.map((record) => <option key={record.model}>{record.model}</option>)}</select></label><button type="button" onClick={() => resetTable({ focus_model: drillChoice || String(modelRecords[0]?.model ?? ""), focus_branch: null })}>View branches <span aria-hidden="true">→</span></button></div></>
     : level === "branches" ?
-      <InvestigateTable caption={`${selectedModel} warranty cost by branch`} columns={branchColumns} result={result as PageResult<BranchWarrantyRecord>} onPage={(value) => navigate({ table_page: String(value) })} onPageSize={(value) => navigate({ page_size: String(value), table_page: "1" })} onSort={onSort} rowAction={{ label: "View claims", onSelect: (record) => resetTable({ focus_branch: record.branch }) }}/>
+      <><InvestigateTable caption={`${selectedModel} warranty cost by branch`} columns={branchColumns} result={result as PageResult<BranchWarrantyRecord>} onPage={(value) => navigate({ table_page: String(value) })} onPageSize={(value) => navigate({ page_size: String(value), table_page: "1" })} onSort={onSort}/><div className="drill-controls"><label>Choose a branch to inspect<select value={drillChoice || String(branchRecords[0]?.branch ?? "")} onChange={(event) => setDrillChoice(event.target.value)}>{branchRecords.map((record) => <option key={record.branch}>{record.branch}</option>)}</select></label><button type="button" onClick={() => resetTable({ focus_branch: drillChoice || String(branchRecords[0]?.branch ?? "") })}>View claims <span aria-hidden="true">→</span></button></div></>
     : <>
       <div className="investigate-record-header"><div><span>Claim records</span><strong>{result.total.toLocaleString("en-US")}</strong><p>{selectedModel} · {selectedBranch}</p></div><div className="export-links"><a href={`${exportRoot}.csv?${exportQuery.toString()}`} download>Download CSV</a><a href={`${exportRoot}.pdf?${exportQuery.toString()}`} download>Download PDF</a></div></div>
       <InvestigateTable caption={`${selectedModel} claims in ${selectedBranch}`} columns={claimColumns} result={result as PageResult<WarrantyClaimRecord>} onPage={(value) => navigate({ table_page: String(value) })} onPageSize={(value) => navigate({ page_size: String(value), table_page: "1" })} onSort={onSort}/>

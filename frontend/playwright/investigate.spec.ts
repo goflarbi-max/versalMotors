@@ -42,7 +42,8 @@ test("warranty drill-down preserves baseline rows, breadcrumbs, sorting, and pag
   const firstModelRow = page.locator("tbody tr").first();
   await expect(firstModelRow).toContainText(String(firstModel.model));
   await expect(firstModelRow).toContainText(`GHS ${Number(firstModel.claim_cost).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
-  await firstModelRow.getByRole("button", { name: "View branches" }).click();
+  await page.getByLabel("Choose a model to investigate").selectOption(baseline.selected_model);
+  await page.getByRole("button", { name: "View branches" }).click();
 
   await expect(page).toHaveURL(new RegExp(`focus_model=${baseline.selected_model}`));
   await expect(page.getByRole("heading", { name: `${baseline.selected_model} warranty cost by branch` })).toBeVisible();
@@ -53,7 +54,8 @@ test("warranty drill-down preserves baseline rows, breadcrumbs, sorting, and pag
 
   const firstBranchRow = page.locator("tbody tr").first();
   await expect(firstBranchRow).toContainText(baseline.selected_branch);
-  await firstBranchRow.getByRole("button", { name: "View claims" }).click();
+  await page.getByLabel("Choose a branch to inspect").selectOption(baseline.selected_branch);
+  await page.getByRole("button", { name: "View claims" }).click();
   await expect(page).toHaveURL(new RegExp(`focus_branch=${baseline.selected_branch}`));
   await expect(page.getByText(`Showing 1 to 10 of ${baseline.claims.row_count} entries`)).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toContainText(`Overview›Warranty cost›${baseline.selected_model}›${baseline.selected_branch}`);
