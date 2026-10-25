@@ -36,7 +36,11 @@ async def lifespan(app: FastAPI):
         settings.session_hours * 3600,
         settings.session_idle_minutes * 60,
     )
-    app.state.login_limiter = LoginRateLimiter()
+    app.state.login_limiter = LoginRateLimiter(
+        maximum=settings.login_max_failures,
+        window_seconds=settings.login_window_seconds,
+        lock_seconds=settings.login_lock_seconds,
+    )
     app.state.ask_limiter = TokenBucketRateLimiter(requests_per_minute=10, burst=3)
     app.state.report_store = ReportStore()
     app.state.response_cache = TTLCache(ttl_seconds=300, max_entries=256, max_concurrent_creations=4)

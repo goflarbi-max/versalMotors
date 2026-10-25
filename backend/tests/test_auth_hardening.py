@@ -64,3 +64,24 @@ def test_session_store_rejects_idle_absolute_and_tampered_tokens():
 
 def test_role_aware_me_requires_a_valid_session(api_client):
     assert api_client.get("/api/auth/me").status_code == 401
+
+
+def test_correct_password_is_blocked_during_active_lockout(api_client):
+    headers = {"Origin": "https://testserver"}
+    for _ in range(5):
+        token = api_client.get("/api/v1/auth/csrf").json()["csrf_token"]
+        response = api_client.post(
+            "/api/v1/auth/login",
+            json={"email": "demo@versalmotors.com", "password": "wrong-password"},
+            headers={**headers, "X-CSRF-Token": token},
+        )
+    assert response.status_code == 429
+
+    token = api_client.get("/api/v1/auth/csrf").json()["csrf_token"]
+    blocked = api_client.post(
+        "/api/v1/auth/login",
+        json={"email": "demo@versalmotors.com", "password": "VersalDemo2026!"},
+        headers={**headers, "X-CSRF-Token": token},
+    )
+    assert blocked.status_code == 429
+    assert blocked.json()["message"].startswith("Too many failed attempts")

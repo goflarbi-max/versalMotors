@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+
 from fastapi import APIRouter, HTTPException, Request, Response, status
 
 from backend.app.api.dependencies import UserDependency
@@ -18,6 +20,11 @@ from backend.app.schemas.auth import CsrfResponse, CurrentUserResponse, LoginReq
 
 router = APIRouter(prefix="/api/v1/auth", tags=["authentication"])
 session_router = APIRouter(prefix="/api/auth", tags=["authentication"])
+
+
+def _client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for", "").split(",", 1)[0].strip()
+    return forwarded or (request.client.host if request.client else "unknown")
 
 
 def _require_origin(request: Request) -> None:
@@ -55,9 +62,9 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
         raise HTTPException(status_code=400, detail="Email and password are required")
     if not valid_email(email):
         raise HTTPException(status_code=400, detail="Enter a valid email address")
-    client_ip = request.client.host if request.client else "unknown"
-    limiter_key = f"{client_ip}:{email}"
-    remaining = request.app.state.login_limiter.remaining(limiter_key)
+    client_ip = _client_ip(request)
+    limiter_keys = (f"ip:{client_ip}", f"email:{email}")
+    remaining = request.app.state.login_limiter.remaining_for_any(limiter_keys)
     if remaining:
         raise HTTPException(
             status_code=429,
@@ -65,7 +72,10 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
             headers={"Retry-After": str(remaining)},
         )
     if not verify_password(email, payload.password, request.app.state.settings.password_hashes):
-        lock_seconds = request.app.state.login_limiter.fail(limiter_key)
+        delay = request.app.state.settings.login_failure_delay_ms / 1000
+        if delay:
+            time.sleep(delay)
+        lock_seconds = request.app.state.login_limiter.fail_all(limiter_keys)
         if lock_seconds:
             raise HTTPException(
                 status_code=429,
@@ -73,7 +83,7 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
                 headers={"Retry-After": str(lock_seconds)},
             )
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    request.app.state.login_limiter.clear(limiter_key)
+    request.app.state.login_limiter.clear_all(limiter_keys)
     request.app.state.sessions.revoke(request.cookies.get(SESSION_COOKIE))
     account = request.app.state.settings.auth_users[email]
     _, token = request.app.state.sessions.create(email, account.role)
