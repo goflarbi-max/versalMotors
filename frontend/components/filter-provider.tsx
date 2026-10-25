@@ -82,6 +82,19 @@ const labels: Record<(typeof filterKeys)[number], string> = {
   branch: "Branch", brand: "Brand", model: "Model", salesperson: "Salesperson", status: "Sale status",
 };
 
+function MultiSelectFilter({ label, values, selected, onChange }: { label: string; values: string[]; selected: string[]; onChange: (value: string[]) => void }) {
+  const summary = selected.length === 0 ? "Choose options" : selected.length <= 2 ? selected.join(", ") : `${selected.length} selected`;
+  return <div className="filter-select">
+    <span>{label}</span>
+    <details>
+      <summary aria-label={label}>{summary}</summary>
+      <div className="filter-options" role="group" aria-label={`${label} options`}>
+        {values.map((value) => <label key={value}><input type="checkbox" checked={selected.includes(value)} onChange={(event) => onChange(event.target.checked ? [...selected, value] : selected.filter((item) => item !== value))}/><span>{value}</span></label>)}
+      </div>
+    </details>
+  </div>;
+}
+
 export function BusinessFilterPanel() {
   const { options, filters, loading, error, update, clear } = useBusinessFilters();
   if (loading) return <div className="filter-panel filter-loading" aria-label="Loading business filters" />;
@@ -97,13 +110,7 @@ export function BusinessFilterPanel() {
         <label>From<input type="date" min={options.date_range.minimum ?? undefined} max={(filters.end_date || options.date_range.maximum) ?? undefined} value={filters.start_date} onChange={(event) => update("start_date", event.target.value)} /></label>
         <label>To<input type="date" min={(filters.start_date || options.date_range.minimum) ?? undefined} max={options.date_range.maximum ?? undefined} value={filters.end_date} onChange={(event) => update("end_date", event.target.value)} /></label>
       </div>
-      {filterKeys.map((key) => (
-        <label className="filter-select" key={key}>{labels[key]}
-          <select multiple value={filters[key]} aria-label={labels[key]} onChange={(event) => update(key, Array.from(event.target.selectedOptions, (option) => option.value))}>
-            {optionMap[key].map((value) => <option key={value} value={value}>{value}</option>)}
-          </select>
-        </label>
-      ))}
+      {filterKeys.map((key) => <MultiSelectFilter key={key} label={labels[key]} values={optionMap[key]} selected={filters[key]} onChange={(value) => update(key, value)}/>)}
     </section>
   );
 }
