@@ -79,7 +79,7 @@ export function AskDashboard() {
       <div className="ask-toolbar"><div>{activeTab === "ask" ? <p>Quick questions</p> : <p>Questions asked in this session</p>}</div><button type="button" onClick={() => { setMessages([]); setError(""); }}>Clear chat</button></div>
       {activeTab === "ask" ? <><div className="suggestion-row">{suggestions.map((item) => <button type="button" key={item.label} disabled={pending} onClick={() => void ask(item.question)}>{item.label}</button>)}</div>
       <div className="conversation" aria-live="polite">
-        {!messages.length ? <p className="conversation-empty">Ask a question or choose a reviewed prompt. Every numeric answer is checked against evidence.</p> : messages.map((message, index) => <article className="exchange" key={`${message.question}-${index}`}>
+        {messages.map((message, index) => <article className="exchange" key={`${message.question}-${index}`}>
           <div className="user-question"><span aria-hidden="true">?</span><p>{message.question}</p></div>
           {message.result.table.length ? <EvidenceTable records={message.result.table} caption={`Evidence for: ${message.question}`}/> : null}
           <div className="assistant-answer"><span aria-hidden="true">V</span><div>
