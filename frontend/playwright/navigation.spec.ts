@@ -85,6 +85,18 @@ test("tablet keeps the sidebar open and every protected destination updates its 
   expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.inner);
 });
 
+test("business filters appear only on Overview and Investigate", async ({ page }) => {
+  await signIn(page);
+  for (const path of ["/overview", "/investigate"]) {
+    await page.goto(path);
+    await expect(page.getByRole("region", { name: "Business filters" })).toBeVisible();
+  }
+  for (const path of ["/ask-the-business", "/management-brief", "/data-quality"]) {
+    await page.goto(path);
+    await expect(page.getByRole("region", { name: "Business filters" })).toHaveCount(0);
+  }
+});
+
 test("responsive public pages do not create page-level horizontal scrolling", async ({ page }) => {
   for (const width of [375, 768, 1280]) {
     await page.setViewportSize({ width, height: 800 });

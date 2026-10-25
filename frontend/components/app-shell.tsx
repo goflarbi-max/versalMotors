@@ -34,10 +34,14 @@ function subscribeTheme(callback: () => void) {
 function themeSnapshot() { return document.documentElement.dataset.theme === "dark"; }
 
 export function AppShell(props: Props) {
-  return <FilterProvider><AppShellContent {...props}/></FilterProvider>;
+  const pathname = usePathname();
+  const usesBusinessFilters = pathname === "/overview" || pathname === "/investigate";
+  return usesBusinessFilters
+    ? <FilterProvider><AppShellContent {...props} showBusinessFilters/></FilterProvider>
+    : <AppShellContent {...props} showBusinessFilters={false}/>;
 }
 
-function AppShellContent({ email, children }: Props) {
+function AppShellContent({ email, children, showBusinessFilters }: Props & { showBusinessFilters: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,7 +100,7 @@ function AppShellContent({ email, children }: Props) {
               return <Link key={item.href} href={`${item.href}${query ? `?${query}` : ""}`} onClick={() => { if (mobile) setManualOpen(false); }} className={`sidebar-link${active ? " active" : ""}`} aria-current={active ? "page" : undefined}><Icon />{item.label}</Link>;
             })}
           </nav>
-          <BusinessFilterPanel />
+          {showBusinessFilters ? <BusinessFilterPanel /> : null}
           <div className="sidebar-footer">
             <p className="sidebar-email"><strong>Signed in</strong><br />{email}</p>
             <button className="theme-button" type="button" onClick={toggleTheme}>{dark ? <SunIcon /> : <MoonIcon />}{dark ? "Light mode" : "Dark mode"}</button>
