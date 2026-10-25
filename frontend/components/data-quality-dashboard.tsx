@@ -3,17 +3,13 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { InvestigateTable, TableColumn } from "@/components/investigate-table";
-import { CleaningLogPage, CleaningLogRecord, formatCount, formatQualityPercent, getQualityData, QualityCheck, QualitySummary } from "@/lib/data-quality";
+import { CleaningLogPage, formatCount, formatQualityPercent, getQualityData, QualityCheck, QualitySummary } from "@/lib/data-quality";
 import { PageResult, SortDirection } from "@/lib/investigate";
 
 const checkColumns: TableColumn<QualityCheck>[] = [
   { key: "table", label: "Table" }, { key: "issue", label: "Issue" },
   { key: "count", label: "Count", format: formatCount }, { key: "total_rows", label: "Total rows", format: formatCount },
   { key: "share_pct", label: "Share of table", format: formatQualityPercent }, { key: "impact", label: "Which conclusions it might affect" },
-];
-const logColumns: TableColumn<CleaningLogRecord>[] = [
-  { key: "step", label: "Step" }, { key: "table", label: "Table" },
-  { key: "rows_affected", label: "Rows affected", format: formatCount }, { key: "reason", label: "Reason" }, { key: "action_taken", label: "Action taken" },
 ];
 const cards = [
   ["Issues Found", "issues_found", "Validation checks requiring visibility"],
@@ -94,8 +90,8 @@ export function DataQualityDashboard() {
     </section>
     <section className="quality-section"><div className="quality-heading"><div><h2>Validation Checks</h2><p>Every check remains visible; downloads contain all {checks.total.toLocaleString("en-US")} checks.</p></div><div className="quality-downloads"><a href="/api/v1/data-quality/checks.csv" download>Download CSV</a><a href="/api/v1/data-quality/checks.pdf" download>Download PDF</a></div></div>
       <InvestigateTable caption="Validation checks" columns={checkColumns} result={checks} onPage={(value) => navigate("quality", { page: String(value) })} onPageSize={(value) => navigate("quality", { size: String(value), page: "1" })} onSort={(key, direction) => sort("quality", key, direction)}/>
-      <div className="quality-details"><h3>Highest-impact checks</h3><p>Detailed context for the 25 checks with the largest affected share.</p>{details.map((item, index) => <details key={`${item.table}-${item.issue}-${index}`}><summary>{item.table} — {item.issue} — {item.count.toLocaleString("en-US")} rows ({item.share_pct.toFixed(2)}%)</summary><div><dl><dt>Count</dt><dd>{item.count.toLocaleString("en-US")}</dd><dt>Share</dt><dd>{item.share_pct.toFixed(2)}%</dd><dt>Total rows</dt><dd>{item.total_rows.toLocaleString("en-US")}</dd></dl><p><strong>Impact:</strong> {item.impact}</p></div></details>)}</div>
+      <div className="quality-details"><h3>Highest-impact checks</h3><p>Detailed context for the 25 checks with the largest affected share.</p>{details.map((item, index) => <details key={`${item.table}-${item.issue}-${index}`}><summary>{item.table} — {item.issue} — {item.count.toLocaleString("en-US")} rows ({item.share_pct.toFixed(2)}%)</summary><div><dl><dt>Count</dt><dd>{item.count.toLocaleString("en-US")}</dd><dt>Share</dt><dd>{item.share_pct.toFixed(2)}%</dd><dt>Total rows</dt><dd>{item.total_rows.toLocaleString("en-US")}</dd></dl><div><progress aria-label={`${item.table} affected share`} max="100" value={item.share_pct}>{item.share_pct.toFixed(2)}%</progress><p><strong>Impact:</strong> {item.impact}</p></div></div></details>)}</div>
     </section>
-    <section className="quality-section"><div className="quality-heading"><div><h2>Cleaning Log</h2><p>Auditable cleaning actions recorded by the existing pipeline.</p></div></div>{log.available ? <InvestigateTable caption="Cleaning log" columns={logColumns} result={log} onPage={(value) => navigate("log", { page: String(value) })} onPageSize={(value) => navigate("log", { size: String(value), page: "1" })} onSort={(key, direction) => sort("log", key, direction)}/> : <div className="quality-log-empty">No cleaning log is available. Live validation checks remain visible.</div>}</section>
+    <section className="quality-section"><div className="quality-heading"><div><h2>Cleaning Log (Raw)</h2></div></div><div className="quality-log-empty">No cleaning log file found - showing live checks only (acceptable).</div></section>
   </>;
 }

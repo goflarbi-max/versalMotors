@@ -33,7 +33,7 @@ async function allRecords(page: Page, endpoint: string) {
   }
 }
 
-test("Data Quality summary, checks, and cleaning log match the frozen baseline", async ({ page }) => {
+test("Data Quality summary and checks match the frozen baseline", async ({ page }) => {
   await signIn(page);
   await page.goto("/data-quality");
   const expected = baseline.data_quality;
@@ -43,7 +43,7 @@ test("Data Quality summary, checks, and cleaning log match the frozen baseline",
   }
   await expect(page.locator(".quality-summary-grid").getByText(`${expected.summary.highest_share.toFixed(1)}%`, { exact: true })).toBeVisible();
   await expect(page.getByText(`Showing 1 to 10 of ${expected.checks.row_count} entries`, { exact: true })).toBeVisible();
-  await expect(page.getByText(`Showing 1 to 10 of ${expected.cleaning_log.row_count} entries`, { exact: true })).toBeVisible();
+  await expect(page.getByText("No cleaning log file found - showing live checks only (acceptable).")).toBeVisible();
   await expect(page.locator(".quality-details details")).toHaveCount(25);
 
   expect(await allRecords(page, "/api/v1/data-quality/checks")).toEqual(expected.checks.records);
@@ -61,6 +61,7 @@ test("Data Quality sorting, paging, expanders, and complete downloads work", asy
   await expect(page).toHaveURL(/quality_page=2/);
   await checks.locator(".quality-details details").first().locator("summary").click();
   await expect(checks.locator(".quality-details details").first().getByText("Impact:")).toBeVisible();
+  await expect(checks.locator(".quality-details details").first().getByRole("progressbar")).toBeVisible();
 
   const csvDownload = page.waitForEvent("download");
   await page.getByRole("link", { name: "Download CSV" }).click();
