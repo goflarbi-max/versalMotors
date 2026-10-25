@@ -81,6 +81,15 @@ test("shared filters use the URL and persist across protected pages", async ({ p
   await expect(page.locator('[data-metric="Revenue"] .kpi-value-row > strong')).toHaveText("GHS 277,136,681");
 });
 
+test("Overview exposes the reference evidence investigation action", async ({ page }) => {
+  await signIn(page);
+  const action = page.getByRole("link", { name: "Investigate warranty costs" });
+  await expect(action).toBeVisible();
+  await action.click();
+  await expect(page).toHaveURL(/\/investigate/);
+  await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toBeVisible();
+});
+
 test("Overview shows loading, error, and empty states without crashing", async ({ page }) => {
   test.setTimeout(120_000);
   await page.route("**/api/v1/overview/kpis?**", async (route) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useBusinessFilters } from "@/components/filter-provider";
 import {
@@ -85,5 +86,9 @@ export function OverviewDashboard() {
       <ChartCard eyebrow="Branch performance" title="Revenue by branch" caption="Which locations contribute most to sales revenue?">{data.branches.length ? <BranchRevenueChart data={data.branches}/> : <p className="chart-empty">No branch revenue is available for the selected filters.</p>}</ChartCard>
       <ChartCard eyebrow="Model performance" title="Gross margin by model" caption="Which vehicle models contribute the most gross margin after acquisition cost?">{data.models.length ? <ModelMarginChart data={data.models}/> : <p className="chart-empty">No model margin is available for the selected filters.</p>}</ChartCard>
     </div>
+    <section className="overview-investigate-card">
+      <div><h2>Investigate the evidence</h2><p>Which models, branches, and individual claims are driving warranty cost?</p></div>
+      <Link href={`/investigate${query ? `?${query}` : ""}`}><span aria-hidden="true">⌕</span>Investigate warranty costs</Link>
+    </section>
   </>;
 }
