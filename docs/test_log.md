@@ -204,3 +204,69 @@ The warm path is stable, but the uncached Overview request does not meet the pro
 - The Docker build verifies the generated database during its builder stage, but that build remains pending on a Docker-capable host.
 - Repository-side Phase 7 work and local deployment verification are complete. Remote Railway/Vercel staging remains pending credentials and must be completed before Phase 7 can be declared fully deployed.
 - `autobusiness.goflarbi.com` still points to the existing Streamlit/Worker production path. Phase 8 was not started.
+
+---
+
+## Parity sign-off
+
+Date: 2026-10-25  
+Vercel URL tested: `https://versal-motors-m65j.vercel.app`  
+Result: **FAIL — deployment is not ready for parity sign-off**
+
+### Blocking deployment findings
+
+1. The documented demo account (`demo@versalmotors.com`) with the approved demo password returns **“Invalid email or password”** on the deployed login page. The same failure occurred in desktop and mobile browser runs.
+2. Vercel is connected to GitHub `origin/main`, whose current revision is `10c7763 Make deployment parity verification portable`. The 18 approved parity commits from `efbdb2f` through `d2b9723` are present only in the local branch (`main...origin/main [ahead 18]`). The deployed build therefore cannot contain the approved High and Medium fixes.
+3. Because authentication fails, protected-page visuals, deployed KPI/API parity, filters, drill-downs, tables, downloads, Ask the Business, Management Brief exports, Data Quality, theme switching, the authenticated hamburger, and sign out cannot be truthfully signed off on Vercel.
+
+### Sign-off checklist
+
+| # | Requirement | Result | Production evidence |
+|---:|---|---|---|
+| 1 | Every `docs/parity_audit.md` item is Matches or an intended difference | **FAIL** | The audit still identifies framework-specific loading/error presentation as `Different`, plus the reference-only mobile sidebar defect. More importantly, the deployed revision predates all 18 parity commits, so the resolved local statuses do not describe the current Vercel build. |
+| 2 | Visual comparison at 375, 768 and 1280 px in light and dark mode | **FAIL / BLOCKED** | Public landing and login pages passed no-horizontal-overflow checks at all three widths, fixed public-theme behavior and reduced-motion checks. Protected light/dark comparison is blocked by failed authentication. Above-Low differences expected in the deployed pre-fix revision are the original Overview evidence/chart gaps, filter placement, KPI icons, compact filters, Investigate selection flow, Ask history/evidence, Management Brief layout, Data Quality progress/log presentation, table pagination and landing geometry. These cannot be marked visually resolved on Vercel. |
+| 3 | Numbers match Streamlit and direct SQL for 10 filter combinations | **FAIL / BLOCKED ON DEPLOYMENT** | The local source-to-FastAPI-to-direct-SQL audit still reports 10 scenarios and 0 mismatches. The deployed KPI endpoints return HTTP 401 and login fails, so none of the ten deployed results can be retrieved and compared. No numerical mismatch was observed; deployed equality is unverified. |
+| 4 | Page text and source contain no `Streamlit` or `Made with` wording | **PASS** | Root/login HTML and 18 referenced JavaScript documents were downloaded from Vercel (1,227,102 characters total). Case-insensitive counts: `Streamlit` = 0; `Made with` = 0. Public rendered-page checks also passed. |
+| 5 | Theme, hamburger, filters, drill-down, tables, downloads, Ask, Brief, Data Quality, sign out and protected routes | **FAIL / PARTIAL** | All five signed-out protected URLs correctly return HTTP 307 to `/login?next=...`; 9/9 public/redirect/responsive Playwright checks passed. Login fails, so every authenticated behavior is blocked. Answerable, unanswerable and AI-failure/data-only fallback cases were not reachable. |
+| 6 | Page load times and API first request after idle | **PASS WITH FREE-TIER COLD START** | See timings below. The Render API health request after inactivity took 33.884 s, then 365 ms and 310 ms warm. |
+
+### Deployed timing measurements
+
+Three sequential requests were made for each route. Values include network latency from the audit machine.
+
+| Production request | Statuses | Times |
+|---|---|---|
+| Render `/health/ready` | 200, 200, 200 | **33,884 ms first request after idle**, then 365 ms and 310 ms |
+| Vercel `/` | 200, 200, 200 | 1,884 ms, 461 ms, 385 ms |
+| Vercel `/login` | 200, 200, 200 | 549 ms, 341 ms, 365 ms |
+| Vercel `/api/v1/auth/csrf` | 200, 200, 200 | 324 ms, 280 ms, 261 ms |
+| Vercel `/api/v1/overview/kpis` signed out | 401 | 259 ms |
+
+The first independent reachability request to the Vercel landing page took 1,979 ms. The API cold start is consistent with the Render free-tier behavior documented by the host.
+
+### Signed-out route and security results
+
+- `/overview`, `/investigate`, `/ask-the-business`, `/management-brief`, and `/data-quality`: **PASS**, each redirected to login with its original destination in `next`.
+- Landing-to-login routing: **PASS**.
+- Public pages at 375, 768 and 1280 px: **PASS**, no page-level horizontal scrolling.
+- Landing/login fixed designs with stored dark theme: **PASS**.
+- Reduced-motion landing behavior: **PASS**.
+- Same-origin CSRF route: **PASS** by direct HTTPS request (HTTP 200 with a response body).
+- A Node Playwright request-context probe reported a local certificate-chain verification error, while Chromium and PowerShell HTTPS requests reached the same Vercel routes successfully. This did not hide the separate login credential failure.
+
+### Items failing or not testable
+
+- Deployed demo login: **FAIL**.
+- Deployed revision contains approved parity fixes: **FAIL**.
+- Protected light/dark visual matrix: **BLOCKED**.
+- Deployed ten-filter number comparison: **BLOCKED**.
+- Authenticated theme switch and hamburger: **BLOCKED**.
+- Shared filters and persistence: **BLOCKED**.
+- Investigate drill-down and breadcrumbs: **BLOCKED**.
+- Table sorting, paging and full-data downloads: **BLOCKED**.
+- Ask the Business answerable, unanswerable and failure/fallback cases: **BLOCKED**.
+- Management Brief generation and Markdown/PDF exports: **BLOCKED**.
+- Data Quality page and CSV/PDF downloads: **BLOCKED**.
+- Sign out: **BLOCKED**.
+
+No application code, formula, data, database, analytics, AI, cleaning or deployment setting was changed during this production sign-off.
