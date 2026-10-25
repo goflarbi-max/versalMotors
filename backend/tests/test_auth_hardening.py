@@ -109,3 +109,18 @@ def test_foreign_origin_is_rejected_without_leaking_credentials(api_client):
 
     assert response.status_code == 403
     assert "VersalDemo2026!" not in response.text
+
+
+def test_login_cookie_has_secure_http_only_and_samesite_flags(api_client):
+    token = api_client.get("/api/v1/auth/csrf").json()["csrf_token"]
+    response = api_client.post(
+        "/api/v1/auth/login",
+        json={"email": "demo@versalmotors.com", "password": "VersalDemo2026!"},
+        headers={"Origin": "https://testserver", "X-CSRF-Token": token},
+    )
+
+    cookie = response.headers["set-cookie"].lower()
+    assert "versal_session=" in cookie
+    assert "httponly" in cookie
+    assert "secure" in cookie
+    assert "samesite=lax" in cookie

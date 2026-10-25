@@ -106,6 +106,7 @@ def logout(request: Request, response: Response, user: UserDependency) -> None:
     _require_csrf(request)
     request.app.state.sessions.revoke(request.cookies.get(SESSION_COOKIE))
     response.delete_cookie(SESSION_COOKIE, path="/", secure=request.app.state.settings.secure_cookies, samesite="lax")
+    response.delete_cookie(CSRF_COOKIE, path="/", secure=request.app.state.settings.secure_cookies, samesite="lax")
 
 
 @router.get("/me", response_model=UserResponse)

@@ -114,7 +114,25 @@ flowchart TD
     SIGNOUT --> LOGIN
 ```
 
-The demo access layer is intentionally small and session-scoped. Credential hashes come from Streamlit Secrets or `VERSALMOTORS_AUTH_USERS_JSON` in local `.env`; plaintext passwords are never used for verification or stored in session state. An unknown email is checked against a fixed dummy bcrypt hash and receives the same response as an incorrect password. This is suitable for controlled project demonstration access; a production deployment should use a managed identity provider and Streamlit's OIDC support.
+The production Next.js/FastAPI access boundary is intentionally small. Vercel serves the light-only login and proxies `/api/*` to FastAPI so cookies remain first-party. FastAPI validates Origin plus a double-submit CSRF token, performs the same cost-12 bcrypt work for known and unknown users, and creates a random opaque session identifier. The cookie is HttpOnly, Secure, SameSite=Lax, scoped to `/`, and contains no email, role or password. The server-side record carries email and role, expires after 30 idle minutes or eight absolute hours, and is revoked on logout.
+
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant N as Next.js / Vercel
+    participant A as FastAPI / Render
+    B->>N: GET protected route
+    N->>A: Validate session via /api/auth/me
+    A-->>N: 401 or email + role
+    N-->>B: Redirect /login?next=/safe-path when signed out
+    B->>N: GET CSRF then POST credentials
+    N->>A: Same-origin proxy with Origin + CSRF
+    A->>A: bcrypt real/dummy hash + IP/email limit
+    A-->>B: Opaque Secure HttpOnly session cookie
+    B->>N: Return to validated relative path
+```
+
+The in-memory session and limiter stores suit the current one-process demo service. A restart signs users out and clears lockouts; Redis or another shared TTL store is required before adding replicas. The intentionally public demo credential is the only plaintext-password exception and is not representative of real user handling.
 
 ## Security and configuration
 

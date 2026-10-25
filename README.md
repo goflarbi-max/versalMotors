@@ -22,7 +22,9 @@ The database and cleaned CSVs are generated artifacts. On a fresh clone or Strea
 
 ### Authentication
 
-VersalMotors uses a small app-level login for this project demo. It is an access gate for the demonstration, not a replacement for production identity management or single sign-on. Unauthenticated sessions can reach only the public landing and login routes; protected URLs select the login page until sign-in succeeds. Password verification uses bcrypt hashes, unknown accounts follow the same bcrypt check path, and five failed attempts lock that browser session for 60 seconds.
+VersalMotors uses a small app-level login for this project demo. It is an access gate for the demonstration, not a replacement for managed identity, MFA or enterprise single sign-on. The public landing and `/login` are anonymous; Next.js and FastAPI independently enforce every protected page and API route. Passwords are checked with cost-12 bcrypt, including a dummy-hash check for unknown accounts, and the browser receives only an opaque, HttpOnly, Secure, SameSite=Lax session cookie. Sessions have a 30-minute idle timeout and an eight-hour absolute lifetime, and logout revokes the server-side session.
+
+Login, logout and other POST requests require an allowed Origin and a matching CSRF cookie/header. Five failures are tracked independently by normalized email and IP within a 15-minute window. Production should set `VERSALMOTORS_LOGIN_LOCK_SECONDS=900`; the limiter and session store are in memory on the current single-process Render service, so restarts clear them and horizontal scaling requires a shared store such as Redis. Authentication responses are not cached, CORS is restricted, and both frontend and API send CSP, HSTS, frame-denial, MIME-sniffing, referrer and permissions headers.
 
 The public landing page has one fixed black-and-light presentation, independent of browser theme, with accessible reduced-motion support for its subtle entrance effects. The login screen always uses the light theme; signing out resets the next login to light. After signing in, users enter Overview and can switch protected pages between the existing light and dark themes.
 
@@ -37,10 +39,10 @@ Generate the corresponding hash locally without placing the password in shell hi
 .\.venv\Scripts\python.exe scripts\create_user.py
 ```
 
-For local development, place the generated hash in `.env` as a JSON email-to-hash mapping:
+For local development, place the generated hash and role in `.env`:
 
 ```dotenv
-VERSALMOTORS_AUTH_USERS_JSON='{"demo@versalmotors.com":"<bcrypt-hash>"}'
+VERSALMOTORS_AUTH_USERS_JSON='{"demo@versalmotors.com":{"password_hash":"<bcrypt-hash>","role":"viewer"}}'
 ```
 
 For Streamlit Community Cloud, use this format in the app's Secrets settings:
@@ -50,7 +52,7 @@ For Streamlit Community Cloud, use this format in the app's Secrets settings:
 "demo@versalmotors.com" = "<bcrypt-hash>"
 ```
 
-Only hashes are used for authentication. The displayed demo password is intentionally public for this demonstration account. `.env` and `.streamlit/secrets.toml` are excluded from Git.
+Roles are currently `viewer` or `admin`; they are exposed by `/api/auth/me` for future authorization work, but no role-specific screen exists yet. Only hashes are used for verification. The displayed demo password is intentionally public for this demonstration account. `.env`, `.env.*` and `.streamlit/secrets.toml` are excluded from Git.
 
 ### Testing
 
