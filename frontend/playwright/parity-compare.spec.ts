@@ -118,7 +118,7 @@ async function visit(page: Page, app: App, nextPath: string, streamlitPath: stri
     await closeStreamlitMobileDrawer(page);
   }
   await settle(page);
-  process.stdout.write(`parity: ready ${app} ${app === "nextjs" ? nextPath : streamlitPath}\n`);
+  process.stdout.write(`parity: ready streamlit ${streamlitPath}\n`);
 }
 
 async function capturePair(streamlit: Page, nextjs: Page, state: string, width: number, theme: Theme, results: Record<string, DiffResult>) {
