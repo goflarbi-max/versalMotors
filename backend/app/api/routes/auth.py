@@ -63,8 +63,12 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
     if not valid_email(email):
         raise HTTPException(status_code=400, detail="Enter a valid email address")
     client_ip = _client_ip(request)
-    limiter_keys = (f"ip:{client_ip}", f"email:{email}")
-    remaining = request.app.state.login_limiter.remaining_for_any(limiter_keys)
+    ip_key = f"ip:{client_ip}"
+    email_key = f"email:{email}"
+    remaining = max(
+        request.app.state.login_ip_limiter.remaining(ip_key),
+        request.app.state.login_email_limiter.remaining(email_key),
+    )
     if remaining:
         raise HTTPException(
             status_code=429,
@@ -75,7 +79,10 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
         delay = request.app.state.settings.login_failure_delay_ms / 1000
         if delay:
             time.sleep(delay)
-        lock_seconds = request.app.state.login_limiter.fail_all(limiter_keys)
+        lock_seconds = max(
+            request.app.state.login_ip_limiter.fail(ip_key),
+            request.app.state.login_email_limiter.fail(email_key),
+        )
         if lock_seconds:
             raise HTTPException(
                 status_code=429,
@@ -83,7 +90,7 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
                 headers={"Retry-After": str(lock_seconds)},
             )
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    request.app.state.login_limiter.clear_all(limiter_keys)
+    request.app.state.login_email_limiter.clear(email_key)
     request.app.state.sessions.revoke(request.cookies.get(SESSION_COOKIE))
     account = request.app.state.settings.auth_users[email]
     _, token = request.app.state.sessions.create(email, account.role)

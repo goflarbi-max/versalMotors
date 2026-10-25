@@ -69,7 +69,7 @@ export function LoginForm({ returnTo = "/overview" }: { returnTo?: string }) {
       </span>
       <button className="forgot-button" type="button" onClick={() => showMessage("Please contact the system administrator to reset your password.", true)}>Forgot Password?</button>
       <button className="sign-in-button" type="submit" disabled={pending} aria-disabled={pending}>{pending ? "Signing in..." : "Sign In"}</button>
-      {message ? <p ref={messageRef} className={`login-message${info ? " info" : ""}`} role="alert" aria-live="assertive" tabIndex={-1}>{message}</p> : null}
+      {message ? <p ref={messageRef} className={`login-message${info ? " info" : ""}`} role="status" aria-live="assertive" tabIndex={-1}>{message}</p> : null}
       <p className="demo-access"><strong>Demo access</strong><br />Email: demo@versalmotors.com<br />Password: VersalDemo2026!</p>
     </form>
   );

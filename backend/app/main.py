@@ -36,8 +36,13 @@ async def lifespan(app: FastAPI):
         settings.session_hours * 3600,
         settings.session_idle_minutes * 60,
     )
-    app.state.login_limiter = LoginRateLimiter(
+    app.state.login_email_limiter = LoginRateLimiter(
         maximum=settings.login_max_failures,
+        window_seconds=settings.login_window_seconds,
+        lock_seconds=settings.login_lock_seconds,
+    )
+    app.state.login_ip_limiter = LoginRateLimiter(
+        maximum=settings.login_ip_max_failures,
         window_seconds=settings.login_window_seconds,
         lock_seconds=settings.login_lock_seconds,
     )

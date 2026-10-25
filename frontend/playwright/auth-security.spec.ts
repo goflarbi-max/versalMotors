@@ -19,6 +19,6 @@ test("login controls preserve entered email and expose password safely", async (
   await page.getByRole("button", { name: "Show password" }).click();
   await expect(password).toHaveAttribute("type", "text");
   await page.getByRole("button", { name: "Sign In" }).click();
-  await expect(page.getByRole("alert")).toHaveText("Invalid email or password");
+  await expect(page.locator(".login-message")).toHaveText("Invalid email or password");
   await expect(email).toHaveValue("demo@versalmotors.com");
 });

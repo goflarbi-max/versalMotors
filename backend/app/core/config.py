@@ -25,6 +25,7 @@ class Settings:
     auth_users: dict[str, AuthUser]
     secure_cookies: bool
     login_max_failures: int
+    login_ip_max_failures: int
     login_window_seconds: int
     login_lock_seconds: int
     login_failure_delay_ms: int
@@ -94,6 +95,7 @@ def get_settings() -> Settings:
         secure_cookies=os.getenv("VERSALMOTORS_SECURE_COOKIES", "true").lower()
         not in {"0", "false", "no"},
         login_max_failures=max(1, int(os.getenv("VERSALMOTORS_LOGIN_MAX_FAILURES", "5"))),
+        login_ip_max_failures=max(1, int(os.getenv("VERSALMOTORS_LOGIN_IP_MAX_FAILURES", "25"))),
         login_window_seconds=max(60, int(os.getenv("VERSALMOTORS_LOGIN_WINDOW_SECONDS", "900"))),
         login_lock_seconds=max(60, int(os.getenv("VERSALMOTORS_LOGIN_LOCK_SECONDS", "60"))),
         login_failure_delay_ms=max(0, min(2_000, int(os.getenv("VERSALMOTORS_LOGIN_FAILURE_DELAY_MS", "250")))),

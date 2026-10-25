@@ -182,3 +182,14 @@ Format: Date | Prompt | Wrong Answer | Correct Answer | Fix
 - **What went wrong:** The first High-fix screenshot rerun waited for a CSS class whose presence was not part of the page's user-visible contract, making the audit tool report a false readiness failure while all four summary cards were visible.
 - **How it was discovered:** The Playwright accessibility snapshot showed the complete Ask summary despite the class-count assertion returning zero.
 - **How it was corrected:** The capture tool now waits for stable visible labels and retries transient API readiness. The complete 375 px, 768 px and 1280 px light/dark capture then passed.
+# Authentication status-role regression - 2026-10-25
+
+- **What went wrong:** I changed the login feedback from the established `status` role to `alert`. Next.js also owns a route-announcer alert, making an unscoped browser assertion ambiguous and breaking the existing lockout test's accessibility contract.
+- **How it was discovered:** The full Playwright run reported both the ambiguous framework alert and the missing `status` role while the visible credential message itself was correct.
+- **How it was corrected:** The focused message keeps assertive `aria-live` and programmatic focus but uses the established `status` role. The new browser test targets the login component's scoped class rather than a framework-owned global role.
+
+# Shared-IP login lockout denial - 2026-10-25
+
+- **What went wrong:** I initially applied the five-attempt threshold independently to both an email and the entire client IP. A few failures against one identity could therefore block correct credentials for every other user behind the same office, mobile carrier or test-runner address.
+- **How it was discovered:** The focused Playwright navigation run locked a unique test email, after which unrelated demo-account sign-ins from the same browser host were also rejected.
+- **How it was corrected:** Email lockout remains five failures as required. The separately bounded IP limiter now allows 25 failures in the same window, retaining IP-level brute-force protection without making one account an immediate shared-IP denial of service.
