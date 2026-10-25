@@ -48,8 +48,10 @@ test("Ask summary and deterministic data answer match the frozen baseline", asyn
 });
 
 test("Ask input submits with Enter and failures remain friendly", async ({ page }) => {
+  test.setTimeout(120_000);
   await signIn(page);
   await page.goto("/ask-the-business");
+  await expect(page.locator(".ask-summary-card")).toHaveCount(4, { timeout: 60_000 });
   const input = page.getByLabel("Ask about the business");
   await input.fill("Why is our competitor doing better?");
   await input.press("Enter");

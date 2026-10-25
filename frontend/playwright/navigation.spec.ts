@@ -56,7 +56,7 @@ test("desktop hamburger, theme, navigation, and sign out retain behavior", async
   await page.getByRole("button", { name: "Open navigation menu" }).click();
   await page.getByRole("button", { name: "Dark mode" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.getByRole("link", { name: "Investigate" }).click();
+  await page.getByRole("link", { name: "Investigate", exact: true }).click();
   await expect(page).toHaveURL(/\/investigate(?:\?.*)?$/);
   await expect(page.getByRole("link", { name: "Investigate" })).toHaveAttribute("aria-current", "page");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
@@ -88,9 +88,9 @@ test("tablet keeps the sidebar open and every protected destination updates its 
     ["Overview", "/overview"],
   ] as const;
   for (const [label, path] of destinations) {
-    await page.getByRole("link", { name: label }).click();
+    await page.getByRole("link", { name: label, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`${path}(?:\\?.*)?$`));
-    await expect(page.getByRole("link", { name: label })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("link", { name: label, exact: true })).toHaveAttribute("aria-current", "page");
   }
   const dimensions = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
   expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.inner);

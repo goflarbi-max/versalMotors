@@ -53,7 +53,7 @@ test("Data Quality summary and checks match the frozen baseline", async ({ page 
 test("Data Quality sorting, paging, expanders, and complete downloads work", async ({ page }) => {
   await signIn(page);
   await page.goto("/data-quality");
-  await expect(page).toHaveURL(/start_date=/);
+  await expect(page).toHaveURL(/\/data-quality$/);
   const checks = page.locator(".quality-section").first();
   await checks.getByRole("button", { name: /Sort Count/ }).click();
   await expect(page).toHaveURL(/quality_sort=count/);

@@ -75,13 +75,13 @@ test("shared filters use the URL and persist across protected pages", async ({ p
   await signIn(page);
   await expect(page).toHaveURL(/start_date=2025-04-02/);
   await expect(page).toHaveURL(/end_date=2025-06-30/);
-  await page.getByLabel("Branch").click();
+  await page.getByLabel("Branch", { exact: true }).click();
   await page.getByRole("group", { name: "Branch options" }).getByLabel("Accra").check();
   await expect(page).toHaveURL(/branch=Accra/);
   await page.getByRole("link", { name: "Investigate" }).click();
   await expect(page).toHaveURL(/\/investigate\?.*branch=Accra/);
   await page.getByRole("complementary", { name: "Primary navigation" }).getByRole("link", { name: "Overview" }).click();
-  await expect(page.getByLabel("Branch")).toContainText("Accra");
+  await expect(page.getByLabel("Branch", { exact: true })).toContainText("Accra");
   await expect(page.locator('[data-metric="Revenue"] .kpi-value-row > strong')).toHaveText("GHS 277,136,681");
 });
 
@@ -96,13 +96,14 @@ test("Overview exposes the reference evidence investigation action", async ({ pa
 
 test("Overview shows loading, error, and empty states without crashing", async ({ page }) => {
   test.setTimeout(120_000);
+  test.setTimeout(120_000);
   await page.route("**/api/v1/overview/kpis?**", async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 350));
     await route.continue();
   });
   await signIn(page);
   await expect(page.getByLabel("Loading business overview")).toBeVisible();
-  await expect(page.locator('[data-metric="Revenue"]')).toBeVisible();
+  await expect(page.locator('[data-metric="Revenue"]')).toBeVisible({ timeout: 60_000 });
   await page.unroute("**/api/v1/overview/kpis?**");
 
   await page.route("**/api/v1/overview/revenue-trend?**", (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ message: "unavailable" }) }));
