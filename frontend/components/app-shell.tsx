@@ -101,12 +101,12 @@ function AppShellContent({ email, children, showBusinessFilters }: Props & { sho
               return <Link key={item.href} href={destination} onClick={(event) => { if (mobile) { event.preventDefault(); router.push(destination); setManualOpen(false); } }} className={`sidebar-link${active ? " active" : ""}`} aria-current={active ? "page" : undefined}><Icon />{item.label}</Link>;
             })}
           </nav>
-          {showBusinessFilters ? <BusinessFilterPanel /> : null}
           <div className="sidebar-footer">
             <p className="sidebar-email"><strong>Signed in</strong><br />{email}</p>
             <button className="theme-button" type="button" onClick={toggleTheme}>{dark ? <SunIcon /> : <MoonIcon />}{dark ? "Light mode" : "Dark mode"}</button>
             <button className="logout-button" type="button" onClick={signOut}><LogoutIcon />Sign out</button>
           </div>
+          {showBusinessFilters ? <BusinessFilterPanel /> : null}
         </div>
       </aside>
       <main className="app-main">{children}</main>
