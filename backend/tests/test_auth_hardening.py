@@ -85,3 +85,27 @@ def test_correct_password_is_blocked_during_active_lockout(api_client):
     )
     assert blocked.status_code == 429
     assert blocked.json()["message"].startswith("Too many failed attempts")
+
+
+def test_auth_responses_are_not_cached_and_include_security_headers(api_client):
+    response = api_client.get("/api/v1/auth/csrf")
+
+    assert response.headers["cache-control"] == "no-store, max-age=0"
+    assert response.headers["pragma"] == "no-cache"
+    assert response.headers["strict-transport-security"].startswith("max-age=")
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["x-frame-options"] == "DENY"
+    assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+    assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
+
+
+def test_foreign_origin_is_rejected_without_leaking_credentials(api_client):
+    token = api_client.get("/api/v1/auth/csrf").json()["csrf_token"]
+    response = api_client.post(
+        "/api/v1/auth/login",
+        json={"email": "demo@versalmotors.com", "password": "VersalDemo2026!"},
+        headers={"Origin": "https://evil.example", "X-CSRF-Token": token},
+    )
+
+    assert response.status_code == 403
+    assert "VersalDemo2026!" not in response.text
