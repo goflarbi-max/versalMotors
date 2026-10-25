@@ -71,11 +71,11 @@ test("Management Brief evidence and exact cached downloads match the baseline", 
   await page.getByRole("button", { name: "Generate Management Brief" }).click();
   await expect(page.getByText("Supporting Evidence", { exact: true })).toBeVisible({ timeout: 120_000 });
   for (const item of baseline.management_brief.evidence) {
-    await expect(page.locator(".brief-evidence-summary").getByText(item.value, { exact: true })).toBeVisible();
+    await expect(page.getByRole("table", { name: "Management brief supporting evidence" }).getByText(item.value, { exact: true })).toBeVisible();
   }
 
   const markdownDownload = page.waitForEvent("download");
-  await page.getByRole("link", { name: "Download Markdown" }).click();
+  await page.getByRole("link", { name: "Export Markdown" }).click();
   const markdown = await markdownDownload;
   expect(markdown.suggestedFilename()).toMatch(/^management_brief_.+\.md$/);
   const markdownPath = await markdown.path();
@@ -83,7 +83,7 @@ test("Management Brief evidence and exact cached downloads match the baseline", 
   expect(fs.readFileSync(markdownPath!, "utf8")).toContain("GHS 3,127,546,494.94");
 
   const pdfDownload = page.waitForEvent("download");
-  await page.getByRole("link", { name: "Download PDF" }).click();
+  await page.getByRole("link", { name: "Export PDF" }).click();
   const pdf = await pdfDownload;
   expect(pdf.suggestedFilename()).toMatch(/^management_brief_.+\.pdf$/);
   const pdfPath = await pdf.path();
