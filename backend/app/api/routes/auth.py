@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import logging
 import time
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
@@ -20,11 +22,29 @@ from backend.app.schemas.auth import CsrfResponse, CurrentUserResponse, LoginReq
 
 router = APIRouter(prefix="/api/v1/auth", tags=["authentication"])
 session_router = APIRouter(prefix="/api/auth", tags=["authentication"])
+auth_logger = logging.getLogger("versalmotors.auth")
 
 
 def _client_ip(request: Request) -> str:
     forwarded = request.headers.get("x-forwarded-for", "").split(",", 1)[0].strip()
     return forwarded or (request.client.host if request.client else "unknown")
+
+
+def _masked_email(email: str) -> str:
+    local, separator, domain = email.partition("@")
+    if not separator:
+        return "***"
+    visible = local[:1]
+    return f"{visible}{'*' * max(3, len(local) - 1)}@{domain}"
+
+
+def _log_auth_event(event: str, request: Request, email: str) -> None:
+    auth_logger.info(json.dumps({
+        "event": event,
+        "ip": _client_ip(request),
+        "masked_email": _masked_email(email),
+        "request_id": getattr(request.state, "request_id", "unknown"),
+    }, separators=(",", ":"), sort_keys=True))
 
 
 def _require_origin(request: Request) -> None:
@@ -70,6 +90,7 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
         request.app.state.login_email_limiter.remaining(email_key),
     )
     if remaining:
+        _log_auth_event("login_lockout", request, email)
         raise HTTPException(
             status_code=429,
             detail=f"Too many failed attempts. Try again in {remaining} seconds.",
@@ -84,11 +105,13 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
             request.app.state.login_email_limiter.fail(email_key),
         )
         if lock_seconds:
+            _log_auth_event("login_lockout", request, email)
             raise HTTPException(
                 status_code=429,
                 detail=f"Too many failed attempts. Try again in {lock_seconds} seconds.",
                 headers={"Retry-After": str(lock_seconds)},
             )
+        _log_auth_event("login_failure", request, email)
         raise HTTPException(status_code=401, detail="Invalid email or password")
     request.app.state.login_email_limiter.clear(email_key)
     request.app.state.sessions.revoke(request.cookies.get(SESSION_COOKIE))
@@ -103,17 +126,18 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
         path="/",
         max_age=request.app.state.settings.session_hours * 3600,
     )
+    _log_auth_event("login_success", request, email)
     return UserResponse(authenticated=True, email=email)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(request: Request, response: Response, user: UserDependency) -> None:
-    del user
     _require_origin(request)
     _require_csrf(request)
     request.app.state.sessions.revoke(request.cookies.get(SESSION_COOKIE))
     response.delete_cookie(SESSION_COOKIE, path="/", secure=request.app.state.settings.secure_cookies, samesite="lax")
     response.delete_cookie(CSRF_COOKIE, path="/", secure=request.app.state.settings.secure_cookies, samesite="lax")
+    _log_auth_event("logout", request, user.email)
 
 
 @router.get("/me", response_model=UserResponse)

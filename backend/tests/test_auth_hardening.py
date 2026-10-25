@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 
 from backend.app.core.config import _users_from_environment
 from backend.app.core.security import SessionStore
@@ -124,3 +125,34 @@ def test_login_cookie_has_secure_http_only_and_samesite_flags(api_client):
     assert "httponly" in cookie
     assert "secure" in cookie
     assert "samesite=lax" in cookie
+
+
+def test_auth_events_mask_email_and_never_log_password(api_client, caplog):
+    caplog.set_level(logging.INFO, logger="versalmotors.auth")
+    token = api_client.get("/api/v1/auth/csrf").json()["csrf_token"]
+    api_client.post(
+        "/api/v1/auth/login",
+        json={"email": "demo@versalmotors.com", "password": "not-the-password"},
+        headers={"Origin": "https://testserver", "X-CSRF-Token": token},
+    )
+
+    combined = "\n".join(record.getMessage() for record in caplog.records)
+    assert "login_failure" in combined
+    assert "d***@versalmotors.com" in combined
+    assert "demo@versalmotors.com" not in combined
+    assert "not-the-password" not in combined
+
+
+def test_role_aware_me_returns_viewer_role_after_login(api_client):
+    token = api_client.get("/api/v1/auth/csrf").json()["csrf_token"]
+    response = api_client.post(
+        "/api/v1/auth/login",
+        json={"email": "demo@versalmotors.com", "password": "VersalDemo2026!"},
+        headers={"Origin": "https://testserver", "X-CSRF-Token": token},
+    )
+    assert response.status_code == 200
+    assert api_client.get("/api/auth/me").json() == {
+        "authenticated": True,
+        "email": "demo@versalmotors.com",
+        "role": "viewer",
+    }

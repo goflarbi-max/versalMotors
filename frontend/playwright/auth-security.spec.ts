@@ -22,3 +22,23 @@ test("login controls preserve entered email and expose password safely", async (
   await expect(page.locator(".login-message")).toHaveText("Invalid email or password");
   await expect(email).toHaveValue("demo@versalmotors.com");
 });
+
+test("session cookie is HTTP-only and login stays light and responsive", async ({ page, context }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  for (const width of [375, 768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/login");
+    await expect(page.locator(".login-page")).toHaveCSS("background-color", "rgb(248, 250, 252)");
+    const dimensions = await page.evaluate(() => ({ inner: window.innerWidth, scroll: document.documentElement.scrollWidth }));
+    expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.inner);
+  }
+
+  await page.getByLabel("Email Address").fill("demo@versalmotors.com");
+  await page.getByLabel("Password", { exact: true }).fill("VersalDemo2026!");
+  await page.getByRole("button", { name: "Sign In" }).click();
+  await expect(page).toHaveURL(/\/overview$/);
+  const session = (await context.cookies()).find((cookie) => cookie.name === "versal_session");
+  expect(session?.httpOnly).toBe(true);
+  expect(session?.sameSite).toBe("Lax");
+  expect(await page.evaluate(() => document.cookie)).not.toContain("versal_session");
+});
