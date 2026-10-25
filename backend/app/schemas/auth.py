@@ -1,17 +1,28 @@
 """Authentication request and response models."""
 
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class LoginRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    email: str = Field(max_length=320)
-    password: str = Field(max_length=1024)
+    email: str = Field(min_length=1, max_length=254)
+    password: str = Field(min_length=1, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: str) -> str:
+        return value.strip().lower()
 
 
 class UserResponse(BaseModel):
     authenticated: bool
     email: str
+
+
+class CurrentUserResponse(UserResponse):
+    role: Literal["viewer", "admin"]
 
 
 class CsrfResponse(BaseModel):

@@ -5,8 +5,15 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
+from typing import Literal
 
 from src.auth.credentials import DEFAULT_DEMO_USERS
+
+
+@dataclass(frozen=True)
+class AuthUser:
+    password_hash: str
+    role: Literal["viewer", "admin"] = "viewer"
 
 
 @dataclass(frozen=True)
@@ -14,26 +21,54 @@ class Settings:
     session_secret: str
     session_hours: int
     allowed_origins: tuple[str, ...]
-    auth_users: dict[str, str]
+    auth_users: dict[str, AuthUser]
     secure_cookies: bool
 
+    @property
+    def password_hashes(self) -> dict[str, str]:
+        return {email: user.password_hash for email, user in self.auth_users.items()}
 
-def _users_from_environment() -> dict[str, str]:
+
+def _users_from_environment() -> dict[str, AuthUser]:
     raw = os.getenv("VERSALMOTORS_AUTH_USERS_JSON", "").strip()
     if not raw:
-        return DEFAULT_DEMO_USERS.copy()
+        return {
+            email: AuthUser(password_hash=password_hash, role="viewer")
+            for email, password_hash in DEFAULT_DEMO_USERS.items()
+        }
     try:
         parsed = json.loads(raw)
     except json.JSONDecodeError:
-        return DEFAULT_DEMO_USERS.copy()
+        return {
+            email: AuthUser(password_hash=password_hash, role="viewer")
+            for email, password_hash in DEFAULT_DEMO_USERS.items()
+        }
     if not isinstance(parsed, dict):
-        return DEFAULT_DEMO_USERS.copy()
-    users = {
-        str(email).strip().lower(): str(password_hash).strip()
-        for email, password_hash in parsed.items()
-        if str(email).strip() and str(password_hash).strip()
+        return {
+            email: AuthUser(password_hash=password_hash, role="viewer")
+            for email, password_hash in DEFAULT_DEMO_USERS.items()
+        }
+    users: dict[str, AuthUser] = {}
+    for raw_email, raw_user in parsed.items():
+        email = str(raw_email).strip().lower()
+        if not email:
+            continue
+        if isinstance(raw_user, str):
+            password_hash = raw_user.strip()
+            role = "viewer"
+        elif isinstance(raw_user, dict):
+            password_hash = str(raw_user.get("password_hash", "")).strip()
+            role = str(raw_user.get("role", "viewer")).strip().lower()
+        else:
+            continue
+        if password_hash and role in {"viewer", "admin"}:
+            users[email] = AuthUser(password_hash=password_hash, role=role)  # type: ignore[arg-type]
+    if users:
+        return users
+    return {
+        email: AuthUser(password_hash=password_hash, role="viewer")
+        for email, password_hash in DEFAULT_DEMO_USERS.items()
     }
-    return users or DEFAULT_DEMO_USERS.copy()
 
 
 def get_settings() -> Settings:

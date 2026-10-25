@@ -63,7 +63,7 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
             detail=f"Too many failed attempts. Try again in {remaining} seconds.",
             headers={"Retry-After": str(remaining)},
         )
-    if not verify_password(email, payload.password, request.app.state.settings.auth_users):
+    if not verify_password(email, payload.password, request.app.state.settings.password_hashes):
         lock_seconds = request.app.state.login_limiter.fail(limiter_key)
         if lock_seconds:
             raise HTTPException(
