@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import base64
 import hashlib
 import hmac
-import json
 import secrets
 import threading
 import time
@@ -25,14 +23,23 @@ def verify_password(email: str, password: str, users: dict[str, str]) -> bool:
 class Session:
     sid: str
     email: str
+    role: str
     issued_at: int
-    expires_at: int
+    last_seen_at: int
+    absolute_expires_at: int
 
 
 class SessionStore:
-    def __init__(self, secret: str, lifetime_seconds: int, capacity: int = 10_000):
+    def __init__(
+        self,
+        secret: str,
+        lifetime_seconds: int,
+        idle_seconds: int | None = None,
+        capacity: int = 10_000,
+    ):
         self._secret = secret.encode("utf-8")
         self._lifetime = lifetime_seconds
+        self._idle = idle_seconds or lifetime_seconds
         self._capacity = capacity
         self._sessions: dict[str, Session] = {}
         self._lock = threading.Lock()
@@ -40,14 +47,17 @@ class SessionStore:
     def _sign(self, body: str) -> str:
         return hmac.new(self._secret, body.encode("ascii"), hashlib.sha256).hexdigest()
 
-    def create(self, email: str, now: int | None = None) -> tuple[Session, str]:
+    def create(self, email: str, role: str = "viewer", now: int | None = None) -> tuple[Session, str]:
         issued = int(time.time()) if now is None else int(now)
-        session = Session(secrets.token_urlsafe(24), email, issued, issued + self._lifetime)
-        payload = base64.urlsafe_b64encode(json.dumps(
-            {"sid": session.sid, "email": email, "iat": issued, "exp": session.expires_at},
-            separators=(",", ":"),
-        ).encode("utf-8")).decode("ascii").rstrip("=")
-        token = f"{payload}.{self._sign(payload)}"
+        session = Session(
+            sid=secrets.token_urlsafe(32),
+            email=email,
+            role=role,
+            issued_at=issued,
+            last_seen_at=issued,
+            absolute_expires_at=issued + self._lifetime,
+        )
+        token = f"{session.sid}.{self._sign(session.sid)}"
         with self._lock:
             if len(self._sessions) >= self._capacity:
                 oldest = min(self._sessions, key=lambda sid: self._sessions[sid].issued_at)
@@ -58,22 +68,29 @@ class SessionStore:
     def validate(self, token: str | None, now: int | None = None) -> Session | None:
         if not token or "." not in token:
             return None
-        payload, supplied_signature = token.rsplit(".", 1)
-        if not hmac.compare_digest(self._sign(payload), supplied_signature):
-            return None
-        try:
-            padded = payload + "=" * (-len(payload) % 4)
-            decoded = json.loads(base64.urlsafe_b64decode(padded).decode("utf-8"))
-            sid = str(decoded["sid"])
-        except (KeyError, ValueError, TypeError, json.JSONDecodeError):
+        sid, supplied_signature = token.rsplit(".", 1)
+        if not hmac.compare_digest(self._sign(sid), supplied_signature):
             return None
         current = int(time.time()) if now is None else int(now)
         with self._lock:
             session = self._sessions.get(sid)
-            if session is None or session.expires_at <= current:
+            if session is None:
+                return None
+            idle_expired = session.last_seen_at + self._idle <= current
+            absolute_expired = session.absolute_expires_at <= current
+            if idle_expired or absolute_expired:
                 self._sessions.pop(sid, None)
                 return None
-            return session
+            refreshed = Session(
+                sid=session.sid,
+                email=session.email,
+                role=session.role,
+                issued_at=session.issued_at,
+                last_seen_at=current,
+                absolute_expires_at=session.absolute_expires_at,
+            )
+            self._sessions[sid] = refreshed
+            return refreshed
 
     def revoke(self, token: str | None) -> None:
         session = self.validate(token)

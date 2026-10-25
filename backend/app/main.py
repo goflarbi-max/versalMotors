@@ -31,7 +31,11 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     app.state.settings = settings
     app.state.data_bundle = get_data_bundle()
-    app.state.sessions = SessionStore(settings.session_secret, settings.session_hours * 3600)
+    app.state.sessions = SessionStore(
+        settings.session_secret,
+        settings.session_hours * 3600,
+        settings.session_idle_minutes * 60,
+    )
     app.state.login_limiter = LoginRateLimiter()
     app.state.ask_limiter = TokenBucketRateLimiter(requests_per_minute=10, burst=3)
     app.state.report_store = ReportStore()
@@ -120,6 +124,7 @@ async def validation_problem(request: Request, error: RequestValidationError):
 
 app.include_router(health.router)
 app.include_router(auth.router)
+app.include_router(auth.session_router)
 app.include_router(filters.router)
 app.include_router(overview.router)
 app.include_router(investigate.router)

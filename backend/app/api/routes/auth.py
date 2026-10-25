@@ -14,9 +14,10 @@ from backend.app.core.security import (
     valid_email,
     verify_password,
 )
-from backend.app.schemas.auth import CsrfResponse, LoginRequest, UserResponse
+from backend.app.schemas.auth import CsrfResponse, CurrentUserResponse, LoginRequest, UserResponse
 
 router = APIRouter(prefix="/api/v1/auth", tags=["authentication"])
+session_router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 
 def _require_origin(request: Request) -> None:
@@ -73,7 +74,9 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
             )
         raise HTTPException(status_code=401, detail="Invalid email or password")
     request.app.state.login_limiter.clear(limiter_key)
-    _, token = request.app.state.sessions.create(email)
+    request.app.state.sessions.revoke(request.cookies.get(SESSION_COOKIE))
+    account = request.app.state.settings.auth_users[email]
+    _, token = request.app.state.sessions.create(email, account.role)
     response.set_cookie(
         SESSION_COOKIE,
         token,
@@ -98,3 +101,8 @@ def logout(request: Request, response: Response, user: UserDependency) -> None:
 @router.get("/me", response_model=UserResponse)
 def me(user: UserDependency) -> UserResponse:
     return UserResponse(authenticated=True, email=user.email)
+
+
+@session_router.get("/me", response_model=CurrentUserResponse)
+def role_aware_me_alias(user: UserDependency) -> CurrentUserResponse:
+    return CurrentUserResponse(authenticated=True, email=user.email, role=user.role)

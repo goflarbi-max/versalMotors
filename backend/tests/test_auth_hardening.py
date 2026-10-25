@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from backend.app.core.config import _users_from_environment
+from backend.app.core.security import SessionStore
 from backend.app.schemas.auth import LoginRequest
 
 
@@ -46,3 +47,20 @@ def test_invalid_configured_role_is_not_loaded(monkeypatch):
     )
 
     assert "bad@versalmotors.com" not in _users_from_environment()
+
+
+def test_session_store_rejects_idle_absolute_and_tampered_tokens():
+    store = SessionStore("test-secret", lifetime_seconds=100, idle_seconds=10)
+    session, token = store.create("demo@versalmotors.com", "viewer", now=100)
+
+    assert session.role == "viewer"
+    assert store.validate(token, now=105) is not None
+    assert store.validate(f"{token}tampered", now=106) is None
+    assert store.validate(token, now=116) is None
+
+    _, second_token = store.create("demo@versalmotors.com", "viewer", now=200)
+    assert store.validate(second_token, now=301) is None
+
+
+def test_role_aware_me_requires_a_valid_session(api_client):
+    assert api_client.get("/api/auth/me").status_code == 401
