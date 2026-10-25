@@ -26,6 +26,17 @@ for (const path of ["overview", "investigate", "ask-the-business", "management-b
   });
 }
 
+test("login locks the same session after five failed attempts", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email Address").fill(`lockout-${Date.now()}@example.com`);
+  await page.getByLabel("Password", { exact: true }).fill("incorrect-password");
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    await page.getByRole("button", { name: "Sign In" }).click();
+    if (attempt < 5) await expect(page.getByRole("status")).toHaveText("Invalid email or password");
+  }
+  await expect(page.getByRole("status")).toContainText("Too many failed attempts. Try again in 60 seconds.");
+});
+
 test("login rewrite preserves the backend session cookie and protects the shell", async ({ page }) => {
   await signIn(page);
   await expect(page.getByText("demo@versalmotors.com")).toBeVisible();
