@@ -23,6 +23,7 @@
   --icon-tile-bg: #e8f8ef;
   --icon-tile-fg: #07894b;
   --chart-grid: #d9e2ec;
+  --table-page-active: #5bc0de;
 }
 
 html[data-theme="dark"] {
@@ -46,6 +47,7 @@ html[data-theme="dark"] {
   --icon-tile-bg: #123d31;
   --icon-tile-fg: #6ee7b7;
   --chart-grid: #334155;
+  --table-page-active: #5bc0de;
 }
 
 * { box-sizing: border-box; }
@@ -241,6 +243,7 @@ html[data-theme="dark"] .investigate-table-card th { color: #111827; background:
 .table-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .8rem; padding: .85rem 1.15rem; color: var(--text-muted); font-size: .76rem; }
 .table-footer nav { display: flex; align-items: center; gap: .55rem; }
 .table-footer button { min-width: 40px; min-height: 40px; border: 1px solid var(--border); border-radius: .65rem; color: var(--text); background: var(--surface-soft); cursor: pointer; }
+.table-footer button.active { border-color: var(--table-page-active); color: #fff; background: var(--table-page-active); }.table-ellipsis { min-width: 28px; text-align: center; }
 .table-footer button:disabled { cursor: not-allowed; opacity: .45; }
 .investigate-table-card.empty,.investigate-state { padding: 1.5rem; }.investigate-table-card.empty h2,.investigate-state h2 { margin: 0 0 .35rem; }.investigate-table-card.empty p,.investigate-state p { margin: 0; color: var(--text-muted); }
 .investigate-record-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; padding: 1rem 1.15rem; }

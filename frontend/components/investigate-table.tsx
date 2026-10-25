@@ -24,6 +24,13 @@ function nextDirection(active: boolean, direction: SortDirection): SortDirection
   return "original";
 }
 
+function pageTokens(page: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 5) return Array.from({ length: totalPages }, (_, index) => index + 1);
+  if (page <= 3) return [1, 2, 3, 4, "ellipsis", totalPages];
+  if (page >= totalPages - 2) return [1, "ellipsis", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  return [1, "ellipsis", page - 1, page, page + 1, "ellipsis", totalPages];
+}
+
 export function InvestigateTable<T extends object>({ caption, columns, result, onPage, onPageSize, onSort, rowAction }: Props<T>) {
   const totalPages = Math.max(1, Math.ceil(result.total / result.page_size));
   const first = result.total ? (result.page - 1) * result.page_size + 1 : 0;
@@ -48,6 +55,6 @@ export function InvestigateTable<T extends object>({ caption, columns, result, o
         })}{rowAction ? <td><button className="row-action" type="button" onClick={() => rowAction.onSelect(record)}>{rowAction.label}<span aria-hidden="true">→</span></button></td> : null}</tr>)}</tbody>
       </table>
     </div>
-    <footer className="table-footer"><span>Showing {first} to {last} of {result.total.toLocaleString("en-US")} entries</span>{totalPages > 1 ? <nav aria-label={`${caption} pages`}><button type="button" disabled={result.page <= 1} onClick={() => onPage(result.page - 1)}>«<span className="sr-only"> Previous</span></button><span>Page {result.page} of {totalPages}</span><button type="button" disabled={result.page >= totalPages} onClick={() => onPage(result.page + 1)}><span className="sr-only">Next </span>»</button></nav> : null}</footer>
+    <footer className="table-footer"><span>Showing {first} to {last} of {result.total.toLocaleString("en-US")} entries</span>{totalPages > 1 ? <nav aria-label={`${caption} pages`}><button type="button" aria-label="Previous page" disabled={result.page <= 1} onClick={() => onPage(result.page - 1)}>«</button>{pageTokens(result.page, totalPages).map((token, index) => token === "ellipsis" ? <span className="table-ellipsis" key={`ellipsis-${index}`}>…</span> : <button type="button" key={token} className={token === result.page ? "active" : undefined} aria-label={`Page ${token}`} aria-current={token === result.page ? "page" : undefined} onClick={() => onPage(token)}>{token}</button>)}<button type="button" aria-label="Next page" disabled={result.page >= totalPages} onClick={() => onPage(result.page + 1)}>»</button></nav> : null}</footer>
   </section>;
 }

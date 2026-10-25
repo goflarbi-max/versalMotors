@@ -48,9 +48,10 @@ test("warranty drill-down preserves baseline rows, breadcrumbs, sorting, and pag
   await expect(page).toHaveURL(new RegExp(`focus_model=${baseline.selected_model}`));
   await expect(page.getByRole("heading", { name: `${baseline.selected_model} warranty cost by branch` })).toBeVisible();
   await expect(page.getByText(`Showing 1 to 10 of ${baseline.branches.row_count} entries`)).toBeVisible();
-  await page.getByRole("button", { name: "Next »" }).click();
+  await page.getByRole("button", { name: "Next page" }).click();
   await expect(page.getByText(`Showing 11 to ${baseline.branches.row_count} of ${baseline.branches.row_count} entries`)).toBeVisible();
-  await page.getByRole("button", { name: "Previous" }).click();
+  await expect(page.getByRole("button", { name: "Page 2" })).toHaveAttribute("aria-current", "page");
+  await page.getByRole("button", { name: "Previous page" }).click();
 
   const firstBranchRow = page.locator("tbody tr").first();
   await expect(firstBranchRow).toContainText(baseline.selected_branch);
