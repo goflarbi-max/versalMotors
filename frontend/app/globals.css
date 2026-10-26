@@ -126,8 +126,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 /* Light-only login design. */
 .login-page {
-  min-height: 100dvh; display: grid; place-items: center; padding: 1.25rem;
-  color: #111827; background: #f8fafc; overflow-x: hidden;
+  width: 100%; height: 100dvh; min-height: 100dvh; display: grid; place-items: center; padding: 1.25rem;
+  color: #111827; background: #f8fafc; overflow-x: hidden; overflow-y: auto;
+  overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch;
 }
 .login-page::before, .login-page::after { content: ""; position: fixed; width: 38vw; height: 38vw; border-radius: 50%; filter: blur(80px); opacity: .28; pointer-events: none; }
 .login-page::before { top: -16vw; left: -10vw; background: #c7d2fe; }.login-page::after { right: -12vw; bottom: -18vw; background: #bae6fd; }
@@ -336,6 +337,9 @@ html[data-theme="dark"] .evidence-table-card th { color: #111827; background: #e
   .landing-copy { margin-top: 4.2rem; }.landing-copy h1 { max-width: 100%; font-size: clamp(2.15rem,10vw,2.4rem); line-height: 1.04; }.landing-copy p { font-size: 1rem; line-height: 1.62; }
   .analytics-icons { gap: 10px; margin-top: 28px; }.analytics-icons span { width: 40px; height: 40px; flex-basis: 40px; }.landing-cards { grid-template-columns: 1fr; gap: .9rem; margin-top: -2rem; }.landing-card { grid-template-columns: 3rem minmax(0,1fr); min-height: 0; padding: 1.15rem; }
   .dot-wave { display: none; }.login-card { padding: 1.4rem 1.2rem 1.5rem; }
+}
+@media (max-height: 700px) {
+  .login-page { place-items: start center; }
 }
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; }
