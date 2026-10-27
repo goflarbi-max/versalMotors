@@ -21,6 +21,7 @@ class Settings:
     session_secret: str
     session_hours: int
     session_idle_minutes: int
+    remember_days: int
     allowed_origins: tuple[str, ...]
     auth_users: dict[str, AuthUser]
     secure_cookies: bool
@@ -90,6 +91,7 @@ def get_settings() -> Settings:
         session_secret=os.getenv("VERSALMOTORS_SESSION_SECRET", "development-only-change-me"),
         session_hours=max(1, int(os.getenv("VERSALMOTORS_SESSION_HOURS", "8"))),
         session_idle_minutes=max(1, int(os.getenv("VERSALMOTORS_SESSION_IDLE_MINUTES", "30"))),
+        remember_days=max(1, min(90, int(os.getenv("VERSALMOTORS_REMEMBER_DAYS", "30")))),
         allowed_origins=origins,
         auth_users=_users_from_environment(),
         secure_cookies=os.getenv("VERSALMOTORS_SECURE_COOKIES", "true").lower()

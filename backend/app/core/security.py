@@ -27,6 +27,7 @@ class Session:
     issued_at: int
     last_seen_at: int
     absolute_expires_at: int
+    idle_seconds: int
 
 
 class SessionStore:
@@ -47,15 +48,25 @@ class SessionStore:
     def _sign(self, body: str) -> str:
         return hmac.new(self._secret, body.encode("ascii"), hashlib.sha256).hexdigest()
 
-    def create(self, email: str, role: str = "viewer", now: int | None = None) -> tuple[Session, str]:
+    def create(
+        self,
+        email: str,
+        role: str = "viewer",
+        now: int | None = None,
+        lifetime_seconds: int | None = None,
+        idle_seconds: int | None = None,
+    ) -> tuple[Session, str]:
         issued = int(time.time()) if now is None else int(now)
+        lifetime = lifetime_seconds or self._lifetime
+        idle = idle_seconds or self._idle
         session = Session(
             sid=secrets.token_urlsafe(32),
             email=email,
             role=role,
             issued_at=issued,
             last_seen_at=issued,
-            absolute_expires_at=issued + self._lifetime,
+            absolute_expires_at=issued + lifetime,
+            idle_seconds=idle,
         )
         token = f"{session.sid}.{self._sign(session.sid)}"
         with self._lock:
@@ -76,7 +87,7 @@ class SessionStore:
             session = self._sessions.get(sid)
             if session is None:
                 return None
-            idle_expired = session.last_seen_at + self._idle <= current
+            idle_expired = session.last_seen_at + session.idle_seconds <= current
             absolute_expired = session.absolute_expires_at <= current
             if idle_expired or absolute_expired:
                 self._sessions.pop(sid, None)
@@ -88,6 +99,7 @@ class SessionStore:
                 issued_at=session.issued_at,
                 last_seen_at=current,
                 absolute_expires_at=session.absolute_expires_at,
+                idle_seconds=session.idle_seconds,
             )
             self._sessions[sid] = refreshed
             return refreshed

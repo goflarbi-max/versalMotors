@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon, LockIcon, MailIcon } from "@/components/icons";
 import { safeReturnPath } from "@/lib/safe-redirect";
 
-export function LoginForm({ returnTo = "/overview" }: { returnTo?: string }) {
+export function LoginForm({ returnTo = "/overview", initialMessage = "" }: { returnTo?: string; initialMessage?: string }) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialMessage);
   const [info, setInfo] = useState(false);
   const [pending, setPending] = useState(false);
   const messageRef = useRef<HTMLParagraphElement>(null);
@@ -37,6 +37,7 @@ export function LoginForm({ returnTo = "/overview" }: { returnTo?: string }) {
         body: JSON.stringify({
           email: String(form.get("email") ?? "").trim().toLowerCase(),
           password: String(form.get("password") ?? ""),
+          remember_me: form.get("remember_me") === "on",
         }),
       });
       if (!response.ok) {
@@ -60,14 +61,18 @@ export function LoginForm({ returnTo = "/overview" }: { returnTo?: string }) {
   }
 
   return (
-    <form onSubmit={submit} noValidate>
+    <form action="/auth/login-fallback" method="post" onSubmit={submit} noValidate>
+      <input type="hidden" name="next" value={safeReturnPath(returnTo)} />
       <label className="login-field" htmlFor="login-email">Email Address</label>
       <span className="input-shell"><MailIcon /><input id="login-email" name="email" type="email" maxLength={254} placeholder="Enter your email" autoComplete="username" required /></span>
       <label className="login-field" htmlFor="login-password">Password</label>
       <span className="input-shell"><LockIcon /><input id="login-password" name="password" maxLength={128} type={showPassword ? "text" : "password"} placeholder="Enter your password" autoComplete="current-password" required />
         <button className="password-toggle" type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOffIcon /> : <EyeIcon />}</button>
       </span>
-      <button className="forgot-button" type="button" onClick={() => showMessage("Please contact the system administrator to reset your password.", true)}>Forgot Password?</button>
+      <div className="login-options">
+        <label className="remember-option" htmlFor="remember-me"><input id="remember-me" name="remember_me" type="checkbox" /> <span>Remember me</span></label>
+        <button className="forgot-button" type="button" onClick={() => showMessage("Please contact the system administrator to reset your password.", true)}>Forgot Password?</button>
+      </div>
       <button className="sign-in-button" type="submit" disabled={pending} aria-disabled={pending}>{pending ? "Signing in..." : "Sign In"}</button>
       {message ? <p ref={messageRef} className={`login-message${info ? " info" : ""}`} role="status" aria-live="assertive" tabIndex={-1}>{message}</p> : null}
     </form>

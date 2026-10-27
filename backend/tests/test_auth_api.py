@@ -35,6 +35,25 @@ def test_login_cookie_me_and_logout(api_client):
     assert api_client.get("/api/v1/auth/me").status_code == 401
 
 
+def test_remembered_login_uses_a_thirty_day_persistent_cookie(api_client):
+    token = _csrf(api_client)
+    response = api_client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "demo@versalmotors.com",
+            "password": "VersalDemo2026!",
+            "remember_me": True,
+        },
+        headers={"Origin": "https://testserver", "X-CSRF-Token": token},
+    )
+
+    assert response.status_code == 200
+    cookie = response.headers["set-cookie"].lower()
+    assert "max-age=2592000" in cookie
+    assert "httponly" in cookie
+    assert "secure" in cookie
+
+
 def test_wrong_and_unknown_users_receive_same_safe_message(api_client):
     token = _csrf(api_client)
     wrong = api_client.post(

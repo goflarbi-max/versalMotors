@@ -32,6 +32,7 @@ def test_environment_users_support_roles_and_legacy_hashes(monkeypatch):
 def test_login_request_normalizes_email_and_limits_input_lengths():
     request = LoginRequest(email="  Demo@VersalMotors.com ", password="safe password")
     assert request.email == "demo@versalmotors.com"
+    assert request.remember_me is False
 
 
 def test_invalid_configured_role_is_not_loaded(monkeypatch):
@@ -61,6 +62,16 @@ def test_session_store_rejects_idle_absolute_and_tampered_tokens():
 
     _, second_token = store.create("demo@versalmotors.com", "viewer", now=200)
     assert store.validate(second_token, now=301) is None
+
+    remembered, remembered_token = store.create(
+        "demo@versalmotors.com",
+        "viewer",
+        now=300,
+        lifetime_seconds=1_000,
+        idle_seconds=1_000,
+    )
+    assert remembered.absolute_expires_at == 1_300
+    assert store.validate(remembered_token, now=1_299) is not None
 
 
 def test_role_aware_me_requires_a_valid_session(api_client):

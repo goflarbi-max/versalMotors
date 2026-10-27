@@ -116,7 +116,15 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
     request.app.state.login_email_limiter.clear(email_key)
     request.app.state.sessions.revoke(request.cookies.get(SESSION_COOKIE))
     account = request.app.state.settings.auth_users[email]
-    _, token = request.app.state.sessions.create(email, account.role)
+    remembered_seconds = request.app.state.settings.remember_days * 24 * 3600
+    lifetime_seconds = remembered_seconds if payload.remember_me else request.app.state.settings.session_hours * 3600
+    idle_seconds = remembered_seconds if payload.remember_me else request.app.state.settings.session_idle_minutes * 60
+    _, token = request.app.state.sessions.create(
+        email,
+        account.role,
+        lifetime_seconds=lifetime_seconds,
+        idle_seconds=idle_seconds,
+    )
     response.set_cookie(
         SESSION_COOKIE,
         token,
@@ -124,7 +132,7 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
         secure=request.app.state.settings.secure_cookies,
         samesite="lax",
         path="/",
-        max_age=request.app.state.settings.session_hours * 3600,
+        max_age=remembered_seconds if payload.remember_me else None,
     )
     _log_auth_event("login_success", request, email)
     return UserResponse(authenticated=True, email=email)

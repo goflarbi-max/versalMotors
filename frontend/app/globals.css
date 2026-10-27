@@ -146,7 +146,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .input-shell:focus-within { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.16); }
 .input-shell svg { width: 18px; height: 18px; color: #64748b; }.input-shell input { width: 100%; border: 0; outline: 0; color: #111827; background: transparent; }
 .password-toggle { display: grid; place-items: center; width: 40px; height: 40px; border: 0; color: #475569; background: transparent; cursor: pointer; }.password-toggle svg { width: 19px; height: 19px; }
-.forgot-button { display: block; margin: .65rem 0 1rem auto; border: 0; color: #334155; background: transparent; font-size: .86rem; cursor: pointer; }
+.login-options { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: .75rem 0 1rem; }
+.remember-option { display: inline-flex; align-items: center; gap: .45rem; color: #475569; font-size: .84rem; cursor: pointer; }
+.remember-option input { width: 18px; height: 18px; margin: 0; accent-color: #1c1f26; cursor: pointer; }
+.forgot-button { display: block; margin: 0; padding: .25rem 0; border: 0; color: #334155; background: transparent; font-size: .86rem; cursor: pointer; }
 .sign-in-button { width: 100%; min-height: 54px; border: 0; border-radius: 13px; color: #fff; background: linear-gradient(180deg,#2a2e37,#1c1f26); box-shadow: 0 6px 16px rgba(15,23,42,.25), inset 0 1px rgba(255,255,255,.13); font-size: .9rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; transition: transform 180ms ease, background-color 180ms ease; }
 .sign-in-button:hover { transform: translateY(-1px); background: #2f343e; }.sign-in-button:active { transform: none; }.sign-in-button:disabled { cursor: not-allowed; opacity: .58; }
 .login-message { margin: .8rem 0 0; padding: .7rem .85rem; border-radius: 10px; color: #991b1b; background: #fee2e2; font-size: .86rem; }
