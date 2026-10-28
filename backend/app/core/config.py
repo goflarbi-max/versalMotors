@@ -30,6 +30,8 @@ class Settings:
     login_window_seconds: int
     login_lock_seconds: int
     login_failure_delay_ms: int
+    supabase_url: str | None
+    supabase_service_role_key: str | None
 
     @property
     def password_hashes(self) -> dict[str, str]:
@@ -101,4 +103,6 @@ def get_settings() -> Settings:
         login_window_seconds=max(60, int(os.getenv("VERSALMOTORS_LOGIN_WINDOW_SECONDS", "900"))),
         login_lock_seconds=max(60, int(os.getenv("VERSALMOTORS_LOGIN_LOCK_SECONDS", "60"))),
         login_failure_delay_ms=max(0, min(2_000, int(os.getenv("VERSALMOTORS_LOGIN_FAILURE_DELAY_MS", "250")))),
+        supabase_url=os.getenv("SUPABASE_URL") or None,
+        supabase_service_role_key=os.getenv("SUPABASE_SERVICE_ROLE_KEY") or None,
     )

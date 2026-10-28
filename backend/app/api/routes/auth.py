@@ -96,7 +96,13 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
             detail=f"Too many failed attempts. Try again in {remaining} seconds.",
             headers={"Retry-After": str(remaining)},
         )
-    if not verify_password(email, payload.password, request.app.state.settings.password_hashes):
+    if not verify_password(
+        email,
+        payload.password,
+        request.app.state.settings.password_hashes,
+        request.app.state.settings.supabase_url,
+        request.app.state.settings.supabase_service_role_key,
+    ):
         delay = request.app.state.settings.login_failure_delay_ms / 1000
         if delay:
             time.sleep(delay)
@@ -115,13 +121,15 @@ def login(payload: LoginRequest, request: Request, response: Response) -> UserRe
         raise HTTPException(status_code=401, detail="Invalid email or password")
     request.app.state.login_email_limiter.clear(email_key)
     request.app.state.sessions.revoke(request.cookies.get(SESSION_COOKIE))
-    account = request.app.state.settings.auth_users[email]
+    # Local bcrypt users carry an explicit role; Supabase users default to viewer
+    account = request.app.state.settings.auth_users.get(email)
+    role = account.role if account else "viewer"
     remembered_seconds = request.app.state.settings.remember_days * 24 * 3600
     lifetime_seconds = remembered_seconds if payload.remember_me else request.app.state.settings.session_hours * 3600
     idle_seconds = remembered_seconds if payload.remember_me else request.app.state.settings.session_idle_minutes * 60
     _, token = request.app.state.sessions.create(
         email,
-        account.role,
+        role,
         lifetime_seconds=lifetime_seconds,
         idle_seconds=idle_seconds,
     )

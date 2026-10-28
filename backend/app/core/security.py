@@ -4,19 +4,56 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import logging
 import secrets
 import threading
 import time
 from dataclasses import dataclass
+
+import httpx
 
 from src.auth.credentials import normalize_email, password_matches, valid_email
 
 SESSION_COOKIE = "versal_session"
 CSRF_COOKIE = "versal_csrf"
 
+_supabase_logger = logging.getLogger("versalmotors.auth.supabase")
 
-def verify_password(email: str, password: str, users: dict[str, str]) -> bool:
-    return password_matches(email, password, users)
+
+def _verify_with_supabase(email: str, password: str, url: str, service_role_key: str) -> bool:
+    """Verify credentials against Supabase Auth. Returns True only on HTTP 200."""
+    try:
+        response = httpx.post(
+            f"{url.rstrip('/')}/auth/v1/token",
+            params={"grant_type": "password"},
+            headers={
+                "apikey": service_role_key,
+                "Content-Type": "application/json",
+            },
+            json={"email": email, "password": password},
+            timeout=10.0,
+        )
+        return response.status_code == 200
+    except Exception:
+        _supabase_logger.warning("Supabase auth check failed (provider unreachable)")
+        return False
+
+
+def verify_password(
+    email: str,
+    password: str,
+    users: dict[str, str],
+    supabase_url: str | None = None,
+    supabase_service_role_key: str | None = None,
+) -> bool:
+    """Verify credentials against bcrypt store first, then Supabase as fallback."""
+    # Primary: bcrypt check against VERSALMOTORS_AUTH_USERS_JSON (demo account)
+    if password_matches(email, password, users):
+        return True
+    # Fallback: Supabase Auth (only attempted when both env vars are set)
+    if supabase_url and supabase_service_role_key:
+        return _verify_with_supabase(email, password, supabase_url, supabase_service_role_key)
+    return False
 
 
 @dataclass(frozen=True)
