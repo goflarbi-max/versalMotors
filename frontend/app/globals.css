@@ -212,7 +212,9 @@ html[data-theme="dark"] .sidebar-logo-dark { display: none; } html:not([data-the
 .overview-chart-card { min-width: 0; margin-top: 1rem; padding: 1.25rem; border: 7px solid var(--card-outer); border-radius: 21px; color: var(--text); background: var(--surface); box-shadow: 0 12px 28px var(--card-shadow); }
 .overview-chart-card header h2 { margin: .25rem 0 .25rem; font-size: 1.2rem; }.overview-chart-card header p { margin: 0 0 1rem; color: var(--text-muted); font-size: .8rem; }
 .overview-chart-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }.overview-chart-grid .overview-chart-card { margin-top: 1rem; }
-.chart-canvas,.chart-canvas.chart-tall { width: 100%; height: 400px; min-width: 0; }
+.chart-canvas,.chart-canvas.chart-tall { position: relative; width: 100%; height: 400px; min-width: 0; }
+.overview-chart-legend { position: absolute; z-index: 2; top: 3px; right: 18px; display: inline-flex; align-items: center; gap: 6px; color: #16c060; font-size: 12px; line-height: 1; pointer-events: none; }
+.overview-chart-legend-icon { display: block; width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .chart-empty { display: grid; place-items: center; min-height: 220px; color: var(--text-muted); text-align: center; }
 .overview-state { margin-top: 1rem; padding: 2rem; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); text-align: center; }.overview-state h2 { margin: 0 0 .35rem; }.overview-state p { margin: 0; color: var(--text-muted); }.overview-state button { margin-top: 1rem; min-height: 44px; padding: .6rem 1rem; border: 0; border-radius: .7rem; color: var(--sidebar-active-text); background: var(--sidebar-active); cursor: pointer; }
 .overview-investigate-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; padding: 1.25rem; border: 1px solid var(--border); border-radius: 16px; color: var(--text); background: var(--surface); }
